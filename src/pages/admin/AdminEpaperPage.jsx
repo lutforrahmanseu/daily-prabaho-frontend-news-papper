@@ -22,7 +22,8 @@ import {
   EPAPER_EDITION_CODES,
   EPAPER_STATUS_META,
   buildPdfFragmentUrl,
-  formatPdfBytes
+  formatPdfBytes,
+  resolveEpaperApiUrl
 } from '../../utils/epaperHelpers.js';
 import { hasEffectivePermission } from '../../utils/permissions.js';
 import { toBengaliNumber } from '../../utils/bengaliFormatter.js';
@@ -130,7 +131,9 @@ export function AdminEpaperPage() {
   const [updateSubscriberTier] = useUpdateAdminEpaperSubscriberTierMutation();
 
   const { blobUrl: adminPdfBlobUrl, loading: loadingPreviewPdf } = useProtectedBlobUrl(
-    activeEdition?.has_pdf ? `/api/v1/epaper/editions/${activeEdition.id}/pdf?silent=1` : null,
+    activeEdition?.has_pdf
+      ? resolveEpaperApiUrl(`/api/v1/epaper/editions/${activeEdition.id}/pdf?silent=1`)
+      : null,
     token,
     tab !== 'pages' || !activeEdition?.has_pdf
   );

@@ -51,20 +51,41 @@ export const normalizePaginated = (response, itemNormalizer = (x) => x) => {
 };
 
 /**
- * Normalize Laravel `/storage/...` and external media URLs to avoid cross-origin issues in Vite proxy/Nginx.
+ * Resolve absolute backend origin when VITE_API_URL or VITE_BACKEND_URL points to a separate host (e.g. Render).
+ */
+const resolveCrossOriginMediaOrigin = () => {
+  const configured =
+    (typeof import.meta !== 'undefined' && (import.meta.env?.VITE_BACKEND_URL || import.meta.env?.VITE_API_URL)) ||
+    '';
+  if (!/^https?:\/\//i.test(String(configured))) return '';
+  try {
+    return new URL(String(configured)).origin;
+  } catch {
+    return '';
+  }
+};
+
+/**
+ * Normalize Laravel `/storage/...` and external media URLs to avoid cross-origin issues in Vite proxy/Nginx/Vercel.
  */
 export const normalizeMediaUrl = (url, fallback = '') => {
   if (!url || typeof url !== 'string') return fallback;
   const trimmed = url.trim();
   if (!trimmed) return fallback;
 
-  if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\/storage\//i.test(trimmed)) {
-    return trimmed.replace(/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i, '');
+  const normalizedLocal = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\/storage\//i.test(trimmed)
+    ? trimmed.replace(/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i, '')
+    : trimmed;
+
+  const remoteOrigin = resolveCrossOriginMediaOrigin();
+  if (normalizedLocal.startsWith('/storage/') && remoteOrigin) {
+    return `${remoteOrigin}${normalizedLocal}`;
   }
-  if (/^(https?:|data:|blob:|\/)/i.test(trimmed)) {
-    return trimmed;
+  if (/^(https?:|data:|blob:|\/)/i.test(normalizedLocal)) {
+    return normalizedLocal;
   }
-  return `/storage/${trimmed.replace(/^\/+/, '')}`;
+  const relativeStorage = `/storage/${normalizedLocal.replace(/^\/+/, '')}`;
+  return remoteOrigin ? `${remoteOrigin}${relativeStorage}` : relativeStorage;
 };
 
 /**
