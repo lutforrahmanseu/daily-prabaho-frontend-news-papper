@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
+  <url>
+    <loc>https://dailyprabaho.com/news/dhaka-metro-expansion-tongi-savar-feasibility</loc>
+    <news:news>
+      <news:publication>
+        <news:name>দৈনিক বার্তা প্রবাহ</news:name>
+        <news:language>bn</news:language>
+      </news:publication>
+      <news:publication_date>2026-11-10T09:15:00.000Z</news:publication_date>
+      <news:title>ঢাকা মেট্রোরেল সম্প্রসারণে নতুন গতি: টঙ্গী ও সাভার পর্যন্ত রুট সমীক্ষা সম্পন্ন</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://dailyprabaho.com/news/chittagong-port-bay-terminal-automation-container-handling</loc>
+    <news:news>
+      <news:publication>
+        <news:name>দৈনিক বার্তা প্রবাহ</news:name>
+        <news:language>bn</news:language>
+      </news:publication>
+      <news:publication_date>2026-11-09T18:20:00.000Z</news:publication_date>
+      <news:title>চট্টগ্রাম বন্দর বে-টার্মিনাল অটোমেশন: জাহাজজট শূন্যের কোঠায় নামিয়ে আনার লক্ষ্য</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://dailyprabaho.com/news/bpl-t20-grand-auction-young-talents-record-bids</loc>
+    <news:news>
+      <news:publication>
+        <news:name>দৈনিক বার্তা প্রবাহ</news:name>
+        <news:language>bn</news:language>
+      </news:publication>
+      <news:publication_date>2026-11-09T16:15:00.000Z</news:publication_date>
+      <news:title>বিপিএল টি-টোয়েন্টি নিলামে নতুন তারকার চমক: কোটি টাকার ক্লাবে তরুণ অলরাউন্ডার</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://dailyprabaho.com/news/bangladesh-bank-foreign-reserve-crosses-20-billion-dollar</loc>
+    <news:news>
+      <news:publication>
+        <news:name>দৈনিক বার্তা প্রবাহ</news:name>
+        <news:language>bn</news:language>
+      </news:publication>
+      <news:publication_date>2026-11-09T14:40:00.000Z</news:publication_date>
+      <news:title>কেন্দ্রীয় ব্যাংকের বৈদেশিক মুদ্রার রিজার্ভ ফের ২০ বিলিয়ন ডলার অতিক্রম করল</news:title>
+    </news:news>
+  </url>
+</urlset>

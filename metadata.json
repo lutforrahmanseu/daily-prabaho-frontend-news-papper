@@ -1,0 +1,6 @@
+{
+  "name": "Daily Prabaho - দৈনিক বার্তা প্রবাহ",
+  "description": "A modern, high-performance Bangladeshi digital news portal and editorial CMS platform.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

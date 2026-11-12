@@ -1,0 +1,124 @@
+/* NewsFlow Global Typography & Editorial Design System */
+@layer base {
+  :root {
+    --font-bn-sans: 'Hind Siliguri', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-bn-serif: 'Noto Serif Bengali', Georgia, Cambria, serif;
+    --font-en-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+
+    /* Editorial Crimson Palette */
+    --color-primary: #b91c1c;       /* Crimson Red */
+    --color-primary-hover: #991b1b;
+    --color-primary-light: #fef2f2;
+    --color-ink: #111827;            /* Deep Newsprint Ink */
+    --color-paper: #ffffff;          /* Pure White Background */
+    --color-paper-warm: #fcfbf9;     /* Soft Paper White */
+  }
+
+  body {
+    font-family: var(--font-bn-sans);
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+.font-serif-bn {
+  font-family: 'Noto Serif Bengali', Georgia, serif;
+}
+
+.font-sans-bn {
+  font-family: 'Hind Siliguri', -apple-system, sans-serif;
+}
+
+.font-sans-en {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+/* Rich HTML Article Content Styling */
+.rich-article-block p {
+  margin: 0;
+  color: #292524;
+  text-align: justify;
+}
+
+@media (min-width: 640px) {
+  .rich-article-block p {
+    text-align: left;
+  }
+}
+
+.rich-article-block h2,
+.rich-article-block h3,
+.rich-article-block h4 {
+  font-family: var(--font-bn-serif);
+  font-weight: 700;
+  color: #1c1917;
+  margin-top: 0.75rem;
+  margin-bottom: 0.25rem;
+  line-height: 1.35;
+}
+
+.rich-article-block h2 {
+  font-size: 1.5rem;
+}
+
+.rich-article-block h3 {
+  font-size: 1.25rem;
+}
+
+.rich-article-block h4 {
+  font-size: 1.125rem;
+}
+
+.rich-article-block ul,
+.rich-article-block ol {
+  padding-left: 1.5rem;
+  color: #292524;
+}
+
+.rich-article-block ul {
+  list-style-type: disc;
+}
+
+.rich-article-block ol {
+  list-style-type: decimal;
+}
+
+.rich-article-block li {
+  margin-bottom: 0.35rem;
+}
+
+.rich-article-block blockquote {
+  border-left: 4px solid #b91c1c;
+  background: linear-gradient(to right, rgba(254, 242, 242, 0.7), #fafaf9);
+  padding: 1rem 1.25rem;
+  border-radius: 0 0.75rem 0.75rem 0;
+  font-style: italic;
+  font-weight: 600;
+  color: #1c1917;
+}
+
+.rich-article-block a {
+  color: #b91c1c;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.rich-article-block img {
+  border-radius: 0.75rem;
+  margin: 0.75rem 0;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Print Stylesheet for Newspaper & E-Paper clipping */
+@media print {
+  header, nav, footer, aside, .no-print {
+    display: none !important;
+  }
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+}

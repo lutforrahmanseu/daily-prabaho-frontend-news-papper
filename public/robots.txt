@@ -1,0 +1,25 @@
+# Daily Prabaho (দৈনিক বার্তা প্রবাহ) - Robots Configuration
+# https://dailyprabaho.com
+
+User-agent: *
+Allow: /
+Allow: /news/*
+Allow: /category/*
+Allow: /author/*
+Allow: /tag/*
+Allow: /search*
+Allow: /page/*
+
+# Administrative & Internal Endpoints
+Disallow: /admin/
+Disallow: /api/
+Disallow: /login
+Disallow: /admin/*
+
+# Crawl Delay to Prevent Server Overload
+Crawl-delay: 1
+
+# Sitemaps
+Sitemap: https://dailyprabaho.com/sitemap.xml
+Sitemap: https://dailyprabaho.com/sitemap-news.xml
+
