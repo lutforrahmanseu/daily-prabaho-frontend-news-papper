@@ -37,7 +37,6 @@ import PopularNews from '../../components/news/PopularNews.jsx';
 import RelatedNews from '../../components/news/RelatedNews.jsx';
 import SocialShareBar from '../../components/news/SocialShareBar.jsx';
 import RichArticleBody from '../../components/news/RichArticleBody.jsx';
-import ReadingProgress from '../../components/news/ReadingProgress.jsx';
 import NewsletterSubscription from '../../components/common/NewsletterSubscription.jsx';
 import TodayPollWidget from '../../components/news/TodayPollWidget.jsx';
 import {
@@ -321,9 +320,6 @@ export function NewsDetailsPage() {
         subcategory={article.subcategory}
         tags={article.tags}
       />
-
-      {/* 9. Article Reading Progress Bar with Remaining Time Badge */}
-      <ReadingProgress content={content} showRemainingTime={true} />
 
       {/* Top Leaderboard Advertisement Slot */}
       <AdPlacement placement="leaderboard" className="mb-4 sm:mb-6" />

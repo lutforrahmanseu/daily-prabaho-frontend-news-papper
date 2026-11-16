@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import {
   CheckCircle2,
   XCircle,
   AlertTriangle,
   Info,
-  HelpCircle
+  HelpCircle,
+  X
 } from 'lucide-react';
 import { resolveCurrentAlert, subscribeSweetAlert } from '../../utils/sweetAlert.js';
 import { MotionOverlay, SPRING_SNAPPY } from './MotionPrimitives.jsx';
@@ -103,11 +104,68 @@ export function SweetAlertHost() {
   const confirmBtnClass =
     CONFIRM_VARIANT_CLASSES[alertState?.confirmVariant] || CONFIRM_VARIANT_CLASSES.primary;
 
+  const isToast = Boolean(alertState && (alertState.toast || alertState.icon === 'success'));
+
   const handleBackdropClick = () => {
     if (alertState?.allowOutsideClick) {
       resolveCurrentAlert({ isConfirmed: false, dismiss: 'backdrop' });
     }
   };
+
+  if (isToast && alertState) {
+    return (
+      <div className="fixed top-5 right-5 z-[9999] max-w-sm w-full pointer-events-auto">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={alertState.id}
+            initial={{ opacity: 0, y: -20, x: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, x: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, x: 20, scale: 0.95 }}
+            transition={SPRING_SNAPPY}
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+            className="relative overflow-hidden rounded-2xl bg-white border border-emerald-200 shadow-2xl p-4 pr-10 text-left flex items-start gap-3.5"
+          >
+            <div className="shrink-0 w-9 h-9 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center ring-4 ring-emerald-100">
+              <CheckCircle2 className="w-5 h-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              {alertState.title && (
+                <h4 className="text-sm font-bold text-stone-900 font-serif-bn leading-tight">
+                  {alertState.title}
+                </h4>
+              )}
+              {alertState.text && (
+                <p className="mt-1 text-xs text-stone-600 leading-snug whitespace-pre-line">
+                  {alertState.text}
+                </p>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={() => resolveCurrentAlert({ isConfirmed: true, dismiss: 'close' })}
+              className="absolute top-3 right-3 text-stone-400 hover:text-stone-600 p-1 rounded-md transition-colors cursor-pointer"
+              aria-label="বার্তা বন্ধ করুন"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            {alertState.timer > 0 && alertState.timerProgressBar && (
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-emerald-50 overflow-hidden">
+                <div
+                  className="h-full origin-left bg-emerald-600 transition-all ease-linear"
+                  style={{
+                    width: isPaused ? '100%' : '0%',
+                    transitionDuration: isPaused ? '0ms' : `${alertState.timer}ms`
+                  }}
+                />
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    );
+  }
 
   return (
     <MotionOverlay

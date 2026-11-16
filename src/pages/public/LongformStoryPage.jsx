@@ -53,18 +53,6 @@ export function LongformStoryPage() {
 
   return (
     <div className={themeWrapper}>
-      {/* Accessible sticky reading progress indicator */}
-      <div
-        className="sticky top-0 z-30 h-1 bg-stone-200 dark:bg-stone-800 w-full"
-        role="progressbar"
-        aria-valuenow={scrollPct}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-label="পাঠের অগ্রগতি"
-      >
-        <div className="h-full bg-rose-700 transition-all duration-150" style={{ width: `${scrollPct}%` }} />
-      </div>
-
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-8">
         <Link
           to="/multimedia?tab=story"
