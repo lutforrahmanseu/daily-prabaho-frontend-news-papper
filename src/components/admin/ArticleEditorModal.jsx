@@ -43,7 +43,7 @@ import { toBengaliNumber } from '../../utils/bengaliFormatter.js';
 const DEFAULT_IMAGE_URL =
   'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=1200&q=80';
 
-export function ArticleEditorModal({ isOpen, onClose, articleToEdit = null }) {
+export function ArticleEditorModal({ isOpen, onClose, articleToEdit = null, onSuccess = null }) {
   const authState = useSelector((state) => state.auth || {});
   const adminState = useSelector((state) => state.admin || {});
   const authUser = authState?.user;
@@ -396,6 +396,9 @@ export function ArticleEditorModal({ isOpen, onClose, articleToEdit = null }) {
       }
 
       onClose();
+      if (typeof onSuccess === 'function') {
+        onSuccess(saved);
+      }
       await sweetAlert.success(
         articleToEdit ? 'সংবাদ হালনাগাদ হয়েছে!' : 'সংবাদ সংরক্ষিত হয়েছে!',
         successMessage
