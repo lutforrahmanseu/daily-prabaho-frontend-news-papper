@@ -3,7 +3,6 @@ import { Outlet } from 'react-router-dom';
 import TopUtilityBar from '../components/layout/TopUtilityBar.jsx';
 import Header from '../components/layout/Header.jsx';
 import Navbar from '../components/layout/Navbar.jsx';
-import BreakingTicker from '../components/layout/BreakingTicker.jsx';
 import Footer from '../components/layout/Footer.jsx';
 import SearchModal from '../components/layout/SearchModal.jsx';
 import EpaperModal from '../components/layout/EpaperModal.jsx';
@@ -31,9 +30,6 @@ export function PublicLayout({ children }) {
 
       {/* 3. Sticky Navigation */}
       <Navbar />
-
-      {/* 4. Breaking News Ticker */}
-      <BreakingTicker />
 
       {/* 5. Main Content Canvas */}
       <main id="main-content" tabIndex={-1} className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 focus:outline-none">
