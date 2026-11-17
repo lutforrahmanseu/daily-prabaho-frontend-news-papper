@@ -30,6 +30,10 @@ import {
   BookOpen,
   MessageSquare,
   HelpCircle,
+  Sun,
+  Moon,
+  Bell,
+  Crown,
   X
 } from 'lucide-react';
 import { toBengaliNumber } from '../../utils/bengaliFormatter.js';
@@ -190,6 +194,7 @@ export function AdminAiContentGeneratorPage() {
   const authState = useSelector((state) => state.auth || {});
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [showFilters, setShowFilters] = useState(true);
   const [activeMainTab, setActiveMainTab] = useState('templates'); // 'templates' | 'library' | 'brand_voice'
 
   // Generator Modal State
@@ -440,8 +445,58 @@ export function AdminAiContentGeneratorPage() {
             </p>
           </div>
 
-          {/* Quick AI Assistant Button */}
-          <div className="flex items-center gap-3">
+          {/* Top Right Header Controls matching screenshot */}
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Theme Toggle */}
+            <button
+              type="button"
+              onClick={() => sweetAlert.toast('AI স্টুডিও ডার্ক মোড সক্রিয় রয়েছে', 'info', 1600)}
+              className="p-2 rounded-xl text-stone-400 hover:text-stone-200 hover:bg-stone-800/60 transition-colors cursor-pointer"
+              title="থিম"
+            >
+              <Sun className="w-4 h-4" />
+            </button>
+
+            {/* Notification */}
+            <button
+              type="button"
+              onClick={() => sweetAlert.toast('আপনার সকল এআই কোটা ও মডেল সক্রিয় আছে', 'success', 1800)}
+              className="p-2 rounded-xl text-stone-400 hover:text-stone-200 hover:bg-stone-800/60 transition-colors cursor-pointer"
+              title="নোটিফিকেশন"
+            >
+              <Bell className="w-4 h-4" />
+            </button>
+
+            {/* User Profile matching screenshot */}
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-stone-900/80 border border-stone-800 text-xs">
+              <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center font-bold text-white text-[10px] font-mono">
+                {(authState?.user?.name || 'A').charAt(0).toUpperCase()}
+              </div>
+              <div className="hidden sm:block text-left">
+                <p className="font-bold text-stone-200 text-[11px] leading-tight">
+                  {authState?.user?.name || 'লুতফর রহমান'}
+                </p>
+                <p className="text-[9px] text-stone-500 font-mono leading-tight">
+                  {authState?.user?.email || 'newsroom@dailyprabaho.com'}
+                </p>
+              </div>
+            </div>
+
+            {/* Filter Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setShowFilters(!showFilters)}
+              className={`px-3.5 py-2 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer ${
+                showFilters
+                  ? 'bg-stone-800 border-purple-500/50 text-white'
+                  : 'bg-stone-900/90 border-stone-800 text-stone-300 hover:bg-stone-800'
+              }`}
+            >
+              <Filter className="w-3.5 h-3.5" />
+              <span>Filter</span>
+            </button>
+
+            {/* Quick AI Assistant Button */}
             <button
               type="button"
               onClick={() => handleOpenTemplate(CONTENT_TEMPLATES[0])}
@@ -530,32 +585,34 @@ export function AdminAiContentGeneratorPage() {
       {activeMainTab === 'templates' && (
         <div className="space-y-6">
 
-          {/* Category Filter Pills */}
-          <div className="flex items-center justify-between gap-3 flex-wrap">
-            <div className="flex items-center gap-1.5 p-1 bg-white border border-stone-200 rounded-2xl shadow-2xs overflow-x-auto max-w-full">
-              {FILTER_TABS.map((tab) => {
-                const isActive = activeCategory === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => setActiveCategory(tab.id)}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-                      isActive
-                        ? 'bg-purple-600 text-white shadow-xs'
-                        : 'text-stone-600 hover:text-stone-900 hover:bg-stone-50'
-                    }`}
-                  >
-                    {tab.label}
-                  </button>
-                );
-              })}
-            </div>
+          {/* Category Filter Pills (Toggled by Filter button) */}
+          {showFilters && (
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <div className="flex items-center gap-1.5 p-1 bg-[#12131c] border border-stone-800 rounded-2xl shadow-md overflow-x-auto max-w-full">
+                {FILTER_TABS.map((tab) => {
+                  const isActive = activeCategory === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => setActiveCategory(tab.id)}
+                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                        isActive
+                          ? 'bg-purple-600 text-white shadow-xs'
+                          : 'text-stone-400 hover:text-stone-100 hover:bg-stone-800/60'
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  );
+                })}
+              </div>
 
-            <div className="text-xs text-stone-500 font-mono">
-              মোট <strong>{toBengaliNumber(filteredTemplates.length)}</strong> টি টেমপ্লেট
+              <div className="text-xs text-stone-400 font-mono">
+                মোট <strong>{toBengaliNumber(filteredTemplates.length)}</strong> টি টেমপ্লেট
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Template Cards Grid (Matching the Dark Modern Glass Aesthetic) */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -566,7 +623,8 @@ export function AdminAiContentGeneratorPage() {
                   key={tpl.id}
                   whileHover={{ y: -3 }}
                   transition={{ duration: 0.18, ease: EDITORIAL_EASE }}
-                  className="relative group rounded-3xl bg-[#111218] border border-stone-800 hover:border-purple-500/40 p-6 flex flex-col justify-between shadow-xl shadow-black/20 transition-all overflow-hidden"
+                  onClick={() => handleOpenTemplate(tpl)}
+                  className="relative group rounded-3xl bg-[#111218] border border-stone-800 hover:border-purple-500/40 p-6 flex flex-col justify-between shadow-xl shadow-black/20 transition-all overflow-hidden cursor-pointer"
                 >
                   {/* Subtle Top-Right Ambient Light */}
                   <div className="absolute top-0 right-0 w-32 h-32 bg-white/2 rounded-full blur-2xl group-hover:bg-purple-600/10 transition-colors pointer-events-none" />
@@ -621,6 +679,32 @@ export function AdminAiContentGeneratorPage() {
                 </motion.div>
               );
             })}
+          </div>
+
+          {/* Upgrade to Pro Banner matching bottom-left card in screenshot */}
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-purple-950/60 via-[#12131c] to-stone-900 border border-purple-500/30 p-6 flex flex-wrap items-center justify-between gap-4 shadow-xl">
+            <div className="flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center text-white shadow-lg shadow-purple-600/30 shrink-0">
+                <Crown className="w-5 h-5 text-amber-300" />
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-white font-serif-bn">
+                  Upgrade to Pro Plan
+                </h4>
+                <p className="text-xs text-stone-400">
+                  আনলিমিটেড এআই কনটেন্ট তৈরি, জিপিটি-৪ও ইন্টিগ্রেশন এবং স্বয়ংক্রিয় ফ্যাক্ট-চেক ফিচার আনলক করুন।
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => sweetAlert.info('AI Pro প্ল্যান', 'দৈনিক বার্তা প্রবাহ এআই প্রো সাবস্ক্রিপশনে আনলিমিটেড কনটেন্ট, কাস্টম ফাইন-টিউনিং এবং টিম কলাবোরেশন সুবিধা অন্তর্ভুক্ত রয়েছে।')}
+              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white text-xs font-bold flex items-center gap-2 shadow-md shadow-purple-600/30 transition-all cursor-pointer"
+            >
+              <Sparkles className="w-4 h-4 text-amber-300" />
+              <span>Upgrade Plan</span>
+            </button>
           </div>
 
         </div>
@@ -1150,3 +1234,4 @@ ${kwText ? kwText.split(',').map(k => k.trim()).join(', ') : topic}, দৈন�
 }
 
 export default AdminAiContentGeneratorPage;
+

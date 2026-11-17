@@ -144,12 +144,15 @@ export function AdminScribeForgePage() {
 
   const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'transcribe' | 'batch' | 'live' | 'all' | 'ai_tools' | 'settings'
   const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all'); // 'all' | 'Completed' | 'Failed'
+  const searchInputRef = useRef(null);
   
   // Modals
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [urlModalOpen, setUrlModalOpen] = useState(false);
   const [liveModalOpen, setLiveModalOpen] = useState(false);
   const [batchModalOpen, setBatchModalOpen] = useState(false);
+  const [aiToolsModalOpen, setAiToolsModalOpen] = useState(false);
   const [inspectorItem, setInspectorItem] = useState(null);
 
   // Upload Form State
@@ -172,6 +175,29 @@ export function AdminScribeForgePage() {
   const [activeSegmentIndex, setActiveSegmentIndex] = useState(0);
 
   const [createNewsMutation, { isLoading: isSendingToCms }] = useCreateNewsMutation();
+
+  // Ctrl+K Global Shortcut Handler
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Simulated Playback Timer advancing segments
+  useEffect(() => {
+    let interval = null;
+    if (isPlayingAudio && inspectorItem?.segments?.length) {
+      interval = setInterval(() => {
+        setActiveSegmentIndex((prev) => (prev + 1) % inspectorItem.segments.length);
+      }, 3500);
+    }
+    return () => clearInterval(interval);
+  }, [isPlayingAudio, inspectorItem]);
 
   // Persist transcripts
   const persistTranscripts = (items) => {
@@ -201,17 +227,53 @@ export function AdminScribeForgePage() {
     };
   }, [transcripts]);
 
-  // Search filter
+  // Search & Status filter
   const filteredTranscripts = useMemo(() => {
-    if (!searchQuery.trim()) return transcripts;
-    const q = searchQuery.toLowerCase().trim();
-    return transcripts.filter(
-      (t) =>
+    return transcripts.filter((t) => {
+      const matchesStatus = statusFilter === 'all' || t.status === statusFilter;
+      const q = searchQuery.toLowerCase().trim();
+      const matchesSearch =
+        !q ||
         t.title.toLowerCase().includes(q) ||
         t.source.toLowerCase().includes(q) ||
-        t.status.toLowerCase().includes(q)
+        t.status.toLowerCase().includes(q);
+      return matchesStatus && matchesSearch;
+    });
+  }, [transcripts, searchQuery, statusFilter]);
+
+  // Handle Failed Row Interactive Click
+  const handleFailedRowClick = async (row) => {
+    const { isConfirmed } = await sweetAlert.confirm(
+      'ট্রানস্ক্রিপশন ব্যর্থ হয়েছিল',
+      `ফাইল: "${row.fileName}"\nকারণ: ${row.errorReason || 'টাইমআউট বা ফাইল ফরম্যাটজনিত ত্রুটি'}\n\nআপনি কি ফাইলটি পুনরায় আপলোড করে ট্রানস্ক্রাইব করতে চান?`,
+      'পুনরায় চেষ্টা করুন (Retry)',
+      'বাতিল'
     );
-  }, [transcripts, searchQuery]);
+    if (isConfirmed) {
+      setUploadTitle(row.title);
+      setUploadModalOpen(true);
+    }
+  };
+
+  // Simulated Live Speech for environments without mic permissions
+  const handleSimulatedLiveSpeech = () => {
+    const demoPhrases = [
+      'আজকের সংসদ অধিবেশনে বাজেট নিয়ে গুরুত্বপূর্ণ সিদ্ধান্ত নেওয়া হয়েছে।',
+      'আইসিটি মন্ত্রী জানিয়েছেন, গণমাধ্যমে রিয়েলটাইম এআই ব্যবহারে বিশেষ প্রণোদনা থাকবে।',
+      'দৈনিক বার্তা প্রবাহের সংবাদকক্ষে ট্রানস্ক্রিপশন সফলভাবে কাজ করছে।'
+    ];
+    let step = 0;
+    setIsLiveListening(true);
+    const interval = setInterval(() => {
+      if (step < demoPhrases.length) {
+        setLiveTranscriptText((prev) => (prev ? `${prev} ${demoPhrases[step]}` : demoPhrases[step]));
+        step++;
+      } else {
+        clearInterval(interval);
+        setIsLiveListening(false);
+      }
+    }, 1200);
+  };
 
   // Handle File Upload & Simulation of Transcription
   const handleStartFileTranscription = async (e) => {
@@ -583,6 +645,7 @@ export function AdminScribeForgePage() {
           <div className="relative flex-1 max-w-md">
             <Search className="w-3.5 h-3.5 absolute left-3.5 top-3 text-stone-400" />
             <input
+              ref={searchInputRef}
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -593,7 +656,7 @@ export function AdminScribeForgePage() {
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-2.5 text-stone-400 hover:text-stone-200"
+                className="absolute right-3 top-2.5 text-stone-400 hover:text-stone-200 cursor-pointer"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -604,13 +667,17 @@ export function AdminScribeForgePage() {
           <div className="flex items-center gap-3">
             <button
               type="button"
-              className="p-2 rounded-xl text-stone-400 hover:text-stone-200 hover:bg-stone-800/50 transition-colors"
+              onClick={() => sweetAlert.toast('ScribeForge ডার্ক স্টুডিও মোড সক্রিয় রয়েছে', 'info', 1800)}
+              className="p-2 rounded-xl text-stone-400 hover:text-stone-200 hover:bg-stone-800/50 transition-colors cursor-pointer"
+              title="ডার্ক মোড সক্রিয়"
             >
               <Moon className="w-4 h-4" />
             </button>
             <button
               type="button"
-              className="p-2 rounded-xl text-stone-400 hover:text-stone-200 hover:bg-stone-800/50 transition-colors"
+              onClick={() => sweetAlert.toast('সব প্রসেসিং আপডেট হালনাগাদ রয়েছে', 'success', 1800)}
+              className="p-2 rounded-xl text-stone-400 hover:text-stone-200 hover:bg-stone-800/50 transition-colors cursor-pointer"
+              title="নোটিফিকেশন"
             >
               <Bell className="w-4 h-4" />
             </button>
@@ -626,9 +693,14 @@ export function AdminScribeForgePage() {
             </button>
 
             {/* User Profile Avatar */}
-            <div className="w-7 h-7 rounded-full bg-stone-800 border border-stone-700 text-stone-300 font-bold text-xs flex items-center justify-center font-mono">
+            <button
+              type="button"
+              onClick={() => sweetAlert.info('ব্যবহারকারী প্রোফাইল', `সংবাদকক্ষ প্রোফাইল: ${authState?.user?.name || 'লুতফর রহমান'} (${authState?.user?.email || 'newsroom@dailyprabaho.com'})`)}
+              className="w-7 h-7 rounded-full bg-stone-800 hover:bg-stone-700 border border-stone-700 text-stone-300 font-bold text-xs flex items-center justify-center font-mono cursor-pointer"
+              title="প্রোফাইল তথ্য"
+            >
               {(authState?.user?.name || 'L').charAt(0).toUpperCase()}
-            </div>
+            </button>
           </div>
 
         </div>
@@ -787,17 +859,57 @@ export function AdminScribeForgePage() {
           {/* 3. RECENT TRANSCRIPTS TABLE (Matching exact rows and statuses in Image) */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold text-stone-300 tracking-wide">
-                Recent transcripts
-              </h3>
-              <button
-                type="button"
-                onClick={() => setActiveTab('all')}
-                className="text-xs font-semibold text-orange-400 hover:text-orange-300 flex items-center gap-1 cursor-pointer"
-              >
-                <span>View all</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </button>
+              <div className="flex items-center gap-2">
+                <h3 className="text-xs font-bold text-stone-300 tracking-wide">
+                  {activeTab === 'all' ? 'All Transcripts Library' : 'Recent transcripts'}
+                </h3>
+                {activeTab === 'all' && (
+                  <span className="text-[10px] text-stone-500 font-mono">
+                    (মোট {transcripts.length}টি ফাইল)
+                  </span>
+                )}
+              </div>
+
+              {activeTab === 'all' ? (
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('dashboard')}
+                  className="text-xs font-semibold text-stone-400 hover:text-stone-200 flex items-center gap-1 cursor-pointer"
+                >
+                  ← ড্যাশবোর্ডে ফিরুন
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('all')}
+                  className="text-xs font-semibold text-orange-400 hover:text-orange-300 flex items-center gap-1 cursor-pointer"
+                >
+                  <span>View all</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+
+            {/* Status Filter Tabs (All / Completed / Failed) */}
+            <div className="flex items-center gap-1.5 pb-1">
+              {[
+                { id: 'all', label: 'সকল ফাইল' },
+                { id: 'Completed', label: 'সম্পন্ন (Completed)' },
+                { id: 'Failed', label: 'ব্যর্থ (Failed)' }
+              ].map((filterTab) => (
+                <button
+                  key={filterTab.id}
+                  type="button"
+                  onClick={() => setStatusFilter(filterTab.id)}
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                    statusFilter === filterTab.id
+                      ? 'bg-orange-500/15 text-orange-400 border border-orange-500/30 font-bold'
+                      : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800/40'
+                  }`}
+                >
+                  {filterTab.label}
+                </button>
+              ))}
             </div>
 
             <div className="bg-[#12141c] rounded-2xl border border-stone-800 divide-y divide-stone-800/80 overflow-hidden">
@@ -806,14 +918,33 @@ export function AdminScribeForgePage() {
                 return (
                   <div
                     key={row.id}
-                    onClick={() => isCompleted && setInspectorItem(row)}
+                    onClick={() => {
+                      if (isCompleted) {
+                        setInspectorItem(row);
+                      } else {
+                        handleFailedRowClick(row);
+                      }
+                    }}
                     className="p-4 flex items-center justify-between gap-4 hover:bg-stone-800/30 transition-colors cursor-pointer group"
                   >
                     {/* Left Play Icon & Title/Path */}
                     <div className="flex items-center gap-3.5 min-w-0">
-                      <div className="w-8 h-8 rounded-xl bg-sky-950/40 text-sky-400 flex items-center justify-center shrink-0 border border-sky-800/40 group-hover:scale-105 transition-transform">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (isCompleted) {
+                            setInspectorItem(row);
+                            setIsPlayingAudio(true);
+                          } else {
+                            handleFailedRowClick(row);
+                          }
+                        }}
+                        className="w-8 h-8 rounded-xl bg-sky-950/40 text-sky-400 flex items-center justify-center shrink-0 border border-sky-800/40 group-hover:scale-105 hover:bg-sky-900/60 transition-transform cursor-pointer"
+                        title={isCompleted ? 'প্লে ও ইন্সপেক্ট শুনুন' : 'ব্যর্থ কারণ দেখুন'}
+                      >
                         <Play className="w-3.5 h-3.5 ml-0.5 fill-current" />
-                      </div>
+                      </button>
 
                       <div className="min-w-0">
                         <p className="text-xs font-bold text-white group-hover:text-orange-400 transition-colors truncate">
@@ -847,14 +978,19 @@ export function AdminScribeForgePage() {
                       </span>
 
                       {/* Action Menu */}
-                      <div className="relative group/menu">
+                      <div className="relative flex items-center gap-1">
                         <button
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (isCompleted) setInspectorItem(row);
+                            if (isCompleted) {
+                              setInspectorItem(row);
+                            } else {
+                              handleFailedRowClick(row);
+                            }
                           }}
-                          className="p-1 rounded-lg text-stone-400 hover:text-stone-200 hover:bg-stone-800 transition-colors"
+                          className="p-1 rounded-lg text-stone-400 hover:text-stone-200 hover:bg-stone-800 transition-colors cursor-pointer"
+                          title="বিস্তারিত অপশন"
                         >
                           <MoreVertical className="w-4 h-4" />
                         </button>
@@ -1122,7 +1258,7 @@ export function AdminScribeForgePage() {
                   )}
                 </div>
 
-                <div className="flex items-center gap-2 pt-2">
+                <div className="flex flex-wrap items-center gap-2 pt-2">
                   <button
                     type="button"
                     disabled={!liveTranscriptText.trim()}
@@ -1133,8 +1269,17 @@ export function AdminScribeForgePage() {
                   </button>
                   <button
                     type="button"
+                    onClick={handleSimulatedLiveSpeech}
+                    className="px-3.5 py-2.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs font-bold cursor-pointer flex items-center gap-1"
+                    title="মাইক্রোফোন ছাড়া টেস্ট ডেমো চালান"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                    <span>ডেমো স্পিচ</span>
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => setLiveTranscriptText('')}
-                    className="px-4 py-2.5 rounded-xl border border-stone-700 hover:bg-stone-800 text-xs text-stone-300 cursor-pointer"
+                    className="px-3 py-2.5 rounded-xl border border-stone-700 hover:bg-stone-800 text-xs text-stone-300 cursor-pointer"
                   >
                     ক্লিয়ার
                   </button>
@@ -1226,11 +1371,48 @@ export function AdminScribeForgePage() {
 
                 <button
                   type="button"
-                  onClick={() => setInspectorItem(null)}
-                  className="p-2 rounded-xl text-stone-400 hover:text-white hover:bg-stone-800"
+                  onClick={() => {
+                    setIsPlayingAudio(false);
+                    setInspectorItem(null);
+                  }}
+                  className="p-2 rounded-xl text-stone-400 hover:text-white hover:bg-stone-800 cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
+              </div>
+
+              {/* Interactive Audio Player Simulator Bar */}
+              <div className="p-3.5 rounded-2xl bg-stone-900 border border-stone-800 flex flex-wrap items-center justify-between gap-3 text-xs">
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setIsPlayingAudio(!isPlayingAudio)}
+                    className="w-9 h-9 rounded-full bg-orange-600 hover:bg-orange-500 text-white flex items-center justify-center cursor-pointer shadow-md transition-all shrink-0"
+                    title={isPlayingAudio ? 'পজ করুন' : 'প্লে করুন'}
+                  >
+                    {isPlayingAudio ? (
+                      <Pause className="w-4 h-4 fill-current" />
+                    ) : (
+                      <Play className="w-4 h-4 ml-0.5 fill-current" />
+                    )}
+                  </button>
+                  <div>
+                    <p className="font-bold text-stone-200">
+                      {isPlayingAudio ? 'অডিও প্রিভিউ চলছে...' : 'অডিও প্রিভিউ চালু করুন'}
+                    </p>
+                    <p className="text-[10px] text-stone-400 font-mono">
+                      সেগমেন্ট {activeSegmentIndex + 1} / {inspectorItem.segments?.length || 1}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Animated Equalizer Visualizer */}
+                <div className="flex items-center gap-1.5 h-5">
+                  <span className={`w-1 bg-orange-500 rounded-full transition-all ${isPlayingAudio ? 'animate-bounce h-4' : 'h-1.5 opacity-40'}`}></span>
+                  <span className={`w-1 bg-orange-400 rounded-full transition-all ${isPlayingAudio ? 'animate-bounce h-5 delay-75' : 'h-2 opacity-40'}`}></span>
+                  <span className={`w-1 bg-amber-400 rounded-full transition-all ${isPlayingAudio ? 'animate-bounce h-3 delay-150' : 'h-1 opacity-40'}`}></span>
+                  <span className={`w-1 bg-orange-500 rounded-full transition-all ${isPlayingAudio ? 'animate-bounce h-4.5 delay-100' : 'h-2 opacity-40'}`}></span>
+                </div>
               </div>
 
               {/* Timecoded Synchronized Segments View */}
@@ -1323,3 +1505,4 @@ export function AdminScribeForgePage() {
 }
 
 export default AdminScribeForgePage;
+
