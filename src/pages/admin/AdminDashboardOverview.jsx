@@ -9,7 +9,6 @@ import {
 import { useGetAdminNewsListQuery } from '../../store/api/newsApi.js';
 import { useGetCategoriesQuery } from '../../store/api/categoryApi.js';
 import { useGetReportersQuery } from '../../store/api/reporterApi.js';
-import { useGetAuditLogsQuery } from '../../store/api/auditLogApi.js';
 import { useTransitionWorkflowMutation } from '../../store/api/workflowApi.js';
 import { extractApiError, transitionArticleWorkflow } from '../../utils/apiNormalizer.js';
 import { getEffectiveRole, hasEffectivePermission } from '../../utils/permissions.js';
@@ -32,7 +31,6 @@ import {
   CheckCircle2,
   ArrowUpRight,
   BarChart3,
-  Activity,
   Loader2,
   Eye,
   Share2,
@@ -60,7 +58,6 @@ export function AdminDashboardOverview() {
 
   const effectiveRole = getEffectiveRole(authState, adminState);
   const isSuperAdmin = effectiveRole === 'super_admin';
-  const canViewAuditLogs = hasEffectivePermission(authState, adminState, ['user.manage', 'settings.manage']);
 
   // Live Real-Time & Backend Analytics Queries
   const {
@@ -84,9 +81,6 @@ export function AdminDashboardOverview() {
     data: reportersData
   } = useGetReportersQuery({ per_page: 50 });
   const {
-    data: auditLogsData
-  } = useGetAuditLogsQuery({ per_page: 5 }, { skip: !canViewAuditLogs });
-  const {
     data: apiTopStories = []
   } = useGetTopStoriesQuery();
 
@@ -96,7 +90,6 @@ export function AdminDashboardOverview() {
 
   const articles = useMemo(() => adminNewsData?.items || [], [adminNewsData]);
   const reportersList = useMemo(() => reportersData?.items || [], [reportersData]);
-  const recentLogs = useMemo(() => auditLogsData?.items || [], [auditLogsData]);
 
   // Newspaper Masthead Dates
   const todayNewspaperDate = useMemo(() => getBengaliNewspaperDate(), []);
@@ -701,7 +694,7 @@ export function AdminDashboardOverview() {
           </div>
         </div>
 
-        {/* Action Center & Real-Time Activities */}
+        {/* Action Center & Editorial Operations (Right Col) */}
         <div className="space-y-5">
           
           {/* Pending Approval Fast-Track */}
@@ -746,51 +739,75 @@ export function AdminDashboardOverview() {
             </div>
           )}
 
-          {/* Live Newsroom Audit Activities */}
+          {/* Editorial Operations Hub */}
           <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-xs space-y-3.5">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold font-serif-bn text-stone-900 flex items-center gap-2">
-                <Activity className="w-4 h-4 text-rose-700" />
-                <span>সাম্প্রতিক কার্যক্রম (Audit Trail)</span>
+                <Layers className="w-4 h-4 text-rose-700" />
+                <span>সম্পাদকীয় অপারেশন হাব (Editorial Hub)</span>
               </h3>
-              <span className="text-[10px] text-stone-400 font-mono">লাইভ ট্রেইল</span>
+              <span className="text-[10px] text-stone-400 font-mono">কুইক অ্যাক্সেস</span>
             </div>
 
-            <div className="space-y-3">
-              {recentLogs.length === 0 ? (
-                <p className="text-xs text-stone-400 italic py-4 text-center">
-                  {canViewAuditLogs ? 'সাম্প্রতিক কোনো কার্যক্রম নেই' : 'সর্বশেষ অডিট কার্যক্রম দেখতে অ্যাডমিন অনুমতি প্রয়োজন'}
-                </p>
-              ) : (
-                recentLogs.map((act) => (
-                  <div key={act.id} className="flex items-start gap-2.5 text-xs">
-                    <div className="w-7 h-7 rounded-full bg-stone-100 text-stone-700 font-bold flex items-center justify-center shrink-0 mt-0.5 border border-stone-200 text-[11px]">
-                      {(act.userName || act.user || 'A').charAt(0).toUpperCase()}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-stone-800 leading-tight">
-                        <span className="font-bold text-stone-900">{act.userName || act.user}</span>{' '}
-                        <span className="text-stone-600">{act.actionBn || act.action}</span>
-                      </p>
-                      <p className="font-serif-bn font-semibold text-rose-700 truncate mt-0.5 text-[11px]">
-                        {act.targetBn || act.target || '—'}
-                      </p>
-                      <span className="text-[10px] text-stone-400 font-mono">
-                        {formatBengaliRelativeTime(act.timestamp)}
-                      </span>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-
-            <div className="pt-2 border-t border-stone-100 text-right">
+            <div className="grid grid-cols-2 gap-2.5">
               <Link
-                to="/admin/audit-logs"
-                className="text-xs font-bold text-rose-700 hover:underline inline-flex items-center gap-1"
+                to="/admin/workflow"
+                className="p-3 rounded-xl bg-stone-50 hover:bg-stone-100/80 border border-stone-200 transition-all group"
               >
-                <span>সম্পূর্ণ অডিট লগ দেখুন</span>
-                <ChevronRight className="w-3.5 h-3.5" />
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-stone-800 font-serif-bn group-hover:text-rose-700 transition-colors">
+                    সম্পাদকীয় ধারা
+                  </span>
+                  <ChevronRight className="w-3.5 h-3.5 text-stone-400 group-hover:text-rose-700 transition-colors" />
+                </div>
+                <p className="text-[10px] text-stone-500 mt-1 line-clamp-1">
+                  পদবি ও কর্মী অনুযায়ী পাইপলাইন
+                </p>
+              </Link>
+
+              <Link
+                to="/admin/news"
+                className="p-3 rounded-xl bg-stone-50 hover:bg-stone-100/80 border border-stone-200 transition-all group"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-stone-800 font-serif-bn group-hover:text-rose-700 transition-colors">
+                    কনটেন্ট সিএমএস
+                  </span>
+                  <ChevronRight className="w-3.5 h-3.5 text-stone-400 group-hover:text-rose-700 transition-colors" />
+                </div>
+                <p className="text-[10px] text-stone-500 mt-1 line-clamp-1">
+                  সংবাদ সম্পাদনা ও পূর্ণ আর্কাইভ
+                </p>
+              </Link>
+
+              <Link
+                to="/admin/analytics"
+                className="p-3 rounded-xl bg-stone-50 hover:bg-stone-100/80 border border-stone-200 transition-all group"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-stone-800 font-serif-bn group-hover:text-rose-700 transition-colors">
+                    পাঠক অ্যানালিটিক্স
+                  </span>
+                  <ChevronRight className="w-3.5 h-3.5 text-stone-400 group-hover:text-rose-700 transition-colors" />
+                </div>
+                <p className="text-[10px] text-stone-500 mt-1 line-clamp-1">
+                  রিয়েলটাইম ট্রাফিক ও পাঠক ডেটা
+                </p>
+              </Link>
+
+              <Link
+                to="/admin/epaper"
+                className="p-3 rounded-xl bg-stone-50 hover:bg-stone-100/80 border border-stone-200 transition-all group"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-stone-800 font-serif-bn group-hover:text-rose-700 transition-colors">
+                    ই-পেপার সংস্করণ
+                  </span>
+                  <ChevronRight className="w-3.5 h-3.5 text-stone-400 group-hover:text-rose-700 transition-colors" />
+                </div>
+                <p className="text-[10px] text-stone-500 mt-1 line-clamp-1">
+                  ডিজিটাল সংস্করণ ও আর্কাইভ
+                </p>
               </Link>
             </div>
           </div>
