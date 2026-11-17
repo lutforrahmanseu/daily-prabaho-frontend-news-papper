@@ -59,6 +59,16 @@ export const globalNewsWireApi = baseApi.injectEndpoints({
       invalidatesTags: ['GlobalWireItems', 'GlobalWireOverview', 'News']
     }),
 
+    triggerSourceFetchNow: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/admin/global-wire/sources/${id}/fetch`,
+        method: 'POST',
+        body
+      }),
+      transformResponse: (res) => res?.data || res,
+      invalidatesTags: ['GlobalWireItems', 'GlobalWireOverview', 'News']
+    }),
+
     convertWireItem: builder.mutation({
       query: (body) => ({
         url: '/admin/global-wire/convert-item',
@@ -80,6 +90,7 @@ export const {
   useDeleteGlobalWireSourceMutation,
   useGetGlobalWireItemsQuery,
   useTriggerWireFetchNowMutation,
+  useTriggerSourceFetchNowMutation,
   useConvertWireItemMutation
 } = globalNewsWireApi;
 
