@@ -59,7 +59,8 @@ import {
   GitPullRequest,
   KeyRound,
   User,
-  Wallet
+  Wallet,
+  Wand2
 } from 'lucide-react';
 
 /**
@@ -345,6 +346,15 @@ export function AdminLayout({ children }) {
       requiredPermission: ['ai.use', 'ai.logs.view', 'ai.settings.manage'],
       badge: 'AI',
       badgeColor: 'bg-indigo-600 text-white'
+    },
+    {
+      name: 'AI কনটেন্ট স্টুডিও',
+      nameEn: 'AI Content',
+      path: '/admin/ai-content',
+      icon: Wand2,
+      requiredPermission: ['ai.use', 'news.create'],
+      badge: 'PRO',
+      badgeColor: 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
     },
     {
       name: 'নিউজ ক্রিয়েটর স্টুডিও',

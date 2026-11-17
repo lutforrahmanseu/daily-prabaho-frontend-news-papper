@@ -81,6 +81,7 @@ const AdminAuditLogsPage = lazy(() => import('../pages/admin/AdminAuditLogsPage.
 const AdminEngagementPage = lazy(() => import('../pages/admin/AdminEngagementPage.jsx'));
 const AdminEpaperPage = lazy(() => import('../pages/admin/AdminEpaperPage.jsx'));
 const AdminAiAssistantPage = lazy(() => import('../pages/admin/AdminAiAssistantPage.jsx'));
+const AdminAiContentGeneratorPage = lazy(() => import('../pages/admin/AdminAiContentGeneratorPage.jsx'));
 const AdminCreatorStudioPage = lazy(() => import('../pages/admin/creator-studio/AdminCreatorStudioPage.jsx'));
 const CreatorShowcasePage = lazy(() => import('../pages/public/CreatorShowcasePage.jsx'));
 const AdminMonetizationPage = lazy(() => import('../pages/admin/AdminMonetizationPage.jsx'));
@@ -449,6 +450,16 @@ export function AppRoutes() {
             element={
               <ProtectedRoute requiredPermission={['ai.use', 'ai.logs.view', 'ai.settings.manage']}>
                 <AdminAiAssistantPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* AI Content Generator Studio */}
+          <Route
+            path="ai-content"
+            element={
+              <ProtectedRoute requiredPermission={['ai.use', 'news.create']}>
+                <AdminAiContentGeneratorPage />
               </ProtectedRoute>
             }
           />
