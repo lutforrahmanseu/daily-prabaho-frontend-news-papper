@@ -90,12 +90,24 @@ export function AdminNewsPage() {
       const matchesSearch =
         !searchLower ||
         art.title?.toLowerCase().includes(searchLower) ||
+        art.titleEn?.toLowerCase().includes(searchLower) ||
         art.excerpt?.toLowerCase().includes(searchLower) ||
+        art.summary?.toLowerCase().includes(searchLower) ||
         art.author?.toLowerCase().includes(searchLower) ||
         art.reporter?.toLowerCase().includes(searchLower) ||
+        art.categoryName?.toLowerCase().includes(searchLower) ||
         art.slug?.toLowerCase().includes(searchLower);
 
-      const matchesCat = categoryFilter === 'all' || art.category === categoryFilter;
+      const matchesCat =
+        categoryFilter === 'all' ||
+        art.category === categoryFilter ||
+        art.categoryName === categoryFilter ||
+        String(art.categoryId) === String(categoryFilter) ||
+        art.categoryObj?.slug === categoryFilter ||
+        art.categoryObj?.name === categoryFilter ||
+        art.subcategory === categoryFilter ||
+        art.subcategoryName === categoryFilter ||
+        String(art.subcategoryId) === String(categoryFilter);
 
       const currentStatus = art.status || 'published';
       const matchesStatus =
@@ -106,20 +118,35 @@ export function AdminNewsPage() {
             : currentStatus === statusFilter;
 
       let matchesDate = true;
-      if (dateFilter !== 'all' && (art.publishedAt || art.createdAt)) {
-        const articleDate = new Date(art.publishedAt || art.createdAt);
-        const now = new Date();
+      if (dateFilter !== 'all') {
+        const rawDate = art.publishedAt || art.createdAt;
+        if (!rawDate) {
+          matchesDate = true;
+        } else {
+          const articleDate = new Date(rawDate);
+          const now = new Date();
 
-        if (dateFilter === 'today') {
-          matchesDate = articleDate.toDateString() === now.toDateString();
-        } else if (dateFilter === 'this_week') {
-          const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-          matchesDate = articleDate >= oneWeekAgo;
-        } else if (dateFilter === 'this_month') {
-          matchesDate = articleDate.getMonth() === now.getMonth() && articleDate.getFullYear() === now.getFullYear();
-        } else if (dateFilter === 'custom' && (customStartDate || customEndDate)) {
-          if (customStartDate && new Date(customStartDate) > articleDate) matchesDate = false;
-          if (customEndDate && new Date(customEndDate + 'T23:59:59') < articleDate) matchesDate = false;
+          if (dateFilter === 'today') {
+            const isSameLocal =
+              articleDate.getFullYear() === now.getFullYear() &&
+              articleDate.getMonth() === now.getMonth() &&
+              articleDate.getDate() === now.getDate();
+            const isSameUtc =
+              articleDate.getUTCFullYear() === now.getUTCFullYear() &&
+              articleDate.getUTCMonth() === now.getUTCMonth() &&
+              articleDate.getUTCDate() === now.getUTCDate();
+            matchesDate = isSameLocal || isSameUtc;
+          } else if (dateFilter === 'this_week') {
+            const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            matchesDate = articleDate >= oneWeekAgo;
+          } else if (dateFilter === 'this_month') {
+            matchesDate =
+              articleDate.getMonth() === now.getMonth() &&
+              articleDate.getFullYear() === now.getFullYear();
+          } else if (dateFilter === 'custom' && (customStartDate || customEndDate)) {
+            if (customStartDate && new Date(customStartDate) > articleDate) matchesDate = false;
+            if (customEndDate && new Date(customEndDate + 'T23:59:59') < articleDate) matchesDate = false;
+          }
         }
       }
 
@@ -607,19 +634,87 @@ export function AdminNewsPage() {
               ) : paginatedArticles.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="py-16 text-center text-stone-500 text-xs">
-                    <p className="italic">কোনো সংবাদ খুঁজে পাওয়া যায়নি (No matching news found)</p>
-                    {isFiltered && (
-                      <div className="mt-3">
-                        <button
-                          type="button"
-                          onClick={resetAllFilters}
-                          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 text-xs font-semibold cursor-pointer transition-colors shadow-xs"
-                        >
-                          <RotateCcw className="w-3.5 h-3.5" />
-                          <span>ফিল্টার রিসেট করে সব সংবাদ দেখুন</span>
-                        </button>
+                    <div className="max-w-md mx-auto space-y-3">
+                      <div className="w-10 h-10 rounded-full bg-stone-100 text-stone-400 mx-auto flex items-center justify-center">
+                        <Search className="w-5 h-5" />
                       </div>
-                    )}
+                      <div>
+                        <p className="font-bold text-stone-800 text-sm">
+                          {isFiltered ? 'ফিল্টারের সাথে মেলে এমন কোনো সংবাদ পাওয়া যায়নি' : 'এখনো কোনো সংবাদ নেই'}
+                        </p>
+                        <p className="text-stone-500 text-xs mt-1">
+                          {isFiltered
+                            ? 'অনুসন্ধান বা ফিল্টারের শর্ত পরিবর্তন করুন অথবা সব সংবাদ দেখতে রিসেট করুন।'
+                            : 'নতুন সংবাদ যুক্ত করতে উপরের "নতুন সংবাদ প্রকাশ করুন" বোতামে ক্লিক করুন।'}
+                        </p>
+                      </div>
+
+                      {isFiltered && (
+                        <div className="flex flex-wrap items-center justify-center gap-1.5 pt-1">
+                          {tableSearch && (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-stone-100 text-stone-700 text-[11px] font-medium">
+                              অনুসন্ধান: "{tableSearch}"
+                              <button
+                                type="button"
+                                onClick={() => setTableSearch('')}
+                                className="text-stone-400 hover:text-stone-700 cursor-pointer"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </span>
+                          )}
+                          {categoryFilter !== 'all' && (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-stone-100 text-stone-700 text-[11px] font-medium">
+                              বিভাগ: {categoriesList.find(c => c.slug === categoryFilter)?.name || categoryFilter}
+                              <button
+                                type="button"
+                                onClick={() => setCategoryFilter('all')}
+                                className="text-stone-400 hover:text-stone-700 cursor-pointer"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </span>
+                          )}
+                          {dateFilter !== 'all' && (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-stone-100 text-stone-700 text-[11px] font-medium">
+                              সময়কাল: {dateFilter === 'today' ? 'আজ' : dateFilter === 'this_week' ? 'গত ৭ দিন' : dateFilter === 'this_month' ? 'এই মাস' : 'নির্দিষ্ট'}
+                              <button
+                                type="button"
+                                onClick={() => setDateFilter('all')}
+                                className="text-stone-400 hover:text-stone-700 cursor-pointer"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </span>
+                          )}
+                          {statusFilter !== 'all' && (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-stone-100 text-stone-700 text-[11px] font-medium">
+                              স্ট্যাটাস: {statusFilter}
+                              <button
+                                type="button"
+                                onClick={() => setStatusFilter('all')}
+                                className="text-stone-400 hover:text-stone-700 cursor-pointer"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </span>
+                          )}
+                        </div>
+                      )}
+
+                      {isFiltered && (
+                        <div className="pt-2">
+                          <button
+                            type="button"
+                            onClick={resetAllFilters}
+                            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-rose-700 text-white hover:bg-rose-800 text-xs font-bold cursor-pointer transition-colors shadow-xs"
+                          >
+                            <RotateCcw className="w-3.5 h-3.5" />
+                            <span>সব ফিল্টার মুছে ফেলুন</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ) : (
