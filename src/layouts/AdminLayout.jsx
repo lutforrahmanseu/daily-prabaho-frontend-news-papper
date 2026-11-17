@@ -60,7 +60,8 @@ import {
   KeyRound,
   User,
   Wallet,
-  Wand2
+  Wand2,
+  FileAudio
 } from 'lucide-react';
 
 /**
@@ -355,6 +356,15 @@ export function AdminLayout({ children }) {
       requiredPermission: ['ai.use', 'news.create'],
       badge: 'PRO',
       badgeColor: 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
+    },
+    {
+      name: 'ScribeForge ট্রানস্ক্রাইব',
+      nameEn: 'ScribeForge Studio',
+      path: '/admin/scribeforge',
+      icon: FileAudio,
+      requiredPermission: ['ai.use', 'news.create'],
+      badge: 'v1.0',
+      badgeColor: 'bg-orange-600 text-white'
     },
     {
       name: 'নিউজ ক্রিয়েটর স্টুডিও',

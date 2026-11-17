@@ -82,6 +82,7 @@ const AdminEngagementPage = lazy(() => import('../pages/admin/AdminEngagementPag
 const AdminEpaperPage = lazy(() => import('../pages/admin/AdminEpaperPage.jsx'));
 const AdminAiAssistantPage = lazy(() => import('../pages/admin/AdminAiAssistantPage.jsx'));
 const AdminAiContentGeneratorPage = lazy(() => import('../pages/admin/AdminAiContentGeneratorPage.jsx'));
+const AdminScribeForgePage = lazy(() => import('../pages/admin/AdminScribeForgePage.jsx'));
 const AdminCreatorStudioPage = lazy(() => import('../pages/admin/creator-studio/AdminCreatorStudioPage.jsx'));
 const CreatorShowcasePage = lazy(() => import('../pages/public/CreatorShowcasePage.jsx'));
 const AdminMonetizationPage = lazy(() => import('../pages/admin/AdminMonetizationPage.jsx'));
@@ -460,6 +461,24 @@ export function AppRoutes() {
             element={
               <ProtectedRoute requiredPermission={['ai.use', 'news.create']}>
                 <AdminAiContentGeneratorPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* ScribeForge Audio/Video Transcriber & Subtitle Studio */}
+          <Route
+            path="scribeforge"
+            element={
+              <ProtectedRoute requiredPermission={['ai.use', 'news.create']}>
+                <AdminScribeForgePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="transcribe"
+            element={
+              <ProtectedRoute requiredPermission={['ai.use', 'news.create']}>
+                <AdminScribeForgePage />
               </ProtectedRoute>
             }
           />
