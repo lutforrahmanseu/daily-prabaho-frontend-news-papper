@@ -7,8 +7,7 @@ import {
   useGetRealtimeAnalyticsQuery
 } from '../../store/api/analyticsApi.js';
 import {
-  useGetAdminNewsListQuery,
-  useDeleteNewsMutation
+  useGetAdminNewsListQuery
 } from '../../store/api/newsApi.js';
 import { useGetCategoriesQuery } from '../../store/api/categoryApi.js';
 import { useGetReportersQuery } from '../../store/api/reporterApi.js';
@@ -17,8 +16,6 @@ import { useTransitionWorkflowMutation } from '../../store/api/workflowApi.js';
 import { extractApiError, transitionArticleWorkflow } from '../../utils/apiNormalizer.js';
 import { getEffectiveRole, hasEffectivePermission } from '../../utils/permissions.js';
 import { toBengaliNumber, formatBengaliRelativeTime } from '../../utils/bengaliFormatter.js';
-import ArticleEditorModal from '../../components/admin/ArticleEditorModal.jsx';
-import Table from '../../components/Table.jsx';
 import sweetAlert from '../../utils/sweetAlert.js';
 import {
   EDITORIAL_EASE,
@@ -34,9 +31,6 @@ import {
   XCircle,
   ArrowUpRight,
   BarChart3,
-  Edit,
-  Trash2,
-  ExternalLink,
   Activity,
   Loader2
 } from 'lucide-react';
@@ -58,11 +52,7 @@ export function AdminDashboardOverview() {
   const { data: reportersData } = useGetReportersQuery({ per_page: 50 });
   const { data: auditLogsData } = useGetAuditLogsQuery({ per_page: 6 }, { skip: !canViewAuditLogs });
 
-  const [deleteNewsMutation] = useDeleteNewsMutation();
   const [transitionWorkflow] = useTransitionWorkflowMutation();
-
-  const [editorModalOpen, setEditorModalOpen] = useState(false);
-  const [editingArticle, setEditingArticle] = useState(null);
 
   const articles = useMemo(() => adminNewsData?.items || [], [adminNewsData]);
   const reportersList = useMemo(() => reportersData?.items || [], [reportersData]);
@@ -79,8 +69,6 @@ export function AdminDashboardOverview() {
   const totalReportersCount = overview?.total_reporters ?? reportersList.length;
   const publishedToday = realtime?.published_today ?? 0;
   const viewsToday = realtime?.views_today ?? 0;
-  const recentArticles = useMemo(() => articles.slice(0, 6), [articles]);
-
   // Real weekly readership series aggregated by publish/create weekday
   const weeklyChartData = useMemo(() => {
     const map = BENGALI_DAYS.map((day, idx) => ({
@@ -173,95 +161,6 @@ export function AdminDashboardOverview() {
       await sweetAlert.error('প্রত্যাখ্যান ব্যর্থ হয়েছে', extractApiError(error, 'প্রত্যাখ্যান করতে ব্যর্থ হয়েছে।'));
     }
   };
-
-  const handleEdit = (article) => {
-    setEditingArticle(article);
-    setEditorModalOpen(true);
-  };
-
-  const handleDelete = async (id, title) => {
-    const { isConfirmed } = await sweetAlert.confirmDelete(
-      title,
-      `আপনি কি "${title}" সংবাদটি অপসারণ করতে চান?`
-    );
-    if (!isConfirmed) return;
-
-    try {
-      await deleteNewsMutation(id).unwrap();
-      await sweetAlert.success('অপসারিত হয়েছে!', 'সংবাদটি সফলভাবে মুছে ফেলা হয়েছে।');
-    } catch (error) {
-      await sweetAlert.error('মুছে ফেলা যায়নি', extractApiError(error, 'সংবাদটি মুছে ফেলতে ব্যর্থ হয়েছে।'));
-    }
-  };
-
-  // Recent articles table columns
-  const tableColumns = [
-    {
-      header: 'শিরোনাম ও স্ট্যাটাস',
-      accessor: 'title',
-      render: (row) => (
-        <div className="max-w-md font-serif-bn">
-          <p className="font-bold text-stone-900 line-clamp-1 hover:text-rose-700 transition-colors">
-            {row.title}
-          </p>
-          <div className="flex items-center gap-2 text-[10px] text-stone-500 mt-0.5">
-            <span className="font-sans px-1.5 py-0.2 rounded bg-stone-100 text-stone-700 font-medium">
-              {row.categoryName}
-            </span>
-            {row.isLead && <span className="text-rose-700 font-bold">★ প্রধান শীর্ষ</span>}
-            {row.isBreaking && <span className="text-amber-700 font-bold">⚡ ব্রেকিং</span>}
-          </div>
-        </div>
-      )
-    },
-    {
-      header: 'প্রতিবেদক',
-      accessor: 'author',
-      render: (row) => <span className="text-xs text-stone-700 font-medium">{row.author}</span>
-    },
-    {
-      header: 'সময়',
-      accessor: 'publishedAt',
-      render: (row) => (
-        <span className="text-xs text-stone-500 font-mono">
-          {formatBengaliRelativeTime(row.publishedAt)}
-        </span>
-      )
-    },
-    {
-      header: 'ভিউ',
-      accessor: 'views',
-      render: (row) => (
-        <span className="font-mono text-xs font-bold text-stone-800">
-          {toBengaliNumber(row.views || 0)}
-        </span>
-      )
-    },
-    {
-      header: 'পদক্ষেপ',
-      align: 'right',
-      render: (row) => (
-        <div className="flex items-center justify-end gap-1.5">
-          <button
-            type="button"
-            onClick={() => handleEdit(row)}
-            className="p-1.5 rounded-md text-blue-600 hover:bg-blue-50 transition-colors"
-            title="সম্পাদনা করুন"
-          >
-            <Edit className="w-3.5 h-3.5" />
-          </button>
-          <button
-            type="button"
-            onClick={() => handleDelete(row.id, row.title)}
-            className="p-1.5 rounded-md text-rose-600 hover:bg-rose-50 transition-colors"
-            title="অপসারণ করুন"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      )
-    }
-  ];
 
   return (
     <div className="space-y-6">
@@ -635,39 +534,6 @@ export function AdminDashboardOverview() {
         </div>
 
       </div>
-
-      {/* 5. Recent News Table */}
-      <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-xs space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-base font-bold font-serif-bn text-stone-900">
-              সাম্প্রতিক প্রকাশিত সংবাদসমূহ
-            </h3>
-            <p className="text-xs text-stone-500 mt-0.5">
-              সর্বশেষ প্রকাশিত প্রতিবেদন, পাঠ প্রতিক্রিয়া এবং কার্যসমূহ
-            </p>
-          </div>
-          <Link
-            to="/admin/news"
-            className="text-xs font-bold text-rose-700 hover:underline flex items-center gap-1"
-          >
-            <span>সকল সংবাদ টেবিল</span>
-            <ExternalLink className="w-3.5 h-3.5" />
-          </Link>
-        </div>
-
-        <Table
-          columns={tableColumns}
-          data={recentArticles}
-        />
-      </div>
-
-      {/* Article Editor Modal */}
-      <ArticleEditorModal
-        isOpen={editorModalOpen}
-        onClose={() => setEditorModalOpen(false)}
-        articleToEdit={editingArticle}
-      />
     </div>
   );
 }
