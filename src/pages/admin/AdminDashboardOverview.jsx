@@ -606,15 +606,15 @@ export function AdminDashboardOverview() {
               recentLogs.map((act) => (
                 <div key={act.id} className="flex items-start gap-3 text-xs">
                   <div className="w-8 h-8 rounded-full bg-rose-50 text-rose-700 font-bold flex items-center justify-center shrink-0 mt-0.5 border border-rose-100">
-                    {(act.userName || 'A').charAt(0).toUpperCase()}
+                    {(act.userName || act.user || 'A').charAt(0).toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-stone-800">
                       <span className="font-bold text-stone-900">{act.userName || act.user}</span>{' '}
-                      <span className="text-stone-600">{act.action}</span>
+                      <span className="text-stone-600">{act.actionBn || act.action}</span>
                     </p>
                     <p className="font-serif-bn font-semibold text-rose-700 truncate mt-0.5">
-                      {act.target || act.modelType || act.url}
+                      {act.targetBn || act.target || '—'}
                     </p>
                     <span className="text-[10px] text-stone-400">{formatBengaliRelativeTime(act.timestamp)}</span>
                   </div>

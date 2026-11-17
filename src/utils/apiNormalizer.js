@@ -5,6 +5,7 @@
  */
 
 import { stripHtmlTags } from './securitySanitizer.js';
+import { toBengaliNumber } from './bengaliFormatter.js';
 
 const FALLBACK_ARTICLE_IMAGE =
   'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=1200&q=80';
@@ -454,19 +455,147 @@ export const normalizeAdvertisement = (ad) => {
   };
 };
 
+const AUDIT_MODEL_MAP = {
+  editorialplan: 'সম্পাদকীয় পরিকল্পনা',
+  editorialplanitem: 'পরিকল্পনা উপাদান',
+  news: 'সংবাদ প্রতিবেদন',
+  assignment: 'রিপোর্টিং অ্যাসাইনমেন্ট',
+  user: 'ব্যবহারকারী অ্যাকাউন্ট',
+  reporter: 'প্রতিবেদক প্রোফাইল',
+  author: 'লেখক প্রোফাইল',
+  category: 'সংবাদ বিভাগ',
+  tag: 'ট্যাগ',
+  medium: 'মিডিয়া ফাইল',
+  media: 'মিডিয়া ফাইল',
+  setting: 'সিস্টেম সেটিংস',
+  role: 'নির্ধারিত ভূমিকা',
+  permission: 'অনুমতি',
+  epaperedition: 'ই-পেপার সংস্করণ',
+  epaperpage: 'ই-পেপার পাতা',
+  liveblog: 'লাইভ ব্লগ',
+  liveblogupdate: 'লাইভ আপডেট',
+  specialcoverage: 'বিশেষ কাভারেজ',
+  specialcoverageitem: 'কাভারেজ আইটেম',
+  longformstory: 'দীর্ঘ প্রতিবেদন',
+  creatorproject: 'ক্রিয়েটর প্রজেক্ট',
+  creatorsocialasset: 'সোশ্যাল অ্যাসেট',
+  creatorvideoscript: 'ভিডিও স্ক্রিপ্ট',
+  creatorpublishjob: 'ক্রিয়েটর প্রকাশনা',
+  newslettersubscriber: 'নিউজলেটার গ্রাহক',
+  citizensubmission: 'সিটিজেন রিপোর্ট',
+  source: 'গোপনীয় সোর্স',
+  api_mutation: 'সিস্টেম অ্যাকশন'
+};
+
+const AUDIT_ACTION_MAP = {
+  'planning.saved': 'সম্পাদকীয় পরিকল্পনা তৈরি করেছেন',
+  'planning.created': 'সম্পাদকীয় পরিকল্পনা তৈরি করেছেন',
+  'planning.updated': 'সম্পাদকীয় পরিকল্পনা হালনাগাদ করেছেন',
+  'planning.deleted': 'সম্পাদকীয় পরিকল্পনা মুছে ফেলেছেন',
+  'news.created': 'নতুন সংবাদ তৈরি করেছেন',
+  'news.updated': 'সংবাদ সম্পাদনা করেছেন',
+  'news.deleted': 'সংবাদ অপসারণ করেছেন',
+  'news.published': 'সংবাদ লাইভ প্রকাশ করেছেন',
+  'publish_news': 'সংবাদ লাইভ প্রকাশ করেছেন',
+  'news.transition': 'সংবাদের কাজের ধাপ পরিবর্তন করেছেন',
+  'assignment.created': 'অ্যাসাইনমেন্ট তৈরি করেছেন',
+  'assignment.updated': 'অ্যাসাইনমেন্ট পরিবর্তন করেছেন',
+  'assignment.submitted': 'অ্যাসাইনমেন্ট জমা দিয়েছেন',
+  'assignment.approved': 'অ্যাসাইনমেন্ট অনুমোদন করেছেন',
+  'assignment.deleted': 'অ্যাসাইনমেন্ট মুছে ফেলেছেন',
+  'user.created': 'নতুন কর্মী যুক্ত করেছেন',
+  'user.updated': 'কর্মী তথ্য হালনাগাদ করেছেন',
+  'user.status': 'কর্মী স্ট্যাটাস পরিবর্তন করেছেন',
+  'user.deleted': 'কর্মী অপসারণ করেছেন',
+  'category.created': 'নতুন ক্যাটাগরি তৈরি করেছেন',
+  'category.updated': 'ক্যাটাগরি হালনাগাদ করেছেন',
+  'category.deleted': 'ক্যাটাগরি মুছে ফেলেছেন',
+  'live_blog.created': 'লাইভ ব্লগ শুরু করেছেন',
+  'live_blog.updated': 'লাইভ ব্লগ হালনাগাদ করেছেন',
+  'live_blog.status_changed': 'লাইভ ব্লগ স্থিতি পরিবর্তন করেছেন',
+  'live_update.created': 'লাইভ আপডেট যোগ করেছেন',
+  'live_update.approved': 'লাইভ আপডেট অনুমোদন করেছেন',
+  'live_update.edited': 'লাইভ আপডেট সংশোধন করেছেন',
+  'live_update.corrected': 'লাইভ আপডেট সংশোধন করেছেন',
+  'special_coverage.created': 'বিশেষ কাভারেজ তৈরি করেছেন',
+  'special_coverage.updated': 'বিশেষ কাভারেজ হালনাগাদ করেছেন',
+  'auth.login': 'লগইন করেছেন',
+  'auth.logout': 'লগআউট করেছেন',
+  'auth.password_changed': 'পাসওয়ার্ড পরিবর্তন করেছেন'
+};
+
+export const formatAuditModelName = (auditableType) => {
+  if (!auditableType) return 'সিস্টেম উপাদান';
+  const clean = String(auditableType)
+    .replace(/^App\\Models\\/i, '')
+    .replace(/^[A-Za-z0-9_]+\\/, '')
+    .toLowerCase();
+  return AUDIT_MODEL_MAP[clean] || clean;
+};
+
+export const formatAuditTarget = (log) => {
+  if (!log || typeof log !== 'object') return '—';
+  const type = log.auditable_type || log.modelType || '';
+  const id = log.auditable_id || log.modelId || '';
+  const newVals = log.new_values && typeof log.new_values === 'object' ? log.new_values : null;
+  const oldVals = log.old_values && typeof log.old_values === 'object' ? log.old_values : null;
+
+  const modelLabel = formatAuditModelName(type);
+  const title =
+    newVals?.title ||
+    oldVals?.title ||
+    newVals?.name ||
+    oldVals?.name ||
+    newVals?.headline ||
+    oldVals?.headline ||
+    (newVals?.plan_date ? `তারিখ: ${newVals.plan_date}` : '');
+
+  if (title) {
+    return `${modelLabel}: "${title}"${id ? ` (#${toBengaliNumber(id)})` : ''}`;
+  }
+
+  if (id) {
+    return `${modelLabel} (#${toBengaliNumber(id)})`;
+  }
+
+  if (type) {
+    return modelLabel;
+  }
+
+  return log.target || log.url || '—';
+};
+
+export const formatAuditAction = (action) => {
+  if (!action) return 'কার্যক্রম সম্পাদিত';
+  const act = String(action).toLowerCase().trim();
+  if (AUDIT_ACTION_MAP[act]) return AUDIT_ACTION_MAP[act];
+
+  if (act.startsWith('post:')) return 'নতুন তথ্য যোগ করেছেন';
+  if (act.startsWith('put:') || act.startsWith('patch:')) return 'তথ্য হালনাগাদ করেছেন';
+  if (act.startsWith('delete:')) return 'তথ্য অপসারণ করেছেন';
+
+  return String(action).replace(/[._]/g, ' ');
+};
+
 export const normalizeAuditLog = (log) => {
   if (!log || typeof log !== 'object') return log;
   const userObj = typeof log.user === 'object' ? log.user : null;
+  const targetLabel = formatAuditTarget(log);
+  const actionLabel = formatAuditAction(log.action);
+
   return {
     ...log,
     id: log.id,
     timestamp: log.created_at || log.timestamp || new Date().toISOString(),
     user: userObj?.name || (typeof log.user === 'string' ? log.user : 'System'),
+    userName: userObj?.name || (typeof log.user === 'string' ? log.user : 'System'),
     role: userObj?.designation || '',
-    action: log.action || '',
-    target: log.auditable_type
-      ? `${log.auditable_type}${log.auditable_id ? ` #${log.auditable_id}` : ''}`
-      : (log.target || '—'),
+    action: actionLabel,
+    rawAction: log.action || '',
+    actionBn: actionLabel,
+    target: targetLabel,
+    targetBn: targetLabel,
+    modelNameBn: formatAuditModelName(log.auditable_type),
     ip: log.ip_address || log.ip || '127.0.0.1'
   };
 };
