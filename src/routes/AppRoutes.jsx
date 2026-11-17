@@ -83,6 +83,7 @@ const AdminEpaperPage = lazy(() => import('../pages/admin/AdminEpaperPage.jsx'))
 const AdminAiAssistantPage = lazy(() => import('../pages/admin/AdminAiAssistantPage.jsx'));
 const AdminAiContentGeneratorPage = lazy(() => import('../pages/admin/AdminAiContentGeneratorPage.jsx'));
 const AdminScribeForgePage = lazy(() => import('../pages/admin/AdminScribeForgePage.jsx'));
+const AdminGlobalNewsWirePage = lazy(() => import('../pages/admin/AdminGlobalNewsWirePage.jsx'));
 const AdminCreatorStudioPage = lazy(() => import('../pages/admin/creator-studio/AdminCreatorStudioPage.jsx'));
 const CreatorShowcasePage = lazy(() => import('../pages/public/CreatorShowcasePage.jsx'));
 const AdminMonetizationPage = lazy(() => import('../pages/admin/AdminMonetizationPage.jsx'));
@@ -479,6 +480,24 @@ export function AppRoutes() {
             element={
               <ProtectedRoute requiredPermission={['ai.use', 'news.create']}>
                 <AdminScribeForgePage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Phase 36: Global AI News Wire Aggregator & Auto-Publisher */}
+          <Route
+            path="global-wire"
+            element={
+              <ProtectedRoute requiredPermission={['ai.use', 'news.create']}>
+                <AdminGlobalNewsWirePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="wire"
+            element={
+              <ProtectedRoute requiredPermission={['ai.use', 'news.create']}>
+                <AdminGlobalNewsWirePage />
               </ProtectedRoute>
             }
           />

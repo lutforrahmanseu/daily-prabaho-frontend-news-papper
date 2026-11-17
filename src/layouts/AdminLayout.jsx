@@ -61,7 +61,8 @@ import {
   User,
   Wallet,
   Wand2,
-  FileAudio
+  FileAudio,
+  Globe
 } from 'lucide-react';
 
 /**
@@ -365,6 +366,15 @@ export function AdminLayout({ children }) {
       requiredPermission: ['ai.use', 'news.create'],
       badge: 'v1.0',
       badgeColor: 'bg-orange-600 text-white'
+    },
+    {
+      name: 'বিশ্ব সংবাদ অটোমেশন (Wire)',
+      nameEn: 'Global AI News Wire',
+      path: '/admin/global-wire',
+      icon: Globe,
+      requiredPermission: ['ai.use', 'news.create'],
+      badge: 'AUTO',
+      badgeColor: 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white'
     },
     {
       name: 'নিউজ ক্রিয়েটর স্টুডিও',
