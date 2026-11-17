@@ -36,7 +36,9 @@ import {
   CheckCheck,
   Image as ImageIcon,
   Upload,
-  UploadCloud
+  UploadCloud,
+  List,
+  LayoutGrid
 } from 'lucide-react';
 import { toBengaliNumber } from '../../utils/bengaliFormatter.js';
 import sweetAlert from '../../utils/sweetAlert.js';
@@ -334,6 +336,7 @@ export function AdminGlobalNewsWirePage() {
 
   // UI Modes & Filters
   const [activeTab, setActiveTab] = useState('stream'); // 'stream' | 'sources' | 'policy'
+  const [streamViewMode, setStreamViewMode] = useState('list'); // 'list' | 'card'
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -1102,202 +1105,401 @@ export function AdminGlobalNewsWirePage() {
               ))}
             </div>
 
-            <span className="text-xs text-stone-500 font-mono">
-              মোট <strong>{toBengaliNumber(filteredItems.length)}</strong> টি প্রতিবেদন
-            </span>
+            {/* View Switcher & Counter */}
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-stone-500 font-mono">
+                মোট <strong>{toBengaliNumber(filteredItems.length)}</strong> টি প্রতিবেদন
+              </span>
+              <div className="flex items-center p-1 bg-stone-100 rounded-xl border border-stone-200">
+                <button
+                  type="button"
+                  onClick={() => setStreamViewMode('list')}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                    streamViewMode === 'list'
+                      ? 'bg-white text-blue-700 shadow-2xs'
+                      : 'text-stone-600 hover:text-stone-900'
+                  }`}
+                  title="লিস্ট ভিউ (তালিকা)"
+                >
+                  <List className="w-3.5 h-3.5" />
+                  <span>তালিকা</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setStreamViewMode('card')}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                    streamViewMode === 'card'
+                      ? 'bg-white text-blue-700 shadow-2xs'
+                      : 'text-stone-600 hover:text-stone-900'
+                  }`}
+                  title="কার্ড ভিউ"
+                >
+                  <LayoutGrid className="w-3.5 h-3.5" />
+                  <span>কার্ড</span>
+                </button>
+              </div>
+            </div>
           </div>
 
-          {/* Wire Articles List */}
-          <div className="space-y-4">
-            {filteredItems.map((item) => {
-              const isPublished = item.status === 'published';
-              return (
-                <motion.div
-                  key={item.id}
-                  layout
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.2, ease: EDITORIAL_EASE }}
-                  className="bg-white rounded-3xl border border-stone-200 p-5 sm:p-6 shadow-xs hover:border-blue-400/80 transition-all space-y-4"
-                >
-                  {/* Top Agency Badge & Timestamps */}
-                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stone-100 pb-3">
-                    <div className="flex items-center gap-2.5">
-                      <span className="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 text-xs font-bold font-mono">
-                        {item.agency}
-                      </span>
-                      <span className="px-2 py-0.5 rounded-md bg-stone-100 text-stone-600 text-[11px] font-serif-bn">
-                        {item.categoryNameBn || 'আন্তর্জাতিক'}
-                      </span>
-                      <span className="text-xs text-stone-400 font-mono">
-                        • {item.publishedAt}
-                      </span>
+          {/* Empty State */}
+          {filteredItems.length === 0 ? (
+            <div className="bg-white rounded-3xl border border-stone-200 p-12 text-center space-y-3">
+              <BookOpen className="w-10 h-10 text-stone-300 mx-auto" />
+              <h3 className="text-base font-bold font-serif-bn text-stone-700">কোনো প্রতিবেদন খুঁজে পাওয়া যায়নি</h3>
+              <p className="text-xs text-stone-500 font-serif-bn">
+                অনুগ্রহ করে ফিল্টার পরিবর্তন করুন অথবা &apos;নতুন তারবার্তা সংগ্রহ করুন&apos; বাটনে ক্লিক করুন।
+              </p>
+            </div>
+          ) : streamViewMode === 'list' ? (
+            /* COMPACT LIST VIEW (ScribeForge / Bloomberg Style) */
+            <div className="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-xs divide-y divide-stone-100">
+              {filteredItems.map((item) => {
+                const isPublished = item.status === 'published';
+                const hasImage = Boolean(item.featured_image || item.imageUrl);
+                return (
+                  <motion.div
+                    key={item.id}
+                    layout
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.15 }}
+                    className="p-3 sm:p-4 hover:bg-blue-50/30 transition-colors flex items-center gap-3 sm:gap-4 group cursor-pointer"
+                  >
+                    {/* 1. Thumbnail or Agency Icon */}
+                    <div
+                      onClick={() => setInspectorItem(item)}
+                      className="w-16 h-12 sm:w-20 sm:h-14 rounded-xl overflow-hidden bg-stone-100 border border-stone-200 shrink-0 relative flex items-center justify-center cursor-pointer group-hover:border-blue-400 transition-colors"
+                    >
+                      {hasImage ? (
+                        <img
+                          src={item.featured_image || item.imageUrl}
+                          alt={item.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center bg-stone-100 text-stone-400">
+                          <ImageIcon className="w-4 h-4 text-stone-400" />
+                          <span className="text-[9px] font-mono font-bold uppercase mt-0.5 text-stone-500">
+                            {item.agency ? item.agency.substring(0, 3) : 'NEWS'}
+                          </span>
+                        </div>
+                      )}
+                      {hasImage && (
+                        <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white" title="ছবি সংযুক্ত রয়েছে" />
+                      )}
                     </div>
 
-                    <div className="flex items-center gap-2">
-                      <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-serif-bn font-bold">
-                        <ShieldCheck className="w-3 h-3 text-emerald-600" />
-                        <span>মৌলিক পুনর্লিখন (কপিরাইট মুক্ত)</span>
-                      </span>
+                    {/* 2. Headline & Metadata Info */}
+                    <div
+                      className="min-w-0 flex-1"
+                      onClick={() => setInspectorItem(item)}
+                    >
+                      {/* Meta badges */}
+                      <div className="flex flex-wrap items-center gap-2 mb-1">
+                        <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-bold font-mono">
+                          {item.agency}
+                        </span>
+                        <span className="px-1.5 py-0.5 rounded bg-stone-100 text-stone-600 text-[10px] font-serif-bn">
+                          {item.categoryNameBn || 'আন্তর্জাতিক'}
+                        </span>
+                        <span className="text-[11px] text-stone-400 font-mono">
+                          • {item.publishedAt}
+                        </span>
+                        <span className="hidden lg:inline-flex items-center gap-1 text-[10px] font-mono text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
+                          <ShieldCheck className="w-2.5 h-2.5" />
+                          <span>৯৯.২% মৌলিক</span>
+                        </span>
+                      </div>
+
+                      {/* Title */}
+                      <h3 className="text-xs sm:text-sm font-bold font-serif-bn text-stone-900 group-hover:text-blue-700 transition-colors line-clamp-1">
+                        {item.title}
+                      </h3>
+
+                      {/* Subheadline / Summary excerpt */}
+                      <p className="text-[11px] text-stone-500 font-serif-bn line-clamp-1 mt-0.5 hidden sm:block">
+                        {item.subheadline || item.summary}
+                      </p>
+                    </div>
+
+                    {/* 3. Status & Quick Actions */}
+                    <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                      {/* Status */}
                       <span
-                        className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold font-mono border ${
+                        className={`px-2 sm:px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold font-mono border whitespace-nowrap ${
                           isPublished
                             ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                             : 'bg-amber-50 text-amber-700 border-amber-200'
                         }`}
                       >
-                        {isPublished ? '✓ লাইভ প্রকাশিত' : 'খসড়া (Pending Review)'}
+                        {isPublished ? '✓ লাইভ' : 'খসড়া'}
                       </span>
-                    </div>
-                  </div>
 
-                  {/* Original English Wire Headline (Compact Collapsible) */}
-                  <div className="p-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-600 flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span className="text-[10px] font-mono font-bold uppercase text-stone-400 bg-white px-1.5 py-0.5 rounded border border-stone-200 shrink-0">
-                        RAW WIRE
-                      </span>
-                      <p className="font-mono text-xs text-stone-700 truncate">
-                        {item.originalTitle}
+                      {/* Action buttons */}
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setInspectorItem(item);
+                          }}
+                          className="p-1.5 sm:px-2.5 sm:py-1 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold flex items-center gap-1 transition-colors cursor-pointer"
+                          title="প্রিভিউ ও এডিট"
+                        >
+                          <Eye className="w-3.5 h-3.5 text-cyan-300" />
+                          <span className="hidden md:inline">প্রিভিউ</span>
+                        </button>
+
+                        {!isPublished ? (
+                          <button
+                            type="button"
+                            disabled={isPublishingToCms}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSendWireItemToCms(item, true);
+                            }}
+                            className="p-1.5 sm:px-2.5 sm:py-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1 transition-colors cursor-pointer shadow-2xs"
+                            title="অনুমোদন ও লাইভ প্রকাশ"
+                          >
+                            <Send className="w-3.5 h-3.5" />
+                            <span className="hidden md:inline">প্রকাশ</span>
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSendWireItemToCms(item, false);
+                            }}
+                            className="p-1.5 sm:px-2 sm:py-1 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold transition-colors cursor-pointer"
+                            title="ড্রাফটে ফেরত"
+                          >
+                            ড্রাফট
+                          </button>
+                        )}
+
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleCopyNews(item);
+                          }}
+                          className="p-1.5 rounded-xl border border-stone-200 hover:bg-stone-100 text-stone-700 transition-colors cursor-pointer hidden sm:flex"
+                          title="কপি করুন"
+                        >
+                          <Copy className="w-3.5 h-3.5" />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteWireItem(item.id, item.title);
+                          }}
+                          className="p-1.5 rounded-xl text-stone-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                          title="মুছে ফেলুন"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          ) : (
+            /* EXPANDED CARD VIEW */
+            <div className="space-y-4">
+              {filteredItems.map((item) => {
+                const isPublished = item.status === 'published';
+                return (
+                  <motion.div
+                    key={item.id}
+                    layout
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2, ease: EDITORIAL_EASE }}
+                    className="bg-white rounded-3xl border border-stone-200 p-5 sm:p-6 shadow-xs hover:border-blue-400/80 transition-all space-y-4"
+                  >
+                    {/* Top Agency Badge & Timestamps */}
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stone-100 pb-3">
+                      <div className="flex items-center gap-2.5">
+                        <span className="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 text-xs font-bold font-mono">
+                          {item.agency}
+                        </span>
+                        <span className="px-2 py-0.5 rounded-md bg-stone-100 text-stone-600 text-[11px] font-serif-bn">
+                          {item.categoryNameBn || 'আন্তর্জাতিক'}
+                        </span>
+                        <span className="text-xs text-stone-400 font-mono">
+                          • {item.publishedAt}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-serif-bn font-bold">
+                          <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                          <span>মৌলিক পুনর্লিখন (কপিরাইট মুক্ত)</span>
+                        </span>
+                        <span
+                          className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold font-mono border ${
+                            isPublished
+                              ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                              : 'bg-amber-50 text-amber-700 border-amber-200'
+                          }`}
+                        >
+                          {isPublished ? '✓ লাইভ প্রকাশিত' : 'খসড়া (Pending Review)'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Original English Wire Headline (Compact Collapsible) */}
+                    <div className="p-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-600 flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="text-[10px] font-mono font-bold uppercase text-stone-400 bg-white px-1.5 py-0.5 rounded border border-stone-200 shrink-0">
+                          RAW WIRE
+                        </span>
+                        <p className="font-mono text-xs text-stone-700 truncate">
+                          {item.originalTitle}
+                        </p>
+                      </div>
+                      {item.originalUrl && (
+                        <a
+                          href={item.originalUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-blue-600 hover:underline inline-flex items-center gap-1 text-[11px] shrink-0 font-medium"
+                        >
+                          <span>সোর্স লিঙ্ক</span>
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      )}
+                    </div>
+
+                    {/* Featured Image Thumbnail if present */}
+                    {(item.featured_image || item.imageUrl) && (
+                      <div className="relative rounded-2xl overflow-hidden aspect-video max-h-48 border border-stone-200 group cursor-pointer"
+                        onClick={() => setInspectorItem(item)}
+                      >
+                        <img
+                          src={item.featured_image || item.imageUrl}
+                          alt={item.featured_image_caption || item.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                        {(item.featured_image_caption || item.featured_image_credit) && (
+                          <div className="absolute bottom-0 inset-x-0 p-2 bg-gradient-to-t from-stone-950/80 via-stone-950/40 to-transparent text-[11px] text-white font-serif-bn flex items-center justify-between gap-2">
+                            <span className="truncate">{item.featured_image_caption || item.title}</span>
+                            {item.featured_image_credit && (
+                              <span className="text-[10px] text-stone-300 font-mono shrink-0">© {item.featured_image_credit}</span>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* AI Composed Bengali Headline & Subheadline */}
+                    <div className="space-y-1.5">
+                      <h3 className="text-base sm:text-lg font-bold font-serif-bn text-stone-900 leading-snug hover:text-blue-700 transition-colors cursor-pointer"
+                        onClick={() => setInspectorItem(item)}
+                      >
+                        {item.title}
+                      </h3>
+                      <p className="text-xs text-stone-500 font-serif-bn">
+                        {item.subheadline}
                       </p>
                     </div>
-                    {item.originalUrl && (
-                      <a
-                        href={item.originalUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-blue-600 hover:underline inline-flex items-center gap-1 text-[11px] shrink-0 font-medium"
-                      >
-                        <span>সোর্স লিঙ্ক</span>
-                        <ExternalLink className="w-3 h-3" />
-                      </a>
-                    )}
-                  </div>
 
-                  {/* Featured Image Thumbnail if present */}
-                  {(item.featured_image || item.imageUrl) && (
-                    <div className="relative rounded-2xl overflow-hidden aspect-video max-h-48 border border-stone-200 group cursor-pointer"
-                      onClick={() => setInspectorItem(item)}
-                    >
-                      <img
-                        src={item.featured_image || item.imageUrl}
-                        alt={item.featured_image_caption || item.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                      {(item.featured_image_caption || item.featured_image_credit) && (
-                        <div className="absolute bottom-0 inset-x-0 p-2 bg-gradient-to-t from-stone-950/80 via-stone-950/40 to-transparent text-[11px] text-white font-serif-bn flex items-center justify-between gap-2">
-                          <span className="truncate">{item.featured_image_caption || item.title}</span>
-                          {item.featured_image_credit && (
-                            <span className="text-[10px] text-stone-300 font-mono shrink-0">© {item.featured_image_credit}</span>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* AI Composed Bengali Headline & Subheadline */}
-                  <div className="space-y-1.5">
-                    <h3 className="text-base sm:text-lg font-bold font-serif-bn text-stone-900 leading-snug hover:text-blue-700 transition-colors cursor-pointer"
-                      onClick={() => setInspectorItem(item)}
-                    >
-                      {item.title}
-                    </h3>
-                    <p className="text-xs text-stone-500 font-serif-bn">
-                      {item.subheadline}
+                    {/* Summary & Bullet Key Takeaways */}
+                    <p className="text-xs text-stone-700 font-serif-bn leading-relaxed bg-blue-50/30 p-3 rounded-2xl border border-blue-100">
+                      {item.summary}
                     </p>
-                  </div>
 
-                  {/* Summary & Bullet Key Takeaways */}
-                  <p className="text-xs text-stone-700 font-serif-bn leading-relaxed bg-blue-50/30 p-3 rounded-2xl border border-blue-100">
-                    {item.summary}
-                  </p>
-
-                  {/* Key Takeaways Bullets */}
-                  {item.keyTakeaways?.length > 0 && (
-                    <div className="space-y-1">
-                      <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider font-mono">
-                        KEY TAKEAWAYS
-                      </span>
-                      <ul className="space-y-1 text-xs text-stone-600 font-serif-bn">
-                        {item.keyTakeaways.map((point, idx) => (
-                          <li key={idx} className="flex items-start gap-2">
-                            <span className="text-blue-600 font-bold shrink-0">•</span>
-                            <span>{point}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {/* Action Toolbar */}
-                  <div className="pt-3 border-t border-stone-100 flex flex-wrap items-center justify-between gap-3">
-                    
-                    {/* Tags */}
-                    <div className="flex flex-wrap items-center gap-1.5">
-                      {item.tags?.slice(0, 3).map((t, idx) => (
-                        <span key={idx} className="px-2 py-0.5 rounded-md bg-stone-100 text-stone-600 text-[10px] font-serif-bn">
-                          #{t}
+                    {/* Key Takeaways Bullets */}
+                    {item.keyTakeaways?.length > 0 && (
+                      <div className="space-y-1">
+                        <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider font-mono">
+                          KEY TAKEAWAYS
                         </span>
-                      ))}
-                    </div>
+                        <ul className="space-y-1 text-xs text-stone-600 font-serif-bn">
+                          {item.keyTakeaways.map((point, idx) => (
+                            <li key={idx} className="flex items-start gap-2">
+                              <span className="text-blue-600 font-bold shrink-0">•</span>
+                              <span>{point}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
 
-                    {/* Operational Buttons */}
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => handleCopyNews(item)}
-                        className="px-3 py-1.5 rounded-xl border border-stone-200 hover:bg-stone-100 text-stone-700 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
-                        title="ক্লিপবোর্ডে কপি করুন"
-                      >
-                        <Copy className="w-3.5 h-3.5 text-stone-500" />
-                        <span className="hidden sm:inline">কপি</span>
-                      </button>
+                    {/* Action Toolbar */}
+                    <div className="pt-3 border-t border-stone-100 flex flex-wrap items-center justify-between gap-3">
+                      
+                      {/* Tags */}
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        {item.tags?.slice(0, 3).map((t, idx) => (
+                          <span key={idx} className="px-2 py-0.5 rounded-md bg-stone-100 text-stone-600 text-[10px] font-serif-bn">
+                            #{t}
+                          </span>
+                        ))}
+                      </div>
 
-                      <button
-                        type="button"
-                        onClick={() => setInspectorItem(item)}
-                        className="px-3.5 py-1.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
-                      >
-                        <Eye className="w-3.5 h-3.5 text-cyan-300" />
-                        <span>প্রিভিউ ও এডিট</span>
-                      </button>
-
-                      {!isPublished ? (
+                      {/* Operational Buttons */}
+                      <div className="flex items-center gap-2">
                         <button
                           type="button"
-                          disabled={isPublishingToCms}
-                          onClick={() => handleSendWireItemToCms(item, true)}
-                          className="px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+                          onClick={() => handleCopyNews(item)}
+                          className="px-3 py-1.5 rounded-xl border border-stone-200 hover:bg-stone-100 text-stone-700 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                          title="ক্লিপবোর্ডে কপি করুন"
                         >
-                          <Send className="w-3.5 h-3.5" />
-                          <span>অনুমোদন ও লাইভ প্রকাশ</span>
+                          <Copy className="w-3.5 h-3.5 text-stone-500" />
+                          <span className="hidden sm:inline">কপি</span>
                         </button>
-                      ) : (
+
                         <button
                           type="button"
-                          onClick={() => handleSendWireItemToCms(item, false)}
-                          className="px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold transition-colors cursor-pointer"
+                          onClick={() => setInspectorItem(item)}
+                          className="px-3.5 py-1.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
                         >
-                          ড্রাফটে ফেরত
+                          <Eye className="w-3.5 h-3.5 text-cyan-300" />
+                          <span>প্রিভিউ ও এডিট</span>
                         </button>
-                      )}
 
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteWireItem(item.id, item.title)}
-                        className="p-1.5 rounded-xl text-rose-500 hover:bg-rose-50 transition-colors cursor-pointer"
-                        title="মুছে ফেলুন"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                        {!isPublished ? (
+                          <button
+                            type="button"
+                            disabled={isPublishingToCms}
+                            onClick={() => handleSendWireItemToCms(item, true)}
+                            className="px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+                          >
+                            <Send className="w-3.5 h-3.5" />
+                            <span>অনুমোদন ও লাইভ প্রকাশ</span>
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => handleSendWireItemToCms(item, false)}
+                            className="px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold transition-colors cursor-pointer"
+                          >
+                            ড্রাফটে ফেরত
+                          </button>
+                        )}
+
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteWireItem(item.id, item.title)}
+                          className="p-1.5 rounded-xl text-rose-500 hover:bg-rose-50 transition-colors cursor-pointer"
+                          title="মুছে ফেলুন"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+
                     </div>
 
-                  </div>
-
-                </motion.div>
-              );
-            })}
-          </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          )}
 
         </div>
       )}
