@@ -33,13 +33,17 @@ import {
   Zap,
   Loader2,
   BookOpen,
-  CheckCheck
+  CheckCheck,
+  Image as ImageIcon,
+  Upload,
+  UploadCloud
 } from 'lucide-react';
 import { toBengaliNumber } from '../../utils/bengaliFormatter.js';
 import sweetAlert from '../../utils/sweetAlert.js';
 import { extractApiError } from '../../utils/apiNormalizer.js';
 import { useGetCategoriesQuery } from '../../store/api/categoryApi.js';
 import { useCreateNewsMutation } from '../../store/api/newsApi.js';
+import { useUploadMediaMutation } from '../../store/api/mediaApi.js';
 import {
   useGetGlobalWireOverviewQuery,
   useGetGlobalWireSourcesQuery,
@@ -304,6 +308,7 @@ export function AdminGlobalNewsWirePage() {
   const [deleteSourceMutation] = useDeleteGlobalWireSourceMutation();
   const [convertWireItemMutation, { isLoading: isConvertingWireItem }] = useConvertWireItemMutation();
   const [createNewsMutation, { isLoading: isCreatingNews }] = useCreateNewsMutation();
+  const [uploadMediaMutation, { isLoading: isUploadingMedia }] = useUploadMediaMutation();
 
   const isPublishingToCms = isConvertingWireItem || isCreatingNews;
   const [fetchingSourceId, setFetchingSourceId] = useState(null);
@@ -341,6 +346,9 @@ export function AdminGlobalNewsWirePage() {
   const [newAgencyName, setNewAgencyName] = useState('');
   const [newFeedUrl, setNewFeedUrl] = useState('');
   const [newCategory, setNewCategory] = useState('international');
+  const [newSourceLogo, setNewSourceLogo] = useState('');
+  const [newSourceColor, setNewSourceColor] = useState('#2563eb');
+  const [newSourceAutoPublish, setNewSourceAutoPublish] = useState(false);
 
   // Synchronize backend API data if available
   useEffect(() => {
@@ -554,6 +562,61 @@ export function AdminGlobalNewsWirePage() {
     await sweetAlert.toast('সোর্স সেটিংস হালনাগাদ হয়েছে!', 'success', 1600);
   };
 
+  // Handle News Article Image Upload
+  const handleImageFileUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const localPreviewUrl = URL.createObjectURL(file);
+    setInspectorItem((prev) => ({
+      ...prev,
+      featured_image: localPreviewUrl,
+      imageUrl: localPreviewUrl
+    }));
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('type', 'image');
+      formData.append('visibility', 'public');
+      formData.append('folder', 'news');
+      formData.append('title', inspectorItem?.title || 'News Wire Image');
+
+      const res = await uploadMediaMutation(formData).unwrap();
+      const serverUrl = res?.file_url || res?.url || res?.data?.file_url || res?.data?.url || localPreviewUrl;
+
+      setInspectorItem((prev) => ({
+        ...prev,
+        featured_image: serverUrl,
+        imageUrl: serverUrl
+      }));
+      await sweetAlert.toast('ছবি সফলভাবে আপলোড হয়েছে!', 'success', 1800);
+    } catch {
+      await sweetAlert.info('লোকাল প্রিভিউ সক্রিয়', 'ছবিটি সফলভাবে লোড হয়েছে।');
+    }
+  };
+
+  // Handle Source Logo Upload
+  const handleSourceLogoUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const localUrl = URL.createObjectURL(file);
+    setNewSourceLogo(localUrl);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('type', 'image');
+      formData.append('folder', 'sources');
+      const res = await uploadMediaMutation(formData).unwrap();
+      const serverUrl = res?.file_url || res?.url || res?.data?.file_url || res?.data?.url || localUrl;
+      setNewSourceLogo(serverUrl);
+      await sweetAlert.toast('সোর্স লোগো আপলোড সফল!', 'success', 1500);
+    } catch {
+      // Local fallback
+    }
+  };
+
   // Add Custom RSS Source
   const handleAddSource = async (e) => {
     e?.preventDefault();
@@ -571,10 +634,11 @@ export function AdminGlobalNewsWirePage() {
       categorySlug: newCategory,
       categoryNameBn: newCategory === 'international' ? 'আন্তর্জাতিক' : newCategory === 'business' ? 'বাণিজ্য' : 'প্রযুক্তি',
       isActive: true,
-      autoPublish: false,
+      autoPublish: newSourceAutoPublish,
+      logo: newSourceLogo.trim() || null,
       icon: 'rss',
-      color: '#3b82f6',
-      trustScore: '96.0%',
+      color: newSourceColor || '#3b82f6',
+      trustScore: '96.5%',
       articlesCount: 0,
       lastFetched: 'এখনই যুক্ত হলো'
     };
@@ -592,18 +656,29 @@ export function AdminGlobalNewsWirePage() {
     setNewSourceName('');
     setNewAgencyName('');
     setNewFeedUrl('');
-    await sweetAlert.success('নতুন সোর্স যুক্ত হয়েছে!', `"${newSource.name}" এখন থেকে নিয়মিত ক্রল করা হবে।`);
+    setNewSourceLogo('');
+    setNewSourceAutoPublish(false);
+    await sweetAlert.success('নতুন সোর্স যুক্ত হয়েছে!', `"${newSource.name}" এখন থেকে ওয়্যার স্টুডিওতে সরাসরি কাজ করবে।`);
   };
 
   // Send / Publish Wire Item to Daily Prabaho News CMS
   const handleSendWireItemToCms = async (item, shouldPublishDirectly = false) => {
     const targetStatus = shouldPublishDirectly ? 'published' : 'draft';
+    const featuredImage = item.featured_image || item.imageUrl || null;
+    const featuredCaption = item.featured_image_caption || item.imageCaption || null;
+    const featuredCredit = item.featured_image_credit || item.agency || 'আন্তর্জাতিক বার্তা সংস্থা';
+
     try {
       // 1. Try dedicated wire convert endpoint
       let savedViaEndpoint = false;
       try {
         await convertWireItemMutation({
-          article: item,
+          article: {
+            ...item,
+            featured_image: featuredImage,
+            featured_image_caption: featuredCaption,
+            featured_image_credit: featuredCredit
+          },
           autoPublish: shouldPublishDirectly
         }).unwrap();
         savedViaEndpoint = true;
@@ -621,6 +696,9 @@ export function AdminGlobalNewsWirePage() {
           subheadline: item.subheadline || `${item.agency} প্রতিবেদন থেকে অনুদিত`,
           summary: item.summary,
           content: item.content,
+          featured_image: featuredImage,
+          featured_image_caption: featuredCaption,
+          featured_image_credit: featuredCredit,
           category_id: validCategoryId,
           status: targetStatus,
           is_breaking: false,
@@ -1096,6 +1174,27 @@ export function AdminGlobalNewsWirePage() {
                     )}
                   </div>
 
+                  {/* Featured Image Thumbnail if present */}
+                  {(item.featured_image || item.imageUrl) && (
+                    <div className="relative rounded-2xl overflow-hidden aspect-video max-h-48 border border-stone-200 group cursor-pointer"
+                      onClick={() => setInspectorItem(item)}
+                    >
+                      <img
+                        src={item.featured_image || item.imageUrl}
+                        alt={item.featured_image_caption || item.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      {(item.featured_image_caption || item.featured_image_credit) && (
+                        <div className="absolute bottom-0 inset-x-0 p-2 bg-gradient-to-t from-stone-950/80 via-stone-950/40 to-transparent text-[11px] text-white font-serif-bn flex items-center justify-between gap-2">
+                          <span className="truncate">{item.featured_image_caption || item.title}</span>
+                          {item.featured_image_credit && (
+                            <span className="text-[10px] text-stone-300 font-mono shrink-0">© {item.featured_image_credit}</span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {/* AI Composed Bengali Headline & Subheadline */}
                   <div className="space-y-1.5">
                     <h3 className="text-base sm:text-lg font-bold font-serif-bn text-stone-900 leading-snug hover:text-blue-700 transition-colors cursor-pointer"
@@ -1237,12 +1336,20 @@ export function AdminGlobalNewsWirePage() {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
-                    <div
-                      className="w-10 h-10 rounded-2xl flex items-center justify-center font-bold text-white text-xs font-mono shadow-sm"
-                      style={{ backgroundColor: source.color || '#2563eb' }}
-                    >
-                      {source.agency.substring(0, 2).toUpperCase()}
-                    </div>
+                    {source.logo ? (
+                      <img
+                        src={source.logo}
+                        alt={source.agency}
+                        className="w-10 h-10 rounded-2xl object-cover border border-stone-200 shadow-xs bg-white"
+                      />
+                    ) : (
+                      <div
+                        className="w-10 h-10 rounded-2xl flex items-center justify-center font-bold text-white text-xs font-mono shadow-sm"
+                        style={{ backgroundColor: source.color || '#2563eb' }}
+                      >
+                        {source.agency.substring(0, 2).toUpperCase()}
+                      </div>
+                    )}
                     <div>
                       <h4 className="font-bold text-sm text-stone-900 font-serif-bn">
                         {source.name}
@@ -1459,6 +1566,113 @@ export function AdminGlobalNewsWirePage() {
 
                 {/* Bengali Composed News Body */}
                 <div className="space-y-4">
+
+                  {/* Featured Image Management for News */}
+                  <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-bold text-stone-800 flex items-center gap-1.5">
+                        <ImageIcon className="w-4 h-4 text-blue-600" />
+                        <span>ফিচারড ইমেজ ও ফটো ক্রেডিট (Featured Image & Credit)</span>
+                      </label>
+                      {(inspectorItem.featured_image || inspectorItem.imageUrl) && (
+                        <button
+                          type="button"
+                          onClick={() => setInspectorItem({ ...inspectorItem, featured_image: '', imageUrl: '' })}
+                          className="text-[11px] text-rose-600 hover:text-rose-700 font-bold cursor-pointer"
+                        >
+                          ছবি রিমুভ করুন
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Image Preview if available */}
+                    {(inspectorItem.featured_image || inspectorItem.imageUrl) ? (
+                      <div className="relative rounded-2xl overflow-hidden border border-stone-200 aspect-video max-h-56 bg-stone-900 group">
+                        <img
+                          src={inspectorItem.featured_image || inspectorItem.imageUrl}
+                          alt={inspectorItem.featured_image_caption || inspectorItem.title}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-stone-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                          <label className="px-3 py-1.5 rounded-xl bg-white text-stone-900 text-xs font-bold cursor-pointer shadow-md hover:bg-stone-100 flex items-center gap-1.5">
+                            <Upload className="w-3.5 h-3.5" />
+                            <span>ছবি পরিবর্তন</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={handleImageFileUpload}
+                            />
+                          </label>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="border-2 border-dashed border-stone-300 hover:border-blue-400 rounded-2xl p-5 text-center bg-white transition-colors">
+                        <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-2">
+                          <UploadCloud className="w-5 h-5" />
+                        </div>
+                        <p className="text-xs font-bold text-stone-800 mb-1">
+                          কম্পিউটার বা মোবাইল থেকে ছবি আপলোড করুন
+                        </p>
+                        <p className="text-[11px] text-stone-400 mb-3">
+                          PNG, JPG, WEBP ফরম্যাট সমর্থিত
+                        </p>
+                        <label className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold cursor-pointer transition-colors shadow-xs">
+                          {isUploadingMedia ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
+                          <span>{isUploadingMedia ? 'ছবি আপলোড হচ্ছে...' : 'ছবি নির্বাচন করুন'}</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleImageFileUpload}
+                          />
+                        </label>
+                      </div>
+                    )}
+
+                    {/* Image URL & Credit Details */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                      <div>
+                        <label className="block text-[11px] font-bold text-stone-600 mb-1">
+                          অথবা ছবির সরাসরি ওয়েব লিঙ্ক (Image URL):
+                        </label>
+                        <input
+                          type="url"
+                          value={inspectorItem.featured_image || inspectorItem.imageUrl || ''}
+                          onChange={(e) => setInspectorItem({ ...inspectorItem, featured_image: e.target.value, imageUrl: e.target.value })}
+                          placeholder="https://images.example.com/photo.jpg"
+                          className="w-full px-3 py-1.5 rounded-xl border border-stone-300 text-xs font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-bold text-stone-600 mb-1">
+                          ছবির ক্যাপশন (Image Caption):
+                        </label>
+                        <input
+                          type="text"
+                          value={inspectorItem.featured_image_caption || inspectorItem.imageCaption || ''}
+                          onChange={(e) => setInspectorItem({ ...inspectorItem, featured_image_caption: e.target.value, imageCaption: e.target.value })}
+                          placeholder="যেমন: শান্তি আলোচনায় অংশগ্রহণকারী নেতৃবৃন্দ"
+                          className="w-full px-3 py-1.5 rounded-xl border border-stone-300 text-xs font-serif-bn focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        />
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label className="block text-[11px] font-bold text-stone-600 mb-1">
+                          ছবির ক্রেডিট / উৎস (Photo Credit):
+                        </label>
+                        <input
+                          type="text"
+                          value={inspectorItem.featured_image_credit || inspectorItem.agency || 'রয়টার্স / এএফপি'}
+                          onChange={(e) => setInspectorItem({ ...inspectorItem, featured_image_credit: e.target.value })}
+                          placeholder="যেমন: রয়টার্স / এপি / গেটি ইমেজেস"
+                          className="w-full px-3 py-1.5 rounded-xl border border-stone-300 text-xs font-serif-bn focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
                   <div>
                     <label className="block text-xs font-bold text-stone-800 mb-1">
                       বাংলা হেডলাইন (Headline)
@@ -1631,6 +1845,100 @@ export function AdminGlobalNewsWirePage() {
                     <option value="sports">খেলাধুলা (Sports)</option>
                   </select>
                 </div>
+
+                {/* Source Logo Upload & URL */}
+                <div className="space-y-2 p-3 bg-stone-50 rounded-2xl border border-stone-200">
+                  <div className="flex items-center justify-between">
+                    <label className="block font-bold text-stone-800">
+                      সোর্স লোগো বা প্রতীক (Logo Image)
+                    </label>
+                    {newSourceLogo && (
+                      <button
+                        type="button"
+                        onClick={() => setNewSourceLogo('')}
+                        className="text-[10px] text-rose-600 font-bold hover:underline"
+                      >
+                        রিমুভ
+                      </button>
+                    )}
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    {newSourceLogo ? (
+                      <img
+                        src={newSourceLogo}
+                        alt="Logo Preview"
+                        className="w-10 h-10 rounded-xl object-cover border border-stone-200 bg-white"
+                      />
+                    ) : (
+                      <div
+                        className="w-10 h-10 rounded-xl flex items-center justify-center text-white text-xs font-bold font-mono shadow-xs"
+                        style={{ backgroundColor: newSourceColor }}
+                      >
+                        {newAgencyName.substring(0, 2).toUpperCase() || 'SRC'}
+                      </div>
+                    )}
+                    <label className="flex-1 py-2 px-3 rounded-xl bg-white hover:bg-stone-100 border border-stone-300 text-stone-700 text-center font-bold text-xs cursor-pointer transition-colors shadow-2xs">
+                      {isUploadingMedia ? 'আপলোড হচ্ছে...' : 'কম্পিউটার থেকে লোগো আপলোড'}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleSourceLogoUpload}
+                      />
+                    </label>
+                  </div>
+
+                  <input
+                    type="url"
+                    value={newSourceLogo}
+                    onChange={(e) => setNewSourceLogo(e.target.value)}
+                    placeholder="অথবা লোগোর সরাসরি লিঙ্ক দিন (URL)"
+                    className="w-full px-3 py-1.5 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-[11px]"
+                  />
+                </div>
+
+                {/* Brand Color Selector */}
+                <div>
+                  <label className="block font-bold text-stone-800 mb-1.5">
+                    সোর্স কালার থিম (Brand Color)
+                  </label>
+                  <div className="flex items-center gap-2">
+                    {['#2563eb', '#dc2626', '#f97316', '#10b981', '#8b5cf6', '#d97706', '#0284c7'].map((c) => (
+                      <button
+                        key={c}
+                        type="button"
+                        onClick={() => setNewSourceColor(c)}
+                        className={`w-6 h-6 rounded-full transition-transform ${newSourceColor === c ? 'scale-125 ring-2 ring-stone-900 ring-offset-2' : 'hover:scale-110'}`}
+                        style={{ backgroundColor: c }}
+                      />
+                    ))}
+                    <input
+                      type="color"
+                      value={newSourceColor}
+                      onChange={(e) => setNewSourceColor(e.target.value)}
+                      className="w-7 h-7 rounded-lg border-0 cursor-pointer p-0 ml-1"
+                    />
+                  </div>
+                </div>
+
+                {/* Auto Publish Checkbox */}
+                <label className="flex items-start gap-2.5 p-3 rounded-2xl bg-stone-50 border border-stone-200 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={newSourceAutoPublish}
+                    onChange={(e) => setNewSourceAutoPublish(e.target.checked)}
+                    className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer mt-0.5"
+                  />
+                  <div className="text-xs">
+                    <span className="font-bold text-stone-800 block">
+                      স্বয়ংক্রিয় সরাসরি প্রকাশনা (Auto Publish)
+                    </span>
+                    <span className="text-[11px] text-stone-500">
+                      এই সোর্স থেকে সংবাদ আসার সাথে সাথে অনুমোদন ছাড়াই লাইভ পোর্টালে যাবে
+                    </span>
+                  </div>
+                </label>
 
                 <div className="pt-2">
                   <button
