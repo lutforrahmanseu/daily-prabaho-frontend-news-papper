@@ -32,7 +32,6 @@ import {
   Users,
   CheckCircle2,
   XCircle,
-  Plus,
   ArrowUpRight,
   BarChart3,
   Edit,
@@ -180,11 +179,6 @@ export function AdminDashboardOverview() {
     setEditorModalOpen(true);
   };
 
-  const handleCreate = () => {
-    setEditingArticle(null);
-    setEditorModalOpen(true);
-  };
-
   const handleDelete = async (id, title) => {
     const { isConfirmed } = await sweetAlert.confirmDelete(
       title,
@@ -287,23 +281,6 @@ export function AdminDashboardOverview() {
           <p className="text-xs text-stone-500 mt-1">
             দৈনিক বার্তা প্রবাহের সংবাদ সংগ্রহ, পাঠকদের পাঠ প্রতিক্রিয়া, অনুমোদন ও প্রকাশনা পর্যবেক্ষণ
           </p>
-        </div>
-
-        <div className="flex items-center gap-2.5">
-          <Link
-            to="/admin/news"
-            className="px-3.5 py-2 rounded-xl border border-stone-300 text-stone-700 text-xs font-bold hover:bg-stone-50 transition-colors shadow-xs"
-          >
-            সকল সংবাদ
-          </Link>
-          <button
-            type="button"
-            onClick={handleCreate}
-            className="px-4 py-2 rounded-xl bg-rose-700 hover:bg-rose-800 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
-          >
-            <Plus className="w-4 h-4" />
-            <span>নতুন সংবাদ তৈরি করুন</span>
-          </button>
         </div>
       </div>
 
