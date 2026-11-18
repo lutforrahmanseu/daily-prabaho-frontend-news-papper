@@ -21,7 +21,7 @@ import {
 /**
  * Curated high-fidelity showcase campaigns.
  * Ensures the advertisement carousel always provides an eye-catching,
- * animated sliding experience even before or alongside single-ad campaigns.
+ * animated sliding experience across all banner placements.
  */
 const DEFAULT_SHOWCASE_ADS = [
   {
@@ -30,7 +30,7 @@ const DEFAULT_SHOWCASE_ADS = [
     subtitle: 'বঙ্গবন্ধু আন্তর্জাতিক সম্মেলন কেন্দ্র • নিবন্ধন চলছে • প্রবেশ সম্পূর্ণ বিনামূল্যে',
     advertiser: 'বাংলাদেশ কম্পিউটার কাউন্সিল',
     tag: 'প্রযুক্তি এক্সপো',
-    ctaText: 'ওয়েবসাইট ভিজিট করুন',
+    ctaText: 'নিবন্ধন করুন',
     image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&h=300&q=80',
     destination_url: 'https://bcc.gov.bd'
   },
@@ -63,6 +63,16 @@ const DEFAULT_SHOWCASE_ADS = [
     ctaText: 'কোটেশন নিন',
     image: 'https://images.unsplash.com/photo-1509391365360-2e959784a276?auto=format&fit=crop&w=1200&h=300&q=80',
     destination_url: 'https://solartechno.com'
+  },
+  {
+    id: 'promo-global-scholarship-2026',
+    title: 'আন্তর্জাতিক স্কলারশিপ ও উচ্চশিক্ষা মেলা ২০২৬',
+    subtitle: 'বিশ্বের শীর্ষ ১০০ বিশ্ববিদ্যালয়ে সরাসরি ভর্তি ও শতভাগ পর্যন্ত স্কলারশিপ তথ্য',
+    advertiser: 'গ্লোবাল এডুকেশন পার্টনারস',
+    tag: 'উচ্চশিক্ষা মেলা',
+    ctaText: 'পরামর্শ নিন',
+    image: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&h=300&q=80',
+    destination_url: 'https://example.com/scholarships'
   }
 ];
 
@@ -70,9 +80,9 @@ const DEFAULT_SHOWCASE_ADS = [
  * Dynamic Advertisement Placement Component (Phase 9 & Public BroadSheet UX)
  * Supports all canonical ad placements with impression and click tracking:
  * 1. homepage_top / leaderboard
- * 2. homepage_sidebar / sidebar
- * 3. news_details_top
- * 4. news_details_middle / in_feed
+ * 2. news_details_middle / in_feed
+ * 3. homepage_sidebar / sidebar
+ * 4. news_details_top
  * 5. category_page
  */
 export function AdPlacement({
@@ -196,15 +206,70 @@ export function AdPlacement({
     }
   };
 
+  // Dynamic context-aware subtitle synthesizer for database ads that lack explicit subtitle
+  const adSubtitle = useMemo(() => {
+    if (!currentAd) return '';
+    if (currentAd.subtitle) return currentAd.subtitle;
+    const t = currentAd.title || '';
+    const adv = currentAd.advertiser || '';
+    if (adv.includes('ব্যাংক') || t.includes('ব্যাংকিং') || t.includes('অ্যাপ')) {
+      return isBn
+        ? 'তাৎক্ষণিক অনলাইন অ্যাকাউন্ট, জিরো ফি ফান্ড ট্রান্সফার ও আকর্ষণীয় ক্যাশব্যাক অফার।'
+        : 'Instant online account opening with zero transfer fees and exclusive cashbacks.';
+    }
+    if (adv.includes('কম্পিউটার') || t.includes('প্রযুক্তি') || t.includes('উদ্ভাবন')) {
+      return isBn
+        ? 'বঙ্গবন্ধু আন্তর্জাতিক সম্মেলন কেন্দ্র • সবার জন্য উন্মুক্ত • ফ্রি অনলাইন রেজিস্ট্রেশন।'
+        : 'BICC Dhaka • Free registration and open to all tech enthusiasts.';
+    }
+    if (adv.includes('অটোমোবাইলস') || t.includes('কার') || t.includes('গাড়ি')) {
+      return isBn
+        ? '১০০% ব্যাটারি ব্যাকআপ • আধুনিক স্মার্ট ড্রাইভ • বিশেষ অফারে টেস্ট ড্রাইভ বুকিং চলছে।'
+        : 'Smart hybrid driving with exclusive test drive booking offers.';
+    }
+    if (adv.includes('সোলার') || t.includes('শক্তি') || t.includes('জ্বালানি')) {
+      return isBn
+        ? 'শিল্প ও বাসাবাড়িতে সাশ্রয়ী বিদ্যুৎ • ২৫ বছরের ওয়ারেন্টি ও সহজ কিস্তি সুবিধা।'
+        : 'Clean solar energy solutions with 25 years warranty and easy EMI.';
+    }
+    if (adv.includes('এডুকেশন') || t.includes('স্কলারশিপ')) {
+      return isBn
+        ? 'বিশ্বের শীর্ষ ১০০ বিশ্ববিদ্যালয়ে সরাসরি ভর্তি ও শতভাগ পর্যন্ত স্কলারশিপের সুবর্ণ সুযোগ।'
+        : 'Direct admission into top universities with scholarship guidance.';
+    }
+    return isBn
+      ? 'অফার ও ক্যাম্পেইনের বিস্তারিত জানতে এখনই অফিশিয়াল পোর্টালে ভিজিট করুন।'
+      : 'Visit the official portal to learn more about this campaign.';
+  }, [currentAd, isBn]);
+
+  // Dynamic action button label
+  const adCtaText = useMemo(() => {
+    if (!currentAd) return isBn ? 'ওয়েবসাইট দেখুন' : 'Visit Website';
+    if (currentAd.ctaText) return currentAd.ctaText;
+    const t = currentAd.title || '';
+    if (t.includes('অ্যাপ') || t.includes('ডাউনলোড')) {
+      return isBn ? 'অ্যাপ ডাউনলোড করুন' : 'Download App';
+    }
+    if (t.includes('মেলা') || t.includes('রেজিস্ট্রেশন')) {
+      return isBn ? 'নিবন্ধন করুন' : 'Register Now';
+    }
+    if (t.includes('কার') || t.includes('ড্রাইভ')) {
+      return isBn ? 'টেস্ট ড্রাইভ বুক' : 'Book Test Drive';
+    }
+    return isBn ? 'ওয়েবসাইট ভিজিট করুন' : 'Visit Website';
+  }, [currentAd, isBn]);
+
   if (isAdFreeReader) {
     return null;
   }
 
-  // 1. TOP LEADERBOARD PLACEMENTS (homepage_top, news_details_top, category_page)
+  // 1. HORIZONTAL BANNER PLACEMENTS (homepage_top, leaderboard, in_feed, news_details_middle, news_details_top, category_page)
+  // Both top leaderboard and mid-page in-feed placements now share the same prominent, eye-catching sliding carousel experience!
   if (
     normalizedPlacement === 'homepage_top' ||
     normalizedPlacement === 'news_details_top' ||
-    normalizedPlacement === 'category_page'
+    normalizedPlacement === 'category_page' ||
+    normalizedPlacement === 'news_details_middle'
   ) {
     if (!currentAd) {
       /* Institutional Fallback Leaderboard */
@@ -241,13 +306,15 @@ export function AdPlacement({
       );
     }
 
+    const defaultMargin = normalizedPlacement === 'news_details_middle' ? 'my-6 sm:my-8' : '';
+
     return (
       <div
-        className={`w-full ${className}`}
+        className={`w-full ${defaultMargin} ${className}`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <div className="relative overflow-hidden bg-stone-950 border-2 border-amber-500/30 hover:border-amber-500/60 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300">
+        <div className="relative overflow-hidden bg-stone-950 border-2 border-amber-500/35 hover:border-amber-500/60 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300">
           {/* Top Sponsor Ribbon */}
           <div className="w-full flex items-center justify-between px-3 sm:px-4 py-2 bg-gradient-to-r from-stone-950 via-stone-900 to-stone-950 text-stone-200 border-b border-stone-800">
             {/* Left: Glowing Ad Badge + Advertiser */}
@@ -300,7 +367,7 @@ export function AdPlacement({
                 onClick={handleAdClick}
                 className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer"
               >
-                <span>{isBn ? 'ওয়েবসাইট ভিজিট করুন' : 'Visit Website'}</span>
+                <span>{adCtaText}</span>
                 <ExternalLink className="w-3 h-3" />
               </button>
             </div>
@@ -309,7 +376,7 @@ export function AdPlacement({
           {/* Sliding Canvas */}
           <div
             onClick={handleAdClick}
-            className="group relative w-full h-[140px] sm:h-[165px] md:h-[185px] bg-stone-950 overflow-hidden cursor-pointer select-none"
+            className="group relative w-full h-[145px] sm:h-[165px] md:h-[185px] bg-stone-950 overflow-hidden cursor-pointer select-none"
           >
             <AnimatePresence mode="wait" initial={false}>
               <motion.div
@@ -320,7 +387,7 @@ export function AdPlacement({
                 transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
                 className="absolute inset-0 w-full h-full"
               >
-                {/* Background Image */}
+                {/* Background Creative Image */}
                 <img
                   src={currentAd.image}
                   alt={currentAd.title}
@@ -355,15 +422,15 @@ export function AdPlacement({
                       {currentAd.title}
                     </h3>
 
-                    {currentAd.subtitle && (
+                    {adSubtitle && (
                       <p className="hidden sm:block text-xs sm:text-sm text-stone-200 mt-1 line-clamp-1 font-sans drop-shadow-sm">
-                        {currentAd.subtitle}
+                        {adSubtitle}
                       </p>
                     )}
 
                     <div className="mt-2.5 sm:mt-3 flex items-center gap-3">
                       <div className="inline-flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-lg bg-rose-600 group-hover:bg-rose-500 text-white font-bold text-xs sm:text-sm shadow-md transition-all group-hover:scale-105">
-                        <span>{currentAd.ctaText || (isBn ? 'ওয়েবসাইট ভিজিট করুন' : 'Visit Website')}</span>
+                        <span>{adCtaText}</span>
                         <ExternalLink className="w-3.5 h-3.5" />
                       </div>
 
@@ -531,7 +598,7 @@ export function AdPlacement({
             className="p-3 bg-stone-50 border-t border-stone-200 flex items-center justify-between cursor-pointer hover:bg-stone-100 transition-colors"
           >
             <span className="text-xs font-bold text-stone-900 line-clamp-1">
-              {currentAd.ctaText || (isBn ? 'অফার ও বিস্তারিত দেখুন' : 'Explore Offer')}
+              {adCtaText}
             </span>
             <ExternalLink className="w-3.5 h-3.5 text-rose-600 shrink-0" />
           </div>
@@ -540,77 +607,8 @@ export function AdPlacement({
     );
   }
 
-  // 3. IN-ARTICLE NATIVE PLACEMENTS (news_details_middle / in_feed)
-  if (currentAd) {
-    return (
-      <div
-        onClick={handleAdClick}
-        className={`my-6 p-4 bg-gradient-to-r from-stone-900 via-stone-850 to-stone-900 text-white border-2 border-amber-500/30 rounded-2xl shadow-sm hover:shadow-md transition-all hover:border-amber-500/60 cursor-pointer flex flex-col sm:flex-row items-center justify-between gap-4 ${className}`}
-      >
-        <div className="flex items-center gap-3.5 min-w-0 w-full sm:w-auto">
-          <div className="relative shrink-0 w-24 h-16 rounded-xl overflow-hidden ring-1 ring-white/20">
-            <img
-              src={currentAd.image}
-              alt={currentAd.title}
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute top-1 left-1 px-1 rounded bg-black/70 text-[8px] font-mono text-amber-300">
-              AD
-            </div>
-          </div>
-
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold text-[9px] uppercase tracking-wider">
-                <Megaphone className="w-2.5 h-2.5" />
-                {isBn ? 'স্পন্সরড বার্তা' : 'SPONSORED'}
-              </span>
-              <span className="text-xs font-semibold text-stone-300 truncate flex items-center gap-1">
-                <BadgeCheck className="w-3 h-3 text-emerald-400" />
-                {currentAd.advertiser}
-              </span>
-            </div>
-            <h4 className="text-xs sm:text-sm font-bold font-serif-bn text-white line-clamp-1">
-              {currentAd.title}
-            </h4>
-            {currentAd.subtitle && (
-              <p className="text-[11px] text-stone-300 line-clamp-1 mt-0.5">
-                {currentAd.subtitle}
-              </p>
-            )}
-          </div>
-        </div>
-
-        <button
-          type="button"
-          className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold flex items-center gap-1.5 shrink-0 transition-colors shadow-sm cursor-pointer w-full sm:w-auto justify-center"
-        >
-          <span>{currentAd.ctaText || (isBn ? 'ওয়েবসাইট ভিজিট করুন' : 'Visit Website')}</span>
-          <ExternalLink className="w-3.5 h-3.5" />
-        </button>
-      </div>
-    );
-  }
-
-  // Default In-feed Fallback
-  return (
-    <div className={`p-4 bg-stone-50 border border-stone-200 rounded-2xl flex items-center justify-between text-xs my-6 ${className}`}>
-      <div className="flex items-center gap-2.5">
-        <span className="text-[10px] uppercase font-bold text-stone-600 bg-white px-2 py-0.5 rounded border border-stone-200 font-mono">
-          {isBn ? 'স্পন্সরড' : 'Sponsored'}
-        </span>
-        <span className="text-stone-800 font-serif-bn font-medium">
-          {isBn ? 'স্মার্ট বাংলাদেশ বিনির্মাণে তথ্যপ্রযুক্তি ও ক্লাউড রূপান্তর' : 'Digital Cloud Solutions for Enterprises'}
-        </span>
-      </div>
-      <a
-        href="mailto:ads@dailyprabaho.com"
-        className="text-rose-700 font-bold hover:underline flex items-center gap-1 cursor-pointer"
-      >
-        <span>{isBn ? 'বিজ্ঞাপন দিন →' : 'Advertise →'}</span>
-      </a>
-    </div>
-  );
+  // Fallback Catch-all
+  return null;
 }
 
 export default AdPlacement;
