@@ -18,10 +18,15 @@ import {
   Sparkles
 } from 'lucide-react';
 
+// Guaranteed local high-resolution bundled assets (offline-safe & zero CDN failure)
+import techHubImg from '../../assets/images/bangladesh_tech_hub_1794291831587.jpg';
+import metroImg from '../../assets/images/hero_dhaka_metro_bridge_1794291829969.jpg';
+import padmaImg from '../../assets/images/padma_bridge_river_shipping_1794291831460.jpg';
+import confImg from '../../assets/images/bangladesh_politics_conference_1794293624945.jpg';
+
 /**
- * Curated high-fidelity showcase campaigns.
- * Ensures the advertisement carousel always provides an eye-catching,
- * animated sliding experience across all banner placements.
+ * Curated high-fidelity showcase campaigns with local bundled graphics.
+ * Guarantees that every advertisement slot is rich, vibrant, and never breaks.
  */
 const DEFAULT_SHOWCASE_ADS = [
   {
@@ -31,7 +36,7 @@ const DEFAULT_SHOWCASE_ADS = [
     advertiser: 'বাংলাদেশ কম্পিউটার কাউন্সিল',
     tag: 'প্রযুক্তি এক্সপো',
     ctaText: 'নিবন্ধন করুন',
-    image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&h=300&q=80',
+    image: confImg,
     destination_url: 'https://bcc.gov.bd'
   },
   {
@@ -41,18 +46,8 @@ const DEFAULT_SHOWCASE_ADS = [
     advertiser: 'ইউনিয়ন স্মার্ট ব্যাংক',
     tag: 'ডিজিটাল ব্যাংকিং',
     ctaText: 'অ্যাপ ডাউনলোড করুন',
-    image: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=1200&h=300&q=80',
+    image: metroImg,
     destination_url: 'https://unionsmartbank.com'
-  },
-  {
-    id: 'promo-hybrid-car-2026',
-    title: 'নতুন প্রজন্মের পরিবেশবান্ধব হাইব্রিড ইলেকট্রিক কার প্রদর্শনী ২০২৬',
-    subtitle: '১০০% ব্যাটারি ব্যাকআপ • আধুনিক স্মার্ট ড্রাইভ • বিশেষ অফারে টেস্ট ড্রাইভ বুকিং',
-    advertiser: 'অটোমোবাইলস বাংলাদেশ',
-    tag: 'পরিবেশবান্ধব কার',
-    ctaText: 'টেস্ট ড্রাইভ বুকিং',
-    image: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&h=300&q=80',
-    destination_url: 'https://automobilesbangladesh.com'
   },
   {
     id: 'promo-solar-energy-2026',
@@ -61,20 +56,38 @@ const DEFAULT_SHOWCASE_ADS = [
     advertiser: 'সোলার টেকনো লিমিটেড',
     tag: 'সবুজ শক্তি',
     ctaText: 'কোটেশন নিন',
-    image: 'https://images.unsplash.com/photo-1509391365360-2e959784a276?auto=format&fit=crop&w=1200&h=300&q=80',
+    image: padmaImg,
     destination_url: 'https://solartechno.com'
   },
   {
-    id: 'promo-global-scholarship-2026',
-    title: 'আন্তর্জাতিক স্কলারশিপ ও উচ্চশিক্ষা মেলা ২০২৬',
-    subtitle: 'বিশ্বের শীর্ষ ১০০ বিশ্ববিদ্যালয়ে সরাসরি ভর্তি ও শতভাগ পর্যন্ত স্কলারশিপ তথ্য',
-    advertiser: 'গ্লোবাল এডুকেশন পার্টনারস',
-    tag: 'উচ্চশিক্ষা মেলা',
-    ctaText: 'পরামর্শ নিন',
-    image: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&h=300&q=80',
-    destination_url: 'https://example.com/scholarships'
+    id: 'promo-hybrid-car-2026',
+    title: 'নতুন প্রজন্মের পরিবেশবান্ধব হাইব্রিড ইলেকট্রিক কার প্রদর্শনী ২০২৬',
+    subtitle: '১০০% ব্যাটারি ব্যাকআপ • আধুনিক স্মার্ট ড্রাইভ • বিশেষ অফারে টেস্ট ড্রাইভ বুকিং',
+    advertiser: 'অটোমোবাইলস বাংলাদেশ',
+    tag: 'পরিবেশবান্ধব কার',
+    ctaText: 'টেস্ট ড্রাইভ বুকিং',
+    image: techHubImg,
+    destination_url: 'https://automobilesbangladesh.com'
   }
 ];
+
+/**
+ * Resolves a reliable local fallback image for any ad whose remote URL fails.
+ */
+function getLocalFallbackImage(ad) {
+  const t = (ad?.title || '').toLowerCase();
+  const adv = (ad?.advertiser || '').toLowerCase();
+  if (adv.includes('সোলার') || t.includes('সোলার') || t.includes('জ্বালানি') || t.includes('সবুজ')) {
+    return padmaImg;
+  }
+  if (adv.includes('ব্যাংক') || t.includes('ব্যাংক') || t.includes('পেমেন্ট')) {
+    return metroImg;
+  }
+  if (adv.includes('কম্পিউটার') || t.includes('প্রযুক্তি') || t.includes('রোবোটিক্স') || t.includes('কার')) {
+    return techHubImg;
+  }
+  return confImg;
+}
 
 /**
  * Dynamic Advertisement Placement Component (Phase 9 & Public BroadSheet UX)
@@ -133,7 +146,9 @@ export function AdPlacement({
       const key = ad.id || ad.title;
       if (key && !seen.has(key)) {
         seen.add(key);
-        result.push(ad);
+        // If remote image is invalid, assign safe local image
+        const safeImage = ad.image || ad.image_url || getLocalFallbackImage(ad);
+        result.push({ ...ad, image: safeImage });
       }
     }
 
@@ -206,7 +221,14 @@ export function AdPlacement({
     }
   };
 
-  // Dynamic context-aware subtitle synthesizer for database ads that lack explicit subtitle
+  const handleImageError = (e) => {
+    const fallback = getLocalFallbackImage(currentAd);
+    if (e?.currentTarget && e.currentTarget.src !== fallback) {
+      e.currentTarget.src = fallback;
+    }
+  };
+
+  // Dynamic context-aware subtitle synthesizer
   const adSubtitle = useMemo(() => {
     if (!currentAd) return '';
     if (currentAd.subtitle) return currentAd.subtitle;
@@ -256,6 +278,9 @@ export function AdPlacement({
     if (t.includes('কার') || t.includes('ড্রাইভ')) {
       return isBn ? 'টেস্ট ড্রাইভ বুক' : 'Book Test Drive';
     }
+    if (t.includes('সোলার') || t.includes('প্যানেল')) {
+      return isBn ? 'কোটেশন নিন' : 'Get Quote';
+    }
     return isBn ? 'ওয়েবসাইট ভিজিট করুন' : 'Visit Website';
   }, [currentAd, isBn]);
 
@@ -264,7 +289,6 @@ export function AdPlacement({
   }
 
   // 1. HORIZONTAL BANNER PLACEMENTS (homepage_top, leaderboard, in_feed, news_details_middle, news_details_top, category_page)
-  // Both top leaderboard and mid-page in-feed placements now share the same prominent, eye-catching sliding carousel experience!
   if (
     normalizedPlacement === 'homepage_top' ||
     normalizedPlacement === 'news_details_top' ||
@@ -387,10 +411,11 @@ export function AdPlacement({
                 transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
                 className="absolute inset-0 w-full h-full"
               >
-                {/* Background Creative Image */}
+                {/* Background Creative Image with Error Fallback */}
                 <img
                   src={currentAd.image}
                   alt={currentAd.title}
+                  onError={handleImageError}
                   className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700"
                 />
 
@@ -499,21 +524,23 @@ export function AdPlacement({
     );
   }
 
-  // 2. SIDEBAR RECTANGLE PLACEMENTS (homepage_sidebar)
+  // 2. SIDEBAR RECTANGLE PLACEMENTS (homepage_sidebar, sidebar)
+  // Upgraded into a dynamic sliding commercial showcase with guaranteed image fallbacks!
   if (normalizedPlacement === 'homepage_sidebar') {
     if (!currentAd) {
       /* Fallback Sidebar */
       return (
-        <div className={`bg-stone-50 border border-dashed border-stone-300 rounded-2xl p-5 text-center ${className}`}>
-          <span className="text-[10px] uppercase font-bold text-stone-500 block mb-2 font-mono">
+        <div className={`bg-stone-900 border-2 border-amber-500/30 rounded-2xl p-5 text-center text-white ${className}`}>
+          <span className="text-[10px] uppercase font-bold text-amber-400 block mb-2 font-mono flex items-center justify-center gap-1">
+            <Megaphone className="w-3.5 h-3.5 text-amber-400" />
             {isBn ? 'বিজ্ঞাপন স্লট (৩০০×২৫০)' : 'Ad Slot (300x250)'}
           </span>
-          <div className="aspect-4/3 bg-stone-200/70 rounded-xl flex flex-col items-center justify-center p-4 border border-stone-200">
-            <Megaphone className="w-6 h-6 text-stone-400 mb-2" />
-            <h5 className="text-xs font-bold text-stone-800 font-serif-bn">
+          <div className="aspect-4/3 bg-stone-950 rounded-xl flex flex-col items-center justify-center p-4 border border-stone-800">
+            <Megaphone className="w-6 h-6 text-amber-400 mb-2 animate-pulse" />
+            <h5 className="text-xs font-bold text-white font-serif-bn">
               {isBn ? 'বার্তা প্রবাহ কমার্শিয়াল নেটওয়ার্ক' : 'Prabaho Ad Network'}
             </h5>
-            <p className="text-[11px] text-stone-500 mt-1">
+            <p className="text-[11px] text-stone-400 mt-1">
               {isBn ? 'যোগাযোগ: ads@dailyprabaho.com' : 'Contact: ads@dailyprabaho.com'}
             </p>
           </div>
@@ -527,64 +554,121 @@ export function AdPlacement({
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <div className="group relative overflow-hidden bg-white border border-stone-200 rounded-2xl shadow-xs hover:shadow-md transition-all">
-          {/* Sponsor Header */}
-          <div className="p-2.5 bg-stone-900 text-stone-100 flex items-center justify-between text-[11px] font-mono border-b border-stone-800">
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold text-[10px] uppercase">
-              <Megaphone className="w-3 h-3 text-amber-400" />
-              {isBn ? 'বিজ্ঞাপন' : 'SPONSORED'}
-            </span>
-            <span className="truncate max-w-[140px] text-stone-200 font-semibold flex items-center gap-1">
-              <BadgeCheck className="w-3 h-3 text-emerald-400" />
-              {currentAd.advertiser}
-            </span>
+        <div className="group relative overflow-hidden bg-stone-950 border-2 border-amber-500/35 hover:border-amber-500/60 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300">
+          {/* Top Sponsor Ribbon */}
+          <div className="px-3 py-2 bg-gradient-to-r from-stone-950 via-stone-900 to-stone-950 text-stone-200 border-b border-stone-800 flex items-center justify-between">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold text-[10px] uppercase tracking-wider shrink-0">
+                <Megaphone className="w-3 h-3 text-amber-400 animate-pulse" />
+                <span>{isBn ? 'বিজ্ঞাপন' : 'SPONSORED'}</span>
+              </span>
+              <span className="truncate text-xs font-semibold text-white flex items-center gap-1">
+                <BadgeCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                <span className="truncate">{currentAd.advertiser}</span>
+              </span>
+            </div>
+
+            {totalSlides > 1 && (
+              <div className="flex items-center gap-1 bg-stone-900 border border-stone-800 rounded-lg p-0.5 shrink-0">
+                <button
+                  type="button"
+                  onClick={handlePrev}
+                  aria-label="পূর্ববর্তী বিজ্ঞাপন"
+                  className="p-1 rounded text-stone-400 hover:text-white hover:bg-stone-800 transition-colors cursor-pointer"
+                >
+                  <ChevronLeft className="w-3 h-3" />
+                </button>
+                <span className="px-1 text-[10px] font-mono font-bold text-amber-300 select-none">
+                  {isBn ? toBengaliNumber(currentIndex + 1) : currentIndex + 1}/{isBn ? toBengaliNumber(totalSlides) : totalSlides}
+                </span>
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  aria-label="পরবর্তী বিজ্ঞাপন"
+                  className="p-1 rounded text-stone-400 hover:text-white hover:bg-stone-800 transition-colors cursor-pointer"
+                >
+                  <ChevronRight className="w-3 h-3" />
+                </button>
+              </div>
+            )}
           </div>
 
-          {/* Image & Overlay */}
+          {/* Sliding Image & Overlay (300x250 style) */}
           <div
             onClick={handleAdClick}
-            className="relative aspect-4/3 bg-stone-950 overflow-hidden cursor-pointer select-none"
+            className="relative h-[210px] sm:h-[230px] bg-stone-950 overflow-hidden cursor-pointer select-none"
           >
             <AnimatePresence mode="wait" initial={false}>
               <motion.div
                 key={currentAd.id || currentIndex}
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 1.02 }}
-                transition={{ duration: 0.3 }}
+                initial={{ opacity: 0, x: direction > 0 ? 50 : -50 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: direction > 0 ? -50 : 50 }}
+                transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
                 className="absolute inset-0 w-full h-full"
               >
+                {/* Background Creative Image with Error Fallback */}
                 <img
                   src={currentAd.image}
                   alt={currentAd.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  onError={handleImageError}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-stone-950/85 via-stone-950/30 to-transparent" />
 
-                <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded bg-black/60 text-[9px] font-mono uppercase text-amber-300 border border-amber-400/30">
-                  AD
+                {/* Multi-Stop Gradient Overlays for High Legibility */}
+                <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/65 to-black/25" />
+
+                {/* Corner Watermark */}
+                <div className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded bg-black/60 backdrop-blur-sm text-[9px] font-mono uppercase font-bold text-amber-300 border border-amber-400/30 flex items-center gap-1 z-10">
+                  <Sparkles className="w-2.5 h-2.5 text-amber-400" />
+                  <span>AD</span>
                 </div>
 
-                <div className="absolute bottom-3 left-3 right-3 text-white">
-                  <h4 className="text-xs sm:text-sm font-bold font-serif-bn line-clamp-2 leading-snug drop-shadow-md">
+                {/* Content Overlay */}
+                <div className="absolute inset-0 p-4 flex flex-col justify-end z-10">
+                  {currentAd.tag && (
+                    <span className="inline-block self-start px-2 py-0.5 mb-1.5 rounded text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                      {currentAd.tag}
+                    </span>
+                  )}
+
+                  <h4 className="text-sm sm:text-base font-bold font-serif-bn text-white line-clamp-2 leading-snug drop-shadow-md">
                     {currentAd.title}
                   </h4>
+
+                  {adSubtitle && (
+                    <p className="text-[11px] text-stone-300 line-clamp-1 mt-1 font-sans">
+                      {adSubtitle}
+                    </p>
+                  )}
+
+                  <div className="mt-3 flex items-center justify-between">
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-600 group-hover:bg-rose-500 text-white font-bold text-xs shadow-md transition-all group-hover:scale-105">
+                      <span>{adCtaText}</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </div>
+
+                    <span className="text-[10px] text-stone-400">
+                      {isBn ? 'ভিজিট করুন ↗' : 'Visit ↗'}
+                    </span>
+                  </div>
                 </div>
               </motion.div>
             </AnimatePresence>
 
-            {/* Sidebar Slide Indicators */}
+            {/* Bottom Slide Indicators (Dots) */}
             {totalSlides > 1 && (
-              <div className="absolute bottom-1.5 right-2 z-10 flex items-center gap-1 bg-black/50 px-2 py-0.5 rounded-full">
+              <div className="absolute bottom-2 right-3 z-20 flex items-center gap-1 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/10">
                 {effectiveAds.map((_, idx) => (
                   <button
                     key={idx}
                     type="button"
                     onClick={(e) => handleDotClick(idx, e)}
-                    className={`transition-all duration-300 ${
+                    aria-label={`স্লাইড ${idx + 1}`}
+                    className={`transition-all duration-300 cursor-pointer ${
                       idx === currentIndex
-                        ? 'w-3 h-1 bg-rose-500 rounded-full'
-                        : 'w-1 h-1 bg-white/50 rounded-full'
+                        ? 'w-4 h-1.5 bg-rose-500 rounded-full'
+                        : 'w-1.5 h-1.5 bg-white/40 hover:bg-white/80 rounded-full'
                     }`}
                   />
                 ))}
@@ -592,16 +676,15 @@ export function AdPlacement({
             )}
           </div>
 
-          {/* Footer CTA */}
-          <div
-            onClick={handleAdClick}
-            className="p-3 bg-stone-50 border-t border-stone-200 flex items-center justify-between cursor-pointer hover:bg-stone-100 transition-colors"
-          >
-            <span className="text-xs font-bold text-stone-900 line-clamp-1">
-              {adCtaText}
-            </span>
-            <ExternalLink className="w-3.5 h-3.5 text-rose-600 shrink-0" />
-          </div>
+          {/* Progress Bar Line */}
+          {totalSlides > 1 && (
+            <div className="w-full bg-stone-900 h-1 relative overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-amber-500 via-rose-500 to-rose-600 transition-all duration-300 ease-out"
+                style={{ width: `${((currentIndex + 1) / totalSlides) * 100}%` }}
+              />
+            </div>
+          )}
         </div>
       </div>
     );
