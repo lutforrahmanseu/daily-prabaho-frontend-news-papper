@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import handler from '../../api/news-meta.js';
+import newsMetaHandler from '../../api/news-meta.js';
+import ogImageHandler from '../../api/og-image.js';
 
 test('Social Preview API: generates valid Open Graph and Twitter Card tags with image', async () => {
   let capturedHeaders = {};
@@ -8,8 +9,8 @@ test('Social Preview API: generates valid Open Graph and Twitter Card tags with 
   let capturedBody = '';
 
   const mockReq = {
-    query: { slug: 'news-1794987610756' },
-    url: '/api/news-meta?slug=news-1794987610756'
+    query: { slug: 'news-1794991454455' },
+    url: '/api/news-meta?slug=news-1794991454455'
   };
 
   const mockRes = {
@@ -31,16 +32,17 @@ test('Social Preview API: generates valid Open Graph and Twitter Card tags with 
     }
   };
 
-  await handler(mockReq, mockRes);
+  await newsMetaHandler(mockReq, mockRes);
 
   assert.equal(capturedStatus, 200);
   assert.equal(capturedHeaders['content-type'], 'text/html; charset=utf-8');
   assert.ok(capturedHeaders['cache-control'].includes('s-maxage'));
 
-  // Verify essential Open Graph tags for social crawlers (Facebook, WhatsApp, LinkedIn)
+  // Verify essential Open Graph tags for WhatsApp, Facebook, Telegram
   assert.match(capturedBody, /<meta\s+property="og:type"\s+content="article"/);
-  assert.match(capturedBody, /<meta\s+property="og:image"\s+content="https?:\/\/[^"]+"/);
+  assert.match(capturedBody, /<meta\s+property="og:image"\s+content="https?:\/\/[^"]+\/api\/og-image\?slug=news-1794991454455"/);
   assert.match(capturedBody, /<meta\s+property="og:image:secure_url"/);
+  assert.match(capturedBody, /<meta\s+property="og:image:type"\s+content="image\/jpeg"/);
   assert.match(capturedBody, /<meta\s+property="og:title"/);
   assert.match(capturedBody, /<meta\s+property="og:description"/);
   assert.match(capturedBody, /<meta\s+property="og:url"/);
@@ -50,9 +52,11 @@ test('Social Preview API: generates valid Open Graph and Twitter Card tags with 
   assert.match(capturedBody, /<meta\s+name="twitter:image"/);
   assert.match(capturedBody, /<meta\s+name="twitter:title"/);
 
-  // Verify canonical and auto-redirect fallback for human readers
+  // Verify canonical and client redirect
   assert.match(capturedBody, /<link\s+rel="canonical"/);
   assert.match(capturedBody, /window\.location\.replace/);
+  // Ensure no http-equiv refresh is present (to avoid crawler redirect loop)
+  assert.ok(!capturedBody.includes('http-equiv="refresh"'));
 });
 
 test('Social Preview API: redirects to home when slug is missing', async () => {
@@ -71,8 +75,38 @@ test('Social Preview API: redirects to home when slug is missing', async () => {
     }
   };
 
-  await handler(mockReq, mockRes);
+  await newsMetaHandler(mockReq, mockRes);
   assert.equal(redirectedCode, 302);
   assert.ok(redirectedUrl.length > 0);
 });
 
+test('OG Image API: delivers optimized JPEG under 300KB for WhatsApp compatibility', async () => {
+  let capturedHeaders = {};
+  let capturedStatus = 200;
+  let capturedBody = null;
+
+  const mockReq = {
+    query: { slug: 'news-1794991454455' }
+  };
+
+  const mockRes = {
+    setHeader(key, value) {
+      capturedHeaders[key.toLowerCase()] = value;
+    },
+    status(code) {
+      capturedStatus = code;
+      return this;
+    },
+    send(body) {
+      capturedBody = body;
+      return this;
+    }
+  };
+
+  await ogImageHandler(mockReq, mockRes);
+  assert.equal(capturedStatus, 200);
+  assert.equal(capturedHeaders['content-type'], 'image/jpeg');
+  assert.ok(capturedBody && capturedBody.length > 0);
+  // WhatsApp requires images < 300KB (307,200 bytes)
+  assert.ok(capturedBody.length < 307200, `Image size ${capturedBody.length} bytes must be < 300KB`);
+});

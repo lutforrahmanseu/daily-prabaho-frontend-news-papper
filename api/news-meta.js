@@ -43,9 +43,10 @@ export default async function handler(req, res) {
   }
 
   const canonicalUrl = `${siteUrl}/news/${slug}`;
+  // The optimized image endpoint guarantees image size < 120KB for WhatsApp (< 300KB requirement)
+  const optimizedImageUrl = `${siteUrl}/api/og-image?slug=${encodeURIComponent(slug)}`;
   let title = 'দৈনিক বার্তা প্রবাহ (Daily Prabaho)';
   let description = 'বাংলাদেশ ও আন্তর্জাতিক বিশ্বের সর্বশেষ নির্ভরযোগ্য সংবাদ, রাজনীতি, বাণিজ্য, খেলাধুলা, বিজ্ঞান ও প্রযুক্তির সত্যনিষ্ঠ বিশ্লেষণ।';
-  let imageUrl = `${siteUrl}/og-default.jpg`;
   let publishedTime = new Date().toISOString();
   let categoryName = 'সংবাদ';
   let authorName = 'দৈনিক বার্তা প্রবাহ ডেস্ক';
@@ -83,17 +84,6 @@ export default async function handler(req, res) {
           }
         }
 
-        if (article.featured_image) {
-          const rawImg = String(article.featured_image).trim();
-          if (rawImg.startsWith('http://') || rawImg.startsWith('https://')) {
-            imageUrl = rawImg;
-          } else if (rawImg.startsWith('/')) {
-            imageUrl = `${defaultApiOrigin}${rawImg}`;
-          } else {
-            imageUrl = `${defaultApiOrigin}/storage/${rawImg}`;
-          }
-        }
-
         if (article.category?.name_bn || article.category?.name) {
           categoryName = article.category.name_bn || article.category.name;
         }
@@ -106,13 +96,12 @@ export default async function handler(req, res) {
       }
     }
   } catch (err) {
-    // If API is slow or temporarily unreachable, gracefully proceed with fallback metadata
     console.error(`[SocialPreview] Failed to fetch article "${slug}":`, err?.message || err);
   }
 
   const safeTitle = escapeHtml(title);
   const safeDesc = escapeHtml(description);
-  const safeImg = escapeHtml(imageUrl);
+  const safeImg = escapeHtml(optimizedImageUrl);
   const safeUrl = escapeHtml(canonicalUrl);
   const safeCategory = escapeHtml(categoryName);
   const safeAuthor = escapeHtml(authorName);
@@ -141,9 +130,10 @@ export default async function handler(req, res) {
   <meta property="og:description" content="${safeDesc}" />
   <meta property="og:image" content="${safeImg}" />
   <meta property="og:image:secure_url" content="${safeImg}" />
+  <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:alt" content="${safeTitle}" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
+  <meta property="og:image:width" content="800" />
+  <meta property="og:image:height" content="450" />
   <meta property="article:published_time" content="${publishedTime}" />
   <meta property="article:section" content="${safeCategory}" />
   <meta property="article:author" content="${safeAuthor}" />
@@ -156,8 +146,7 @@ export default async function handler(req, res) {
   <meta name="twitter:description" content="${safeDesc}" />
   <meta name="twitter:image" content="${safeImg}" />
 
-  <!-- Automatic redirect to full interactive article for human readers -->
-  <meta http-equiv="refresh" content="0;url=${safeUrl}" />
+  <!-- Client redirect for human readers (omitting http-equiv refresh to prevent crawler redirect loops) -->
   <script>
     if (typeof window !== 'undefined') {
       window.location.replace("${safeUrl}");
@@ -177,4 +166,3 @@ export default async function handler(req, res) {
 
   return res.status(200).send(html);
 }
-
