@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   toggleLanguage,
@@ -18,7 +18,6 @@ import {
   CloudSun,
   Crown,
   Newspaper,
-  ShieldAlert,
   Type,
   Globe2,
   Users
@@ -26,7 +25,6 @@ import {
 
 export function TopUtilityBar() {
   const dispatch = useDispatch();
-  const location = useLocation();
   const { language, fontSize, edition, location: userLocation, weatherTemp, weatherCondition } = useSelector((state) => state.ui);
 
   const isBn = language === 'bn';
@@ -38,8 +36,6 @@ export function TopUtilityBar() {
     year: 'numeric'
   });
   const banglaDate = getBanglaCalendarDate(currentDate);
-
-  const isAdmin = location.pathname.startsWith('/admin');
 
   // Social Links with SVG icons
   const socialLinks = [
@@ -218,30 +214,13 @@ export function TopUtilityBar() {
           <button
             type="button"
             onClick={() => dispatch(toggleLanguage())}
-            className="flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded bg-white hover:bg-stone-50 text-stone-900 border border-stone-300 hover:border-stone-400 text-[11px] sm:text-xs font-bold shadow-2xs transition-colors shrink-0 whitespace-nowrap cursor-pointer"
+            className="flex items-center gap-1 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded bg-white hover:bg-stone-50 text-stone-900 border border-stone-300 hover:border-stone-400 text-[11px] sm:text-xs font-bold shadow-2xs transition-colors shrink-0 whitespace-nowrap cursor-pointer"
             title="Switch Language"
             aria-label="Switch Language"
           >
-            <Globe2 className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+            <Globe2 className="w-3.5 h-3.5 text-rose-700 shrink-0" />
             <span>{isBn ? 'English' : 'বাংলা'}</span>
           </button>
-
-          {/* Admin Editorial Portal Link */}
-          <Link
-            to={isAdmin ? '/' : '/admin'}
-            className={`hidden md:flex items-center gap-1.5 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded text-[11px] sm:text-xs font-bold transition-all shrink-0 whitespace-nowrap ${
-              isAdmin
-                ? 'bg-amber-500 text-stone-950 font-bold hover:bg-amber-400'
-                : 'bg-stone-900 hover:bg-black text-white'
-            }`}
-          >
-            <ShieldAlert className="w-3.5 h-3.5 shrink-0" />
-            <span>
-              {isAdmin
-                ? (isBn ? 'মূল পাতায় ফিরুন' : 'Back to News')
-                : (isBn ? 'সম্পাদকীয় প্যানেল' : 'Admin CMS')}
-            </span>
-          </Link>
         </div>
       </div>
     </div>

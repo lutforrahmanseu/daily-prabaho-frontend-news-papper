@@ -6,7 +6,7 @@ import { setSelectedCategory } from '../../store/newsSlice.js';
 import { setMobileDrawerOpen } from '../../store/uiSlice.js';
 import { CATEGORIES } from '../../data/categories.js';
 import { usePortalCategories } from '../../hooks/usePortalData.js';
-import { Home, MoreHorizontal, Radio, Layers, Film, Sparkles, Newspaper, Archive, Users, Calendar, MapPin } from 'lucide-react';
+import { Home, MoreHorizontal, Layers, Film, Sparkles, Newspaper, Archive, Users, Calendar, MapPin } from 'lucide-react';
 import { SPRING_SNAPPY } from '../common/MotionPrimitives.jsx';
 
 export function Navbar() {
@@ -81,111 +81,113 @@ export function Navbar() {
             );
           })}
 
+          {/* Live Updates Pill */}
           <Link
             to="/live"
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold shrink-0 whitespace-nowrap transition-colors ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black shrink-0 whitespace-nowrap transition-all cursor-pointer ${
               location.pathname.startsWith('/live')
-                ? 'bg-rose-700 text-white'
-                : 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 hover:bg-rose-100'
+                ? 'bg-rose-700 text-white shadow-xs'
+                : 'bg-rose-600 hover:bg-rose-700 text-white shadow-2xs'
             }`}
           >
-            <Radio className="w-3.5 h-3.5" />
+            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse shrink-0"></span>
             <span>{isBn ? 'সরাসরি' : 'Live'}</span>
           </Link>
 
+          {/* Editorial Features & Magazine Sections */}
           <Link
             to="/coverage"
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold shrink-0 whitespace-nowrap transition-colors ${
+            className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-semibold whitespace-nowrap transition-colors shrink-0 cursor-pointer ${
               location.pathname.startsWith('/coverage')
-                ? 'bg-stone-900 text-white dark:bg-rose-700'
-                : 'text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800'
+                ? 'text-rose-700 bg-rose-50 font-bold'
+                : 'text-stone-800 hover:text-rose-700 hover:bg-stone-100'
             }`}
           >
-            <Layers className="w-3.5 h-3.5" />
+            <Layers className="w-4 h-4 text-rose-700 shrink-0" />
             <span>{isBn ? 'বিশেষ আয়োজন' : 'Special Coverage'}</span>
           </Link>
 
           <Link
             to="/multimedia"
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold shrink-0 whitespace-nowrap transition-colors ${
+            className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-semibold whitespace-nowrap transition-colors shrink-0 cursor-pointer ${
               location.pathname.startsWith('/multimedia') || location.pathname.startsWith('/stories')
-                ? 'bg-stone-900 text-white dark:bg-rose-700'
-                : 'text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800'
+                ? 'text-rose-700 bg-rose-50 font-bold'
+                : 'text-stone-800 hover:text-rose-700 hover:bg-stone-100'
             }`}
           >
-            <Film className="w-3.5 h-3.5" />
+            <Film className="w-4 h-4 text-rose-700 shrink-0" />
             <span>{isBn ? 'মাল্টিমিডিয়া' : 'Multimedia'}</span>
           </Link>
 
           <Link
             to="/for-you"
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold shrink-0 whitespace-nowrap transition-colors ${
+            className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-semibold whitespace-nowrap transition-colors shrink-0 cursor-pointer ${
               location.pathname.startsWith('/for-you')
-                ? 'bg-stone-900 text-white dark:bg-rose-700'
-                : 'text-rose-700 dark:text-rose-300 hover:bg-rose-50 dark:hover:bg-stone-800'
+                ? 'text-rose-700 bg-rose-50 font-bold'
+                : 'text-stone-800 hover:text-rose-700 hover:bg-stone-100'
             }`}
           >
-            <Sparkles className="w-3.5 h-3.5" />
+            <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
             <span>{isBn ? 'আমার পাতা' : 'For You'}</span>
           </Link>
 
           <Link
             to="/epaper"
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold shrink-0 whitespace-nowrap transition-colors ${
+            className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-semibold whitespace-nowrap transition-colors shrink-0 cursor-pointer ${
               location.pathname.startsWith('/epaper')
-                ? 'bg-rose-700 text-white'
-                : 'text-stone-700 hover:bg-stone-100'
+                ? 'text-rose-700 bg-rose-50 font-bold'
+                : 'text-stone-800 hover:text-rose-700 hover:bg-stone-100'
             }`}
           >
-            <Newspaper className="w-3.5 h-3.5" />
+            <Newspaper className="w-4 h-4 text-rose-700 shrink-0" />
             <span>{isBn ? 'ই-পেপার' : 'E-Paper'}</span>
           </Link>
 
           <Link
             to="/archive"
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold shrink-0 whitespace-nowrap transition-colors ${
+            className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-semibold whitespace-nowrap transition-colors shrink-0 cursor-pointer ${
               location.pathname.startsWith('/archive')
-                ? 'bg-stone-900 text-white'
-                : 'text-stone-700 hover:bg-stone-100'
+                ? 'text-rose-700 bg-rose-50 font-bold'
+                : 'text-stone-800 hover:text-rose-700 hover:bg-stone-100'
             }`}
           >
-            <Archive className="w-3.5 h-3.5" />
+            <Archive className="w-4 h-4 text-amber-600 shrink-0" />
             <span>{isBn ? 'আর্কাইভ' : 'Archive'}</span>
           </Link>
 
           <Link
             to="/community"
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold shrink-0 whitespace-nowrap transition-colors ${
+            className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-semibold whitespace-nowrap transition-colors shrink-0 cursor-pointer ${
               location.pathname.startsWith('/community') || location.pathname.startsWith('/citizen')
-                ? 'bg-teal-700 text-white'
-                : 'text-stone-700 hover:bg-stone-100'
+                ? 'text-rose-700 bg-rose-50 font-bold'
+                : 'text-stone-800 hover:text-rose-700 hover:bg-stone-100'
             }`}
           >
-            <Users className="w-3.5 h-3.5" />
+            <Users className="w-4 h-4 text-teal-600 shrink-0" />
             <span>{isBn ? 'কমিউনিটি' : 'Community'}</span>
           </Link>
 
           <Link
             to="/local"
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold shrink-0 whitespace-nowrap transition-colors ${
+            className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-semibold whitespace-nowrap transition-colors shrink-0 cursor-pointer ${
               location.pathname.startsWith('/local')
-                ? 'bg-rose-700 text-white'
-                : 'text-stone-700 hover:bg-stone-100'
+                ? 'text-rose-700 bg-rose-50 font-bold'
+                : 'text-stone-800 hover:text-rose-700 hover:bg-stone-100'
             }`}
           >
-            <MapPin className="w-3.5 h-3.5" />
+            <MapPin className="w-4 h-4 text-rose-700 shrink-0" />
             <span>{isBn ? 'দেশ ও জনপদ' : 'Local News'}</span>
           </Link>
 
           <Link
             to="/events"
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold shrink-0 whitespace-nowrap transition-colors ${
+            className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-semibold whitespace-nowrap transition-colors shrink-0 cursor-pointer ${
               location.pathname.startsWith('/events') || location.pathname.startsWith('/certificates')
-                ? 'bg-rose-700 text-white'
-                : 'text-stone-700 hover:bg-stone-100'
+                ? 'text-rose-700 bg-rose-50 font-bold'
+                : 'text-stone-800 hover:text-rose-700 hover:bg-stone-100'
             }`}
           >
-            <Calendar className="w-3.5 h-3.5" />
+            <Calendar className="w-4 h-4 text-rose-700 shrink-0" />
             <span>{isBn ? 'ইভেন্ট ও প্রকল্প' : 'Events'}</span>
           </Link>
 
@@ -193,11 +195,11 @@ export function Navbar() {
           <button
             type="button"
             onClick={() => dispatch(setMobileDrawerOpen(true))}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-semibold text-stone-600 hover:text-rose-700 hover:bg-stone-100 whitespace-nowrap shrink-0 border border-stone-200 cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-md text-xs font-bold text-stone-800 hover:text-rose-700 hover:bg-stone-100 whitespace-nowrap shrink-0 border border-stone-300 hover:border-stone-400 transition-colors cursor-pointer shadow-2xs"
             title={isBn ? 'সব বিভাগ দেখুন' : 'View all sections'}
             aria-label="View all sections"
           >
-            <MoreHorizontal className="w-4 h-4" />
+            <MoreHorizontal className="w-4 h-4 text-stone-600" />
             <span>{isBn ? 'সব বিভাগ' : 'All Sections'}</span>
           </button>
 

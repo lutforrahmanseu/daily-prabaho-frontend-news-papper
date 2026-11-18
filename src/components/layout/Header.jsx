@@ -24,7 +24,6 @@ import {
   User,
   X,
   CheckCircle2,
-  SlidersHorizontal,
   Sparkles,
   LogOut,
   LogIn
@@ -84,14 +83,16 @@ export function Header() {
 
           {/* Left: Newspaper Credo / Motto */}
           <div className="hidden lg:flex lg:flex-1 flex-col text-xs text-stone-600">
-            <div className="max-w-[220px] flex flex-col">
-              <span className="font-bold text-stone-900 tracking-tight flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-rose-700 shrink-0"></span>
-                {isBn ? 'স্বাধীন ও বস্তুনিষ্ঠ সাংবাদিকতা' : 'Independent & Objective Journalism'}
-              </span>
-              <span className="text-stone-500 text-[11px] mt-0.5">
-                {isBn ? 'ঢাকা · চট্টগ্রাম · সিলেট · আন্তর্জাতিক' : 'Dhaka · Chittagong · Sylhet · Global'}
-              </span>
+            <div className="flex items-center gap-2.5">
+              <span className="w-1 h-8 bg-rose-700 rounded-full shrink-0"></span>
+              <div className="flex flex-col">
+                <span className="font-bold text-stone-900 tracking-tight font-serif-bn text-xs sm:text-[13px]">
+                  {isBn ? 'স্বাধীন ও বস্তুনিষ্ঠ সাংবাদিকতা' : 'Independent & Objective Journalism'}
+                </span>
+                <span className="text-stone-500 text-[11px] font-sans">
+                  {isBn ? 'ঢাকা · চট্টগ্রাম · সিলেট · আন্তর্জাতিক' : 'Dhaka · Chittagong · Sylhet · Global'}
+                </span>
+              </div>
             </div>
           </div>
 
@@ -216,25 +217,25 @@ export function Header() {
               </MotionDropdown>
             </div>
 
-            {/* User Navigation Dropdown / Reader Account & CMS */}
+            {/* User Navigation Dropdown / Reader Account */}
             <div className="relative">
               <button
                 type="button"
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
-                className="flex items-center gap-1.5 p-1.5 sm:px-2.5 sm:py-1 rounded-full border border-stone-300 hover:border-stone-400 bg-white text-stone-800 text-xs font-semibold cursor-pointer transition-colors shrink-0"
+                className="flex items-center gap-1.5 p-1.5 sm:px-3 sm:py-1.5 rounded-full border border-stone-300 hover:border-rose-300 hover:bg-rose-50/40 bg-white text-stone-800 text-xs font-semibold cursor-pointer transition-all shadow-2xs shrink-0"
                 title={isBn ? 'পাঠক অ্যাকাউন্ট ও মেনু' : 'Reader account'}
                 aria-label="User navigation"
               >
                 <div
                   className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
-                    isReaderAuth ? 'bg-rose-700 text-white font-bold text-[10px]' : 'bg-stone-200 text-stone-600'
+                    isReaderAuth ? 'bg-rose-700 text-white font-bold text-[10px]' : 'bg-rose-100 text-rose-800'
                   }`}
                 >
                   {isReaderAuth
                     ? (readerUser?.display_name || readerUser?.name || 'R').charAt(0)
                     : <User className="w-3.5 h-3.5" />}
                 </div>
-                <span className="hidden md:inline max-w-[110px] truncate">
+                <span className="hidden md:inline max-w-[110px] truncate font-serif-bn font-bold">
                   {isReaderAuth
                     ? readerUser?.display_name || readerUser?.name
                     : isBn
@@ -245,11 +246,11 @@ export function Header() {
 
               <MotionDropdown
                 isOpen={userMenuOpen}
-                className="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-60 max-w-xs bg-white rounded-xl shadow-xl border border-stone-200 z-50 p-2 text-xs divide-y divide-stone-100"
+                className="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-64 max-w-xs bg-white rounded-xl shadow-xl border border-stone-200 z-50 p-2 text-xs divide-y divide-stone-100"
               >
                 {isReaderAuth ? (
                   <>
-                    <div className="p-2">
+                    <div className="p-2.5">
                       <p className="font-bold text-stone-900 truncate">
                         {readerUser?.display_name || readerUser?.name}
                       </p>
@@ -287,7 +288,7 @@ export function Header() {
                         {isBn ? 'প্রাইভেসি ও ডেটা এক্সপোর্ট' : 'Privacy & Data Controls'}
                       </Link>
                     </div>
-                    <div className="py-1 space-y-0.5">
+                    <div className="pt-1">
                       <button
                         type="button"
                         onClick={handleReaderLogout}
@@ -296,34 +297,34 @@ export function Header() {
                         <LogOut className="w-3.5 h-3.5" />
                         <span>{isBn ? 'লগআউট করুন' : 'Sign Out'}</span>
                       </button>
-                      <Link
-                        to="/admin"
-                        onClick={() => setUserMenuOpen(false)}
-                        className="w-full text-left px-3 py-2 rounded-lg hover:bg-stone-50 text-stone-600 flex items-center gap-2"
-                      >
-                        <SlidersHorizontal className="w-3.5 h-3.5" />
-                        <span>{isBn ? 'সম্পাদকীয় সিএমএস প্যানেল' : 'Admin CMS Portal'}</span>
-                      </Link>
                     </div>
                   </>
                 ) : (
                   <>
-                    <div className="p-2">
-                      <p className="font-bold text-stone-900">
-                        {isBn ? 'নিউজফ্লো পাঠক অ্যাকাউন্ট' : 'NewsFlow Reader Account'}
+                    <div className="p-2.5 bg-stone-50 rounded-lg mb-1">
+                      <p className="font-bold text-stone-900 text-xs font-serif-bn">
+                        {isBn ? 'পাঠক অ্যাকাউন্ট' : 'Reader Account'}
                       </p>
-                      <p className="text-[11px] text-stone-500">
-                        {isBn ? 'ব্যক্তিগত নিউজফিড ও বুকমার্ক সিঙ্ক' : 'Sync bookmarks & personalize feed'}
+                      <p className="text-[11px] text-stone-500 mt-0.5">
+                        {isBn ? 'ব্যক্তিগত সংবাদ পছন্দ ও বুকমার্ক সিঙ্ক' : 'Personalize feed & sync reading list'}
                       </p>
                     </div>
-                    <div className="py-1 space-y-0.5">
+                    <div className="py-1 space-y-1">
                       <Link
                         to="/reader/login"
                         onClick={() => setUserMenuOpen(false)}
-                        className="w-full text-left px-3 py-2 rounded-lg hover:bg-rose-50 text-rose-700 font-bold flex items-center gap-2"
+                        className="w-full text-left px-3 py-2 rounded-lg bg-rose-700 hover:bg-rose-800 text-white font-bold flex items-center justify-center gap-2 shadow-xs transition-colors"
                       >
                         <LogIn className="w-3.5 h-3.5" />
-                        <span>{isBn ? 'পাঠক লগইন / নিবন্ধন' : 'Reader Sign In / Register'}</span>
+                        <span>{isBn ? 'পাঠক লগইন ও নিবন্ধন' : 'Reader Sign In / Register'}</span>
+                      </Link>
+                      <Link
+                        to="/for-you"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="w-full text-left px-3 py-1.5 rounded-lg hover:bg-stone-50 text-stone-700 flex items-center gap-2 font-medium"
+                      >
+                        <Sparkles className="w-3.5 h-3.5 text-rose-700" />
+                        <span>{isBn ? 'আমার পছন্দের সংবাদ (For You)' : 'Personalized Feed'}</span>
                       </Link>
                       <button
                         type="button"
@@ -331,21 +332,14 @@ export function Header() {
                           setUserMenuOpen(false);
                           dispatch(setSelectedCategory('saved'));
                         }}
-                        className="w-full text-left px-3 py-2 rounded-lg hover:bg-stone-50 text-stone-700 flex items-center justify-between cursor-pointer"
+                        className="w-full text-left px-3 py-1.5 rounded-lg hover:bg-stone-50 text-stone-700 flex items-center justify-between cursor-pointer"
                       >
-                        <span>{isBn ? 'সংরক্ষিত সংবাদ তালিকা' : 'Saved Reading List'}</span>
-                        <span className="font-bold text-rose-700">{savedCount}</span>
+                        <span className="flex items-center gap-2 font-medium">
+                          <Bookmark className="w-3.5 h-3.5 text-amber-600" />
+                          <span>{isBn ? 'সংরক্ষিত সংবাদ তালিকা' : 'Saved Reading List'}</span>
+                        </span>
+                        <span className="font-bold text-rose-700 text-xs">{savedCount}</span>
                       </button>
-                    </div>
-                    <div className="pt-1">
-                      <Link
-                        to="/admin"
-                        onClick={() => setUserMenuOpen(false)}
-                        className="w-full text-left px-3 py-2 rounded-lg hover:bg-stone-50 text-stone-600 flex items-center gap-2"
-                      >
-                        <SlidersHorizontal className="w-3.5 h-3.5" />
-                        <span>{isBn ? 'সম্পাদকীয় সিএমএস প্যানেল' : 'Admin CMS Portal'}</span>
-                      </Link>
                     </div>
                   </>
                 )}

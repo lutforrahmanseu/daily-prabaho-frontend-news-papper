@@ -5,19 +5,20 @@ import {
   setMobileDrawerOpen,
   setSearchModalOpen,
   setEpaperModalOpen,
-  setActiveView,
   toggleLanguage
 } from '../../store/uiSlice.js';
 import { setSelectedCategory } from '../../store/newsSlice.js';
+import { selectIsReaderAuthenticated } from '../../store/readerSlice.js';
 import { CATEGORIES } from '../../data/categories.js';
 import { usePortalCategories, usePortalSettings } from '../../hooks/usePortalData.js';
-import { X, Search, Globe2, Newspaper, ShieldAlert, Home, Bookmark, Radio, Layers, Film, Sparkles, User, Archive, Users, Calendar, MapPin } from 'lucide-react';
+import { X, Search, Globe2, Newspaper, Home, Bookmark, Radio, Layers, Film, Sparkles, User, Archive, Users, Calendar, MapPin } from 'lucide-react';
 import { MotionDrawerOverlay } from '../common/MotionPrimitives.jsx';
 
 export function MobileDrawer() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { mobileDrawerOpen, language, activeView } = useSelector((state) => state.ui);
+  const { mobileDrawerOpen, language } = useSelector((state) => state.ui);
+  const isReaderAuth = useSelector(selectIsReaderAuthenticated);
   const { selectedCategory, savedArticleIds } = useSelector((state) => state.news);
   const { categories } = usePortalCategories();
   const { settings } = usePortalSettings();
@@ -229,28 +230,20 @@ export function MobileDrawer() {
           ))}
         </div>
 
-        {/* Footer Admin Entry */}
+        {/* Footer Reader Entry */}
         <div className="p-4 border-t border-stone-200 bg-stone-50">
-          <button
-            type="button"
-            onClick={() => {
-              dispatch(setActiveView(activeView === 'admin' ? 'public' : 'admin'));
-              dispatch(setMobileDrawerOpen(false));
-              if (activeView === 'public') {
-                navigate('/admin');
-              } else {
-                navigate('/');
-              }
-            }}
-            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-rose-700 hover:bg-rose-800 text-white font-semibold text-xs transition-colors cursor-pointer"
+          <Link
+            to={isReaderAuth ? '/reader/profile' : '/reader/login'}
+            onClick={() => dispatch(setMobileDrawerOpen(false))}
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-rose-700 hover:bg-rose-800 text-white font-bold text-xs transition-colors shadow-xs"
           >
-            <ShieldAlert className="w-4 h-4" />
+            <User className="w-4 h-4" />
             <span>
-              {activeView === 'admin'
-                ? (isBn ? 'মূল সংবাদ পাতায় যান' : 'Go to Public Portal')
-                : (isBn ? 'সম্পাদকীয় প্যানেল (Admin)' : 'Admin Dashboard')}
+              {isReaderAuth
+                ? (isBn ? 'আমার পাঠক প্রোফাইল' : 'Reader Profile')
+                : (isBn ? 'পাঠক লগইন ও নিবন্ধন' : 'Reader Sign In / Register')}
             </span>
-          </button>
+          </Link>
         </div>
     </MotionDrawerOverlay>
   );
