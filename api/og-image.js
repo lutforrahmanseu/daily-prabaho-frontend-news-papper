@@ -10,7 +10,15 @@ import path from 'node:path';
  * compresses it to ~80-110KB JPEG, and caches it at Vercel Edge for 7 days.
  */
 export default async function handler(req, res) {
-  const { slug, url } = req.query;
+  let slug = req.query?.slug;
+  if (!slug && req.url) {
+    const match = req.url.match(/\/api\/og-image\/([^/?#]+?)(?:\.jpe?g|\.png)?(?:\?|$)/i);
+    if (match && match[1]) {
+      slug = decodeURIComponent(match[1]);
+    }
+  }
+
+  const { url } = req.query;
   const defaultApiOrigin = 'https://daily-prabaho-api.onrender.com';
   const apiBase = process.env.VITE_API_URL || `${defaultApiOrigin}/api/v1`;
 
@@ -100,3 +108,4 @@ export default async function handler(req, res) {
     return res.status(500).send('Image optimization failed');
   }
 }
+

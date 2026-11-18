@@ -43,8 +43,8 @@ export default async function handler(req, res) {
   }
 
   const canonicalUrl = `${siteUrl}/news/${slug}`;
-  // The optimized image endpoint guarantees image size < 120KB for WhatsApp (< 300KB requirement)
-  const optimizedImageUrl = `${siteUrl}/api/og-image?slug=${encodeURIComponent(slug)}`;
+  // Clean .jpg extension endpoint guarantees image size < 120KB for WhatsApp (< 300KB requirement)
+  const optimizedImageUrl = `${siteUrl}/api/og-image/${encodeURIComponent(slug)}.jpg`;
   let title = 'দৈনিক বার্তা প্রবাহ (Daily Prabaho)';
   let description = 'বাংলাদেশ ও আন্তর্জাতিক বিশ্বের সর্বশেষ নির্ভরযোগ্য সংবাদ, রাজনীতি, বাণিজ্য, খেলাধুলা, বিজ্ঞান ও প্রযুক্তির সত্যনিষ্ঠ বিশ্লেষণ।';
   let publishedTime = new Date().toISOString();

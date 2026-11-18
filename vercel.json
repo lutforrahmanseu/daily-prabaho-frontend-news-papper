@@ -5,6 +5,10 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
+      "source": "/api/og-image/:slug.jpg",
+      "destination": "/api/og-image?slug=:slug"
+    },
+    {
       "source": "/news/:slug",
       "has": [
         {

@@ -40,7 +40,7 @@ test('Social Preview API: generates valid Open Graph and Twitter Card tags with 
 
   // Verify essential Open Graph tags for WhatsApp, Facebook, Telegram
   assert.match(capturedBody, /<meta\s+property="og:type"\s+content="article"/);
-  assert.match(capturedBody, /<meta\s+property="og:image"\s+content="https?:\/\/[^"]+\/api\/og-image\?slug=news-1794991454455"/);
+  assert.match(capturedBody, /<meta\s+property="og:image"\s+content="https?:\/\/[^"]+\/api\/og-image\/news-1794991454455\.jpg"/);
   assert.match(capturedBody, /<meta\s+property="og:image:secure_url"/);
   assert.match(capturedBody, /<meta\s+property="og:image:type"\s+content="image\/jpeg"/);
   assert.match(capturedBody, /<meta\s+property="og:title"/);
