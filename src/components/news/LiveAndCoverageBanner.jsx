@@ -12,7 +12,6 @@ import {
 } from '../../utils/liveCoverageHelpers.js';
 import { toBengaliNumber } from '../../utils/bengaliFormatter.js';
 import { LiveBadgePill } from '../live/LiveCoverageShared.jsx';
-import { normalizeMediaUrl } from '../../utils/apiNormalizer.js';
 
 export function LiveAndCoverageBanner() {
   const { data: liveRes } = useGetPublicLiveBlogsQuery({ per_page: 4 });
@@ -29,17 +28,17 @@ export function LiveAndCoverageBanner() {
     <section className="my-5 space-y-4">
       {/* Active Live Blogs Strip */}
       {liveBlogs.length > 0 && (
-        <div className="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-4 shadow-xs">
+        <div className="rounded-2xl border border-stone-200 bg-white p-4 sm:p-5 shadow-xs">
           <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-            <div className="flex items-center gap-2">
-              <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-rose-700 text-white">
+            <div className="flex items-center gap-2.5">
+              <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-rose-700 text-white shrink-0">
                 <Radio className="w-4 h-4" />
               </span>
               <div>
-                <h2 className="font-serif-bn text-base sm:text-lg font-extrabold text-stone-900 dark:text-stone-100">
+                <h2 className="font-serif-bn text-base sm:text-lg font-extrabold text-stone-900">
                   সরাসরি সংবাদ আপডেট
                 </h2>
-                <p className="text-[11px] text-stone-500 dark:text-stone-400">
+                <p className="text-xs text-stone-500 font-normal">
                   মুহূর্তের খবর তাৎক্ষণিক রিয়েল-টাইম ফিডে
                 </p>
               </div>
@@ -47,7 +46,7 @@ export function LiveAndCoverageBanner() {
 
             <Link
               to="/live"
-              className="inline-flex items-center gap-1 text-xs font-bold text-rose-700 dark:text-rose-400 hover:underline"
+              className="inline-flex items-center gap-1 text-xs font-bold text-rose-700 hover:text-rose-800 hover:underline"
             >
               <span>সব লাইভ ডেস্ক</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -61,7 +60,7 @@ export function LiveAndCoverageBanner() {
                 <Link
                   key={blog.id}
                   to={`/live/${blog.slug}`}
-                  className="group rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900/90 p-3.5 hover:border-rose-400 transition-colors flex flex-col justify-between"
+                  className="group rounded-xl border border-stone-200 bg-white p-4 hover:border-rose-400 hover:shadow-xs transition-all flex flex-col justify-between"
                 >
                   <div>
                     <div className="flex items-center justify-between gap-2 mb-2">
@@ -70,14 +69,14 @@ export function LiveAndCoverageBanner() {
                         {eventMeta.label}
                       </span>
                     </div>
-                    <h3 className="font-serif-bn font-bold text-sm sm:text-base text-stone-900 dark:text-stone-100 group-hover:text-rose-700 dark:group-hover:text-rose-400 line-clamp-2 leading-snug">
+                    <h3 className="font-serif-bn font-bold text-sm sm:text-base text-stone-900 group-hover:text-rose-700 line-clamp-2 leading-snug">
                       {blog.title}
                     </h3>
                   </div>
 
-                  <div className="mt-3 pt-2 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between text-xs text-stone-700 dark:text-stone-300 font-medium">
+                  <div className="mt-3 pt-2.5 border-t border-stone-100 flex items-center justify-between text-xs text-stone-500 font-medium">
                     <span>{formatLiveTimestampBadge(blog.last_update_at || blog.started_at)}</span>
-                    <span className="font-bold text-stone-900 dark:text-stone-100">
+                    <span className="font-bold text-stone-800">
                       {toBengaliNumber(blog.updates_count || 0)} আপডেট
                     </span>
                   </div>
@@ -90,17 +89,17 @@ export function LiveAndCoverageBanner() {
 
       {/* Featured Special Coverages Microsite Bar */}
       {coverages.length > 0 && (
-        <div className="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-4 shadow-xs">
+        <div className="rounded-2xl border border-stone-200 bg-white p-4 sm:p-5 shadow-xs">
           <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-            <div className="flex items-center gap-2">
-              <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-stone-900 dark:bg-stone-700 text-white">
+            <div className="flex items-center gap-2.5">
+              <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-rose-700 text-white shrink-0">
                 <Layers className="w-4 h-4" />
               </span>
               <div>
-                <h2 className="font-serif-bn text-base sm:text-lg font-extrabold text-stone-900 dark:text-stone-100">
+                <h2 className="font-serif-bn text-base sm:text-lg font-extrabold text-stone-900">
                   বিশেষ আয়োজন ও পূর্ণাঙ্গ কাভারেজ
                 </h2>
-                <p className="text-xs text-stone-700 dark:text-stone-300 font-medium">
+                <p className="text-xs text-stone-500 font-normal">
                   নির্বাচন, বাজেট, ক্রীড়া আসর, জাতীয় দিবস ও জরুরি বিষয়ের ডেডিকেটেড পাতা
                 </p>
               </div>
@@ -108,7 +107,7 @@ export function LiveAndCoverageBanner() {
 
             <Link
               to="/coverage"
-              className="inline-flex items-center gap-1 text-xs font-bold text-rose-700 dark:text-rose-400 hover:underline"
+              className="inline-flex items-center gap-1 text-xs font-bold text-rose-700 hover:text-rose-800 hover:underline"
             >
               <span>সব বিশেষ আয়োজন</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -122,32 +121,28 @@ export function LiveAndCoverageBanner() {
                 <Link
                   key={cov.id}
                   to={`/coverage/${cov.slug}`}
-                  className="group relative rounded-xl overflow-hidden border border-stone-200 dark:border-stone-800 bg-stone-900 text-white min-h-[126px] flex flex-col justify-end p-4"
+                  className="group rounded-xl border border-stone-200 bg-white p-4 hover:border-rose-400 hover:shadow-xs transition-all flex flex-col justify-between"
                 >
-                  {cov.hero_image && (
-                    <img
-                      src={normalizeMediaUrl(cov.hero_image)}
-                      alt={cov.title}
-                      className="absolute inset-0 w-full h-full object-cover opacity-45 group-hover:scale-105 transition-transform duration-500"
-                    />
-                  )}
-                  <div
-                    className={`absolute inset-0 bg-gradient-to-t ${typeMeta.accentBg} opacity-85`}
-                  />
-
-                  <div className="relative z-10">
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/15 backdrop-blur-xs text-white border border-white/20">
-                        <Sparkles className="w-3 h-3" />
+                  <div>
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                        <Sparkles className="w-3 h-3 text-rose-600" />
                         <span>{cov.badge_text || typeMeta.shortLabel}</span>
                       </span>
                     </div>
-                    <h3 className="font-serif-bn font-bold text-base leading-snug group-hover:underline">
+                    <h3 className="font-serif-bn font-bold text-sm sm:text-base text-stone-900 group-hover:text-rose-700 line-clamp-2 leading-snug">
                       {cov.title}
                     </h3>
                     {cov.subtitle && (
-                      <p className="text-xs text-stone-200/90 line-clamp-1 mt-0.5">{cov.subtitle}</p>
+                      <p className="text-xs text-stone-500 line-clamp-2 mt-1.5 leading-relaxed">
+                        {cov.subtitle}
+                      </p>
                     )}
+                  </div>
+
+                  <div className="mt-3 pt-2.5 border-t border-stone-100 flex items-center justify-between text-xs font-semibold text-rose-700 group-hover:translate-x-0.5 transition-transform">
+                    <span>পূর্ণাঙ্গ কাভারেজ পড়ুন</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
                   </div>
                 </Link>
               );
@@ -160,4 +155,3 @@ export function LiveAndCoverageBanner() {
 }
 
 export default LiveAndCoverageBanner;
-

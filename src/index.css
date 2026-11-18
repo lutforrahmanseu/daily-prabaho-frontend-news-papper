@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @import "./styles/theme.css";
 
+/* Only activate dark: variants when .dark class is explicitly present on an ancestor */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* Newspaper helper utilities */
 .newspaper-headline {
   font-family: 'Noto Serif Bengali', Georgia, serif;
