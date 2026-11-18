@@ -673,6 +673,7 @@ export function AppRoutes() {
           <Route path="for-you" element={<PersonalizedFeedPage />} />
           <Route path="reader/login" element={<ReaderAuthPage defaultMode="login" />} />
           <Route path="reader/register" element={<ReaderAuthPage defaultMode="register" />} />
+          <Route path="reader/auth" element={<Navigate to="/reader/login" replace />} />
           <Route path="reader/profile" element={<ReaderProfilePage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>

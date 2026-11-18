@@ -242,7 +242,7 @@ export function Navbar() {
                 </div>
               ) : (
                 <Link
-                  to="/reader/auth?mode=login"
+                  to="/reader/login"
                   className="flex items-center gap-1.5 px-2.5 py-1 text-stone-800 hover:text-rose-700 hover:bg-stone-100 rounded-md text-xs xl:text-sm font-bold transition-colors cursor-pointer"
                   title={isBn ? 'পাঠক অ্যাকাউন্টে লগইন করুন' : 'Sign In'}
                 >
