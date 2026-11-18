@@ -75,3 +75,4 @@ test('Social Preview API: redirects to home when slug is missing', async () => {
   assert.equal(redirectedCode, 302);
   assert.ok(redirectedUrl.length > 0);
 });
+
