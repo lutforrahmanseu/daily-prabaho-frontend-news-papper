@@ -82,29 +82,29 @@ export function TopUtilityBar() {
   ];
 
   return (
-    <div className="bg-[#1f2937] text-stone-300 text-[11px] xl:text-xs border-b border-stone-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-wrap lg:flex-nowrap items-center justify-between gap-x-3 gap-y-2 py-2">
+    <div className="bg-stone-100/90 text-stone-700 text-xs border-b border-stone-200 select-none">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 py-1.5 sm:py-2 flex items-center justify-between gap-2 sm:gap-3 flex-nowrap">
         {/* Left: Date, Bengali Calendar & Weather */}
-        <div className="flex items-center flex-wrap gap-x-2.5 xl:gap-x-3 gap-y-1 text-stone-300 min-w-0">
-          <div className="flex items-center gap-1.5 font-medium text-white whitespace-nowrap">
-            <Calendar className="w-3.5 h-3.5 text-rose-400 shrink-0" />
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0 min-w-0">
+          <div className="flex items-center gap-1.5 font-medium text-stone-900 shrink-0 whitespace-nowrap text-[11px] sm:text-xs">
+            <Calendar className="w-3.5 h-3.5 text-rose-700 shrink-0" />
             <span>{dateFormatted}</span>
             {isBn && (
-              <span className="hidden md:inline text-stone-400">
+              <span className="hidden md:inline text-stone-500 font-normal">
                 · {banglaDate}
               </span>
             )}
           </div>
 
-          <div className="hidden sm:flex items-center gap-1.5 text-stone-300 border-l border-stone-700 pl-2.5 xl:pl-3 whitespace-nowrap">
-            <CloudSun className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+          <div className="hidden sm:flex items-center gap-1.5 text-stone-700 border-l border-stone-300 pl-2 sm:pl-3 whitespace-nowrap shrink-0 text-[11px] sm:text-xs">
+            <CloudSun className="w-3.5 h-3.5 text-amber-500 shrink-0" />
             <span>{userLocation}: {isBn ? toBengaliNumber(weatherTemp) : weatherTemp}°C</span>
-            <span className="hidden xl:inline text-stone-400 text-[11px]">({weatherCondition})</span>
+            <span className="hidden xl:inline text-stone-500">({weatherCondition})</span>
           </div>
 
-          {/* Social Links as required by Section 1 */}
-          <div className="hidden lg:flex items-center gap-1 border-l border-stone-700 pl-2.5 xl:pl-3 shrink-0">
-            <span className="hidden 2xl:inline text-stone-400 text-[11px] mr-1 whitespace-nowrap">
+          {/* Social Links on wide screens */}
+          <div className="hidden 2xl:flex items-center gap-1 border-l border-stone-300 pl-3 shrink-0">
+            <span className="text-stone-500 text-[11px] mr-1 whitespace-nowrap">
               {isBn ? 'অনুসরণ করুন:' : 'Follow Us:'}
             </span>
             {socialLinks.map((item) => (
@@ -115,7 +115,7 @@ export function TopUtilityBar() {
                 rel="noopener noreferrer"
                 title={item.name}
                 aria-label={item.name}
-                className="p-1 rounded text-stone-400 hover:text-white hover:bg-stone-800 transition-colors"
+                className="p-1 rounded text-stone-500 hover:text-stone-900 hover:bg-stone-200 transition-colors"
               >
                 {item.icon}
               </a>
@@ -124,80 +124,89 @@ export function TopUtilityBar() {
         </div>
 
         {/* Right: Edition Switcher, Font Resize, Language, E-paper & Admin Portal */}
-        <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap sm:flex-nowrap ml-auto shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-2 ml-auto shrink-0 flex-nowrap">
           {/* Edition Selection */}
-          <div className="flex items-center bg-stone-800/80 rounded p-0.5 border border-stone-700 text-[11px] whitespace-nowrap">
+          <div className="flex items-center bg-stone-200/90 rounded-md p-0.5 border border-stone-300 text-[11px] font-medium shrink-0">
             <button
               type="button"
               onClick={() => dispatch(setEdition('national'))}
-              className={`px-2 py-0.5 rounded transition-colors cursor-pointer whitespace-nowrap ${edition === 'national' ? 'bg-rose-700 text-white font-medium' : 'text-stone-300 hover:text-white'
-                }`}
+              className={`px-2 py-0.5 rounded transition-colors cursor-pointer whitespace-nowrap ${
+                edition === 'national' ? 'bg-rose-700 text-white font-bold shadow-2xs' : 'text-stone-700 hover:text-stone-900'
+              }`}
             >
-              {isBn ? 'জাতীয়' : 'National'}
+              {isBn ? 'জাতীয়' : 'National'}
             </button>
             <button
               type="button"
               onClick={() => dispatch(setEdition('international'))}
-              className={`px-2 py-0.5 rounded transition-colors cursor-pointer whitespace-nowrap ${edition === 'international' ? 'bg-rose-700 text-white font-medium' : 'text-stone-300 hover:text-white'
-                }`}
+              className={`px-2 py-0.5 rounded transition-colors cursor-pointer whitespace-nowrap ${
+                edition === 'international' ? 'bg-rose-700 text-white font-bold shadow-2xs' : 'text-stone-700 hover:text-stone-900'
+              }`}
             >
               {isBn ? 'আন্তর্জাতিক' : 'Global'}
             </button>
           </div>
 
-          {/* E-Paper & Archive Links */}
+          {/* E-Paper Link (visible on xs and up, inside mobile drawer on small) */}
           <Link
             to="/epaper"
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-stone-800 hover:bg-stone-700 text-stone-200 border border-stone-700 transition-colors cursor-pointer whitespace-nowrap"
+            className="hidden xs:flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded bg-white hover:bg-stone-50 text-stone-800 border border-stone-300 hover:border-stone-400 text-[11px] sm:text-xs font-semibold shadow-2xs transition-colors shrink-0 whitespace-nowrap"
             title="Read Today's E-Paper"
             aria-label="Open Digital E-Paper Reader"
           >
-            <Newspaper className="w-3.5 h-3.5 text-rose-400 shrink-0" />
-            <span className="font-medium">{isBn ? 'ই-পেপার' : 'E-Paper'}</span>
+            <Newspaper className="w-3.5 h-3.5 text-rose-700 shrink-0" />
+            <span>{isBn ? 'ই-পেপার' : 'E-Paper'}</span>
           </Link>
 
+          {/* Archive Link */}
           <Link
             to="/archive"
-            className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded bg-stone-800/80 hover:bg-stone-700 text-stone-200 border border-stone-700 transition-colors cursor-pointer whitespace-nowrap"
+            className="hidden lg:flex items-center gap-1 px-2.5 py-1 rounded bg-white hover:bg-stone-50 text-stone-700 border border-stone-300 text-xs font-medium shadow-2xs transition-colors shrink-0 whitespace-nowrap"
             title="Browse News Archive"
             aria-label="Browse News Archive"
           >
-            <Archive className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-            <span className="font-medium">{isBn ? 'আর্কাইভ' : 'Archive'}</span>
+            <Archive className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+            <span>{isBn ? 'আর্কাইভ' : 'Archive'}</span>
           </Link>
+
+          {/* Community Link */}
           <Link
             to="/community"
-            className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded bg-stone-800/80 hover:bg-stone-700 text-stone-200 border border-stone-700 transition-colors cursor-pointer whitespace-nowrap"
+            className="hidden 2xl:flex items-center gap-1 px-2.5 py-1 rounded bg-white hover:bg-stone-50 text-stone-700 border border-stone-300 text-xs font-medium shadow-2xs transition-colors shrink-0 whitespace-nowrap"
             title={isBn ? 'নাগরিক সাংবাদিকতা ও পাঠক কমিউনিটি' : 'Citizen Journalism & Community'}
             aria-label="Community Hub"
           >
-            <Users className="w-3.5 h-3.5 text-teal-400 shrink-0" />
-            <span className="font-medium">{isBn ? 'কমিউনিটি' : 'Community'}</span>
+            <Users className="w-3.5 h-3.5 text-teal-600 shrink-0" />
+            <span>{isBn ? 'কমিউনিটি' : 'Community'}</span>
           </Link>
+
+          {/* Events Link */}
           <Link
             to="/events"
-            className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded bg-stone-800/80 hover:bg-stone-700 text-stone-200 border border-stone-700 transition-colors cursor-pointer whitespace-nowrap"
+            className="hidden 2xl:flex items-center gap-1 px-2.5 py-1 rounded bg-white hover:bg-stone-50 text-stone-700 border border-stone-300 text-xs font-medium shadow-2xs transition-colors shrink-0 whitespace-nowrap"
             title={isBn ? 'ইভেন্ট, প্রতিযোগিতা ও বিশেষ প্রকল্প' : 'Events & Special Projects'}
             aria-label="Events Hub"
           >
-            <Calendar className="w-3.5 h-3.5 text-rose-400 shrink-0" />
-            <span className="font-medium">{isBn ? 'ইভেন্ট ও প্রকল্প' : 'Events'}</span>
+            <Calendar className="w-3.5 h-3.5 text-rose-700 shrink-0" />
+            <span>{isBn ? 'ইভেন্ট ও প্রকল্প' : 'Events'}</span>
           </Link>
+
+          {/* Premium Membership Link */}
           <Link
             to="/subscribe"
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-gradient-to-r from-amber-500 to-rose-600 hover:from-amber-400 hover:to-rose-500 text-white border border-amber-400/40 shadow-xs transition-colors cursor-pointer whitespace-nowrap"
+            className="hidden sm:flex items-center gap-1 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded bg-gradient-to-r from-amber-500 to-rose-600 hover:from-amber-600 hover:to-rose-700 text-white text-[11px] sm:text-xs font-bold shadow-xs transition-all shrink-0 whitespace-nowrap"
             title={isBn ? 'প্রিমিয়াম সাবস্ক্রিপশন ও অ্যাড-ফ্রি পাঠ' : 'Premium Membership & Ad-Free Reading'}
             aria-label="Premium Membership"
           >
             <Crown className="w-3.5 h-3.5 shrink-0" />
-            <span className="font-bold">{isBn ? 'প্রিমিয়াম' : 'Premium'}</span>
+            <span>{isBn ? 'প্রিমিয়াম' : 'Premium'}</span>
           </Link>
 
           {/* Font Resizer */}
           <button
             type="button"
             onClick={() => dispatch(toggleFontSize())}
-            className="hidden sm:flex items-center gap-1 px-2 py-1 rounded hover:bg-stone-800 text-stone-300 hover:text-white transition-colors cursor-pointer whitespace-nowrap"
+            className="hidden xl:flex items-center gap-1 px-2 py-1 rounded hover:bg-stone-200 text-stone-700 transition-colors shrink-0 whitespace-nowrap cursor-pointer"
             title={fontSize === 'normal' ? 'বড় হরফ (Large Text)' : 'স্বাভাবিক হরফ (Normal Text)'}
             aria-label="Toggle text size"
           >
@@ -209,24 +218,25 @@ export function TopUtilityBar() {
           <button
             type="button"
             onClick={() => dispatch(toggleLanguage())}
-            className="flex items-center gap-1 px-2.5 py-1 rounded bg-rose-950/50 hover:bg-rose-900/70 text-rose-200 border border-rose-800/80 font-bold transition-colors cursor-pointer whitespace-nowrap"
+            className="flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded bg-white hover:bg-stone-50 text-stone-900 border border-stone-300 hover:border-stone-400 text-[11px] sm:text-xs font-bold shadow-2xs transition-colors shrink-0 whitespace-nowrap cursor-pointer"
             title="Switch Language"
             aria-label="Switch Language"
           >
-            <Globe2 className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+            <Globe2 className="w-3.5 h-3.5 text-blue-600 shrink-0" />
             <span>{isBn ? 'English' : 'বাংলা'}</span>
           </button>
 
           {/* Admin Editorial Portal Link */}
           <Link
             to={isAdmin ? '/' : '/admin'}
-            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded font-medium transition-all whitespace-nowrap ${isAdmin
+            className={`hidden md:flex items-center gap-1.5 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded text-[11px] sm:text-xs font-bold transition-all shrink-0 whitespace-nowrap ${
+              isAdmin
                 ? 'bg-amber-500 text-stone-950 font-bold hover:bg-amber-400'
-                : 'bg-rose-700 hover:bg-rose-600 text-white'
-              }`}
+                : 'bg-stone-900 hover:bg-black text-white'
+            }`}
           >
             <ShieldAlert className="w-3.5 h-3.5 shrink-0" />
-            <span className="font-semibold">
+            <span>
               {isAdmin
                 ? (isBn ? 'মূল পাতায় ফিরুন' : 'Back to News')
                 : (isBn ? 'সম্পাদকীয় প্যানেল' : 'Admin CMS')}

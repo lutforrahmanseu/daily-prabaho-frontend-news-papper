@@ -98,27 +98,27 @@ export function Header() {
           {/* Center: Original NewsFlow Logo Masthead */}
           <Link
             to="/"
-            className="text-center flex-1 lg:flex-none cursor-pointer select-none"
+            className="text-center flex-1 lg:flex-none cursor-pointer select-none min-w-0"
             onClick={() => dispatch(setSelectedCategory('all'))}
           >
-            <div className="inline-flex flex-col items-center group">
-              <div className="flex items-center justify-center gap-2.5 sm:gap-3.5">
+            <div className="inline-flex flex-col items-center group max-w-full">
+              <div className="flex items-center justify-center gap-2 sm:gap-3.5">
                 {/* NewsFlow Custom SVG Crest Logo Mark */}
-                <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-rose-700 via-rose-800 to-stone-900 text-white flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
-                  <svg className="w-5 h-5 sm:w-6 sm:h-6 fill-current" viewBox="0 0 24 24">
+                <div className="w-8 h-8 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-rose-700 via-rose-800 to-stone-900 text-white flex items-center justify-center shadow-md group-hover:scale-105 transition-transform shrink-0">
+                  <svg className="w-4 h-4 sm:w-6 sm:h-6 fill-current" viewBox="0 0 24 24">
                     <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
                   </svg>
                 </div>
 
-                <h1 className="text-3xl sm:text-5xl lg:text-5xl font-extrabold text-[#111827] tracking-tight font-serif-bn group-hover:text-rose-800 transition-colors">
+                <h1 className="text-2xl xs:text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#111827] tracking-tight font-serif-bn group-hover:text-rose-800 transition-colors truncate sm:whitespace-nowrap">
                   {websiteName}
                 </h1>
               </div>
 
               {/* Tagline Ribbon with hairline dividers */}
-              <div className="flex items-center justify-center gap-2 mt-1 sm:mt-1.5">
+              <div className="hidden xs:flex items-center justify-center gap-2 mt-1 sm:mt-1.5">
                 <span className="h-px w-6 sm:w-12 bg-rose-700"></span>
-                <p className="text-[10px] sm:text-xs font-semibold text-rose-800 tracking-wider uppercase font-sans">
+                <p className="text-[10px] sm:text-xs font-semibold text-rose-800 tracking-wider uppercase font-sans truncate">
                   {tagline}
                 </p>
                 <span className="h-px w-6 sm:w-12 bg-rose-700"></span>
@@ -127,16 +127,16 @@ export function Header() {
           </Link>
 
           {/* Right: Search & User Navigation */}
-          <div className="flex items-center justify-end gap-2 sm:gap-3 relative lg:flex-1">
+          <div className="flex items-center justify-end gap-1.5 sm:gap-3 relative lg:flex-1 shrink-0">
             {/* Quick Search Button */}
             <button
               type="button"
               onClick={() => dispatch(setSearchModalOpen(true))}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-stone-300 hover:border-stone-400 bg-stone-50 hover:bg-white text-stone-700 text-xs transition-all cursor-pointer shadow-2xs"
+              className="p-2 sm:px-3 sm:py-1.5 rounded-full border border-stone-300 hover:border-stone-400 bg-stone-50 hover:bg-white text-stone-700 text-xs transition-all cursor-pointer shadow-2xs flex items-center gap-1.5"
               title={isBn ? 'সংবাদ খুঁজুন' : 'Search news'}
               aria-label="Search articles"
             >
-              <Search className="w-4 h-4 text-stone-500" />
+              <Search className="w-4 h-4 text-stone-500 shrink-0" />
               <span className="hidden sm:inline font-medium">
                 {isBn ? 'অনুসন্ধান' : 'Search'}
               </span>
@@ -153,7 +153,7 @@ export function Header() {
                   navigate('/');
                 }
               }}
-              className="relative p-2 rounded-full border border-stone-200 hover:border-stone-300 bg-white text-stone-700 hover:text-rose-700 transition-colors cursor-pointer"
+              className="relative p-2 rounded-full border border-stone-200 hover:border-stone-300 bg-white text-stone-700 hover:text-rose-700 transition-colors cursor-pointer shrink-0"
               title={isBn ? 'সংরক্ষিত সংবাদ' : 'Saved Articles'}
               aria-label="Saved Articles"
             >
@@ -166,7 +166,7 @@ export function Header() {
             </button>
 
             {/* Live Alerts Notification Popover */}
-            <div className="relative">
+            <div className="relative hidden xs:block">
               <button
                 type="button"
                 onClick={() => setNotificationOpen(!notificationOpen)}
@@ -180,7 +180,7 @@ export function Header() {
 
               <MotionDropdown
                 isOpen={notificationOpen}
-                className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-stone-200 z-50 p-3 text-xs"
+                className="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 max-w-sm bg-white rounded-xl shadow-xl border border-stone-200 z-50 p-3 text-xs"
               >
                   <div className="flex items-center justify-between pb-2 mb-2 border-b border-stone-100">
                     <span className="font-bold text-stone-900 font-serif-bn">
@@ -221,12 +221,12 @@ export function Header() {
               <button
                 type="button"
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
-                className="flex items-center gap-1.5 p-1.5 sm:px-2.5 sm:py-1 rounded-full border border-stone-300 hover:border-stone-400 bg-white text-stone-800 text-xs font-semibold cursor-pointer transition-colors"
+                className="flex items-center gap-1.5 p-1.5 sm:px-2.5 sm:py-1 rounded-full border border-stone-300 hover:border-stone-400 bg-white text-stone-800 text-xs font-semibold cursor-pointer transition-colors shrink-0"
                 title={isBn ? 'পাঠক অ্যাকাউন্ট ও মেনু' : 'Reader account'}
                 aria-label="User navigation"
               >
                 <div
-                  className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                  className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
                     isReaderAuth ? 'bg-rose-700 text-white font-bold text-[10px]' : 'bg-stone-200 text-stone-600'
                   }`}
                 >
@@ -245,7 +245,7 @@ export function Header() {
 
               <MotionDropdown
                 isOpen={userMenuOpen}
-                className="absolute right-0 mt-2 w-60 bg-white rounded-xl shadow-xl border border-stone-200 z-50 p-2 text-xs divide-y divide-stone-100"
+                className="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-60 max-w-xs bg-white rounded-xl shadow-xl border border-stone-200 z-50 p-2 text-xs divide-y divide-stone-100"
               >
                 {isReaderAuth ? (
                   <>

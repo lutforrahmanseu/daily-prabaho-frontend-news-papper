@@ -247,7 +247,7 @@ export function NewsCard({
         onClick={handleCardClick}
         className={`group cursor-pointer bg-white border border-stone-200 rounded-lg p-3 hover:border-stone-300 hover:shadow-xs transition-all flex gap-3.5 ${className}`}
       >
-        <div className="flex-1 flex flex-col justify-between">
+        <div className="flex-1 flex flex-col justify-between min-w-0">
           <div>
             <div className="flex items-center gap-1.5 text-xs text-rose-700 font-semibold mb-1 flex-wrap">
               <Link

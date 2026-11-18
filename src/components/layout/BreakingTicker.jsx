@@ -51,21 +51,22 @@ export function BreakingTicker() {
   };
 
   return (
-    <div className="bg-gradient-to-r from-stone-950 via-stone-900 to-rose-950 text-stone-100 border-b border-stone-800 shadow-xs">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2 flex items-center justify-between gap-3">
+    <div className="bg-stone-900 text-stone-100 border-b border-stone-800 shadow-xs">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 py-1.5 sm:py-2 flex items-center justify-between gap-2 sm:gap-3">
         
         {/* Left: Breaking Badge */}
-        <div className="flex items-center gap-2 shrink-0">
-          <span className="flex items-center gap-1.5 bg-rose-700 text-white text-xs font-black px-3 py-1 rounded-md uppercase tracking-wider shadow-sm font-sans">
-            <Zap className="w-3.5 h-3.5 fill-current text-amber-300 animate-pulse" />
-            <span>{isBn ? 'জরুরি সংবাদ' : 'BREAKING'}</span>
+        <div className="flex items-center gap-1.5 shrink-0">
+          <span className="flex items-center gap-1 sm:gap-1.5 bg-rose-700 text-white text-[11px] sm:text-xs font-black px-2 sm:px-3 py-0.5 sm:py-1 rounded-md uppercase tracking-wider shadow-xs font-sans">
+            <Zap className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-current text-amber-300 animate-pulse shrink-0" />
+            <span className="hidden xs:inline">{isBn ? 'জরুরি সংবাদ' : 'BREAKING'}</span>
+            <span className="xs:hidden">{isBn ? 'ব্রেকিং' : 'LIVE'}</span>
           </span>
           <span className="hidden sm:inline-block w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
         </div>
 
         {/* Center: Cycling News Item */}
         <div
-          className="flex-1 overflow-hidden cursor-pointer relative min-h-[22px] flex items-center"
+          className="flex-1 overflow-hidden cursor-pointer relative min-h-[20px] sm:min-h-[22px] flex items-center min-w-0"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
           onClick={handleItemClick}
@@ -78,7 +79,7 @@ export function BreakingTicker() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.22, ease: EDITORIAL_EASE }}
-              className="w-full text-sm sm:text-base font-bold text-white truncate hover:text-amber-300 transition-colors font-serif-bn"
+              className="w-full text-xs sm:text-sm md:text-base font-bold text-white truncate hover:text-amber-300 transition-colors font-serif-bn"
             >
               {newsList[currentIndex]}
             </motion.p>
@@ -86,12 +87,12 @@ export function BreakingTicker() {
         </div>
 
         {/* Right: Pause/Play & Prev/Next Controls */}
-        <div className="flex items-center gap-1.5 shrink-0 text-stone-300">
+        <div className="flex items-center gap-0.5 sm:gap-1.5 shrink-0 text-stone-300">
           <button
             type="button"
             onClick={() => setIsPaused(!isPaused)}
             aria-label={isPaused ? 'Play breaking news ticker' : 'Pause breaking news ticker'}
-            className="p-1 rounded-md hover:bg-stone-800 text-stone-200 hover:text-white transition-colors cursor-pointer"
+            className="hidden xs:flex p-1 rounded-md hover:bg-stone-800 text-stone-200 hover:text-white transition-colors cursor-pointer"
             title={isPaused ? (isBn ? 'চালু করুন' : 'Resume') : (isBn ? 'বিরতি' : 'Pause')}
           >
             {isPaused ? <Play className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
@@ -103,9 +104,9 @@ export function BreakingTicker() {
             aria-label="Previous breaking news"
             className="p-1 rounded-md hover:bg-stone-800 text-stone-200 hover:text-white transition-colors cursor-pointer"
           >
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
-          <span className="text-xs text-stone-300 font-mono select-none px-1">
+          <span className="text-[11px] sm:text-xs text-stone-400 font-mono select-none px-0.5 sm:px-1 hidden sm:inline">
             {currentIndex + 1}/{newsList.length}
           </span>
           <button

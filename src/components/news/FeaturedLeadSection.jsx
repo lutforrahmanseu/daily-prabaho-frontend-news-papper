@@ -241,10 +241,10 @@ export function FeaturedLeadSection() {
                   trackLayoutOrHeadlineClick(story);
                   navigate(`/news/${story.slug || story.id}`);
                 }}
-                className="group cursor-pointer bg-white border border-stone-200 rounded-xl p-4 hover:shadow-md hover:border-stone-300 transition-shadow flex gap-4 flex-1 items-stretch"
+                className="group cursor-pointer bg-white border border-stone-200 rounded-xl p-3 sm:p-4 hover:shadow-md hover:border-stone-300 transition-shadow flex gap-3 sm:gap-4 flex-1 items-stretch"
               >
                 {/* Content */}
-                <div className="flex-1 flex flex-col justify-between">
+                <div className="flex-1 flex flex-col justify-between min-w-0">
                   <div>
                     <div className="flex items-center gap-2 text-[11px] text-rose-700 font-bold mb-1">
                       <span className="w-5 h-5 rounded-md bg-stone-100 text-stone-700 text-[10px] font-mono font-black flex items-center justify-center">
@@ -282,7 +282,7 @@ export function FeaturedLeadSection() {
                 </div>
 
                 {/* Thumbnail */}
-                <div className="w-28 sm:w-36 aspect-4/3 rounded-lg overflow-hidden bg-stone-100 shrink-0">
+                <div className="w-24 xs:w-28 sm:w-36 aspect-4/3 rounded-lg overflow-hidden bg-stone-100 shrink-0">
                   <img
                     src={story.image}
                     alt={title}
