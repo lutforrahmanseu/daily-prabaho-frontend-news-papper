@@ -35,6 +35,31 @@ export const advertisementApi = baseApi.injectEndpoints({
       providesTags: (result, error, placement) => [{ type: 'Advertisement', id: placement }]
     }),
 
+    // 2b. Get Public Ad Carousel/List by Placement Slot with multiple active ads
+    getAdPlacementList: builder.query({
+      query: (arg) => {
+        const placement = typeof arg === 'string' ? arg : arg?.placement;
+        const limit = typeof arg === 'object' && arg?.limit ? arg.limit : 5;
+        return {
+          url: `ads/placement/${placement}`,
+          params: { multiple: true, limit }
+        };
+      },
+      transformResponse: (response) => {
+        const payload = unwrapPayload(response);
+        if (!payload) return [];
+        const items = Array.isArray(payload) ? payload : [payload];
+        return items.filter(Boolean).map(normalizeAdvertisement);
+      },
+      providesTags: (result, error, arg) => {
+        const placement = typeof arg === 'string' ? arg : arg?.placement;
+        return [
+          { type: 'Advertisement', id: `${placement}_LIST` },
+          { type: 'Advertisement', id: 'LIST' }
+        ];
+      }
+    }),
+
     // 3. Create Advertisement Campaign
     createAdvertisement: builder.mutation({
       query: (adData) => ({
@@ -91,6 +116,7 @@ export const advertisementApi = baseApi.injectEndpoints({
 export const {
   useGetAdvertisementsQuery,
   useGetAdPlacementQuery,
+  useGetAdPlacementListQuery,
   useCreateAdvertisementMutation,
   useUpdateAdvertisementMutation,
   useDeleteAdvertisementMutation,
