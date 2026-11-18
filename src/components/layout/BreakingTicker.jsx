@@ -51,21 +51,21 @@ export function BreakingTicker() {
   };
 
   return (
-    <div className="bg-rose-50 border-y border-rose-200/90 text-stone-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-1.5 flex items-center justify-between gap-3">
+    <div className="bg-gradient-to-r from-stone-950 via-stone-900 to-rose-950 text-stone-100 border-b border-stone-800 shadow-xs">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2 flex items-center justify-between gap-3">
         
         {/* Left: Breaking Badge */}
         <div className="flex items-center gap-2 shrink-0">
-          <span className="flex items-center gap-1 bg-rose-700 text-white text-[11px] font-bold px-2.5 py-0.5 rounded uppercase tracking-wider shadow-xs">
-            <Zap className="w-3 h-3 fill-current animate-pulse" />
+          <span className="flex items-center gap-1.5 bg-rose-600 text-white text-[11px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider shadow-sm font-sans">
+            <Zap className="w-3.5 h-3.5 fill-current text-amber-300 animate-pulse" />
             <span>{isBn ? 'জরুরি সংবাদ' : 'BREAKING'}</span>
           </span>
-          <span className="hidden sm:inline-block w-1.5 h-1.5 rounded-full bg-rose-600 animate-ping"></span>
+          <span className="hidden sm:inline-block w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
         </div>
 
         {/* Center: Cycling News Item */}
         <div
-          className="flex-1 overflow-hidden cursor-pointer relative min-h-[20px] flex items-center"
+          className="flex-1 overflow-hidden cursor-pointer relative min-h-[22px] flex items-center"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
           onClick={handleItemClick}
@@ -78,7 +78,7 @@ export function BreakingTicker() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.22, ease: EDITORIAL_EASE }}
-              className="w-full text-xs sm:text-sm font-semibold text-stone-900 truncate hover:text-rose-700 transition-colors font-serif-bn"
+              className="w-full text-xs sm:text-sm font-medium text-stone-100 truncate hover:text-rose-300 transition-colors font-serif-bn"
             >
               {newsList[currentIndex]}
             </motion.p>
@@ -86,12 +86,12 @@ export function BreakingTicker() {
         </div>
 
         {/* Right: Pause/Play & Prev/Next Controls */}
-        <div className="flex items-center gap-1 shrink-0">
+        <div className="flex items-center gap-1.5 shrink-0 text-stone-400">
           <button
             type="button"
             onClick={() => setIsPaused(!isPaused)}
             aria-label={isPaused ? 'Play breaking news ticker' : 'Pause breaking news ticker'}
-            className="p-1 rounded hover:bg-rose-100 text-stone-600 hover:text-rose-800 transition-colors cursor-pointer"
+            className="p-1 rounded-md hover:bg-stone-800 text-stone-300 hover:text-white transition-colors cursor-pointer"
             title={isPaused ? (isBn ? 'চালু করুন' : 'Resume') : (isBn ? 'বিরতি' : 'Pause')}
           >
             {isPaused ? <Play className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
@@ -101,18 +101,18 @@ export function BreakingTicker() {
             type="button"
             onClick={handlePrev}
             aria-label="Previous breaking news"
-            className="p-1 rounded hover:bg-rose-100 text-stone-700 hover:text-rose-800 transition-colors cursor-pointer"
+            className="p-1 rounded-md hover:bg-stone-800 text-stone-300 hover:text-white transition-colors cursor-pointer"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <span className="text-[11px] text-stone-500 font-mono">
+          <span className="text-[11px] text-stone-400 font-mono select-none px-0.5">
             {currentIndex + 1}/{newsList.length}
           </span>
           <button
             type="button"
             onClick={handleNext}
             aria-label="Next breaking news"
-            className="p-1 rounded hover:bg-rose-100 text-stone-700 hover:text-rose-800 transition-colors cursor-pointer"
+            className="p-1 rounded-md hover:bg-stone-800 text-stone-300 hover:text-white transition-colors cursor-pointer"
           >
             <ChevronRight className="w-4 h-4" />
           </button>

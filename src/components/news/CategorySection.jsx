@@ -10,12 +10,17 @@ export function CategorySection({
   titleBn,
   titleEn,
   articles,
-  columns = 3
+  columns = 3,
+  layout = 'magazine'
 }) {
   const { language } = useSelector((state) => state.ui);
   const isBn = language === 'bn';
 
   if (!articles || articles.length === 0) return null;
+
+  const isMagazineStyle = layout === 'magazine' && articles.length >= 3 && columns === 2;
+  const leadArticle = articles[0];
+  const sideArticles = articles.slice(1, 4);
 
   return (
     <EditorialReveal as="section" className="mb-10 pt-6 border-t border-stone-200 scroll-mt-20">
@@ -38,19 +43,45 @@ export function CategorySection({
           </Link>
         </div>
 
-        {/* Grid of Articles */}
-        <MotionStaggerGrid
-          className={columns === 2 ? 'grid grid-cols-1 sm:grid-cols-2 gap-5' : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5'}
-        >
-          {articles.slice(0, columns === 2 ? 2 : 3).map((article) => (
-            <MotionStaggerItem key={article.id}>
+        {/* Magazine Style (Lead + Side Horizontal List) or Standard Grid */}
+        {isMagazineStyle ? (
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-stretch">
+            {/* Left Lead Story (Col 1 to 7) */}
+            <div className="md:col-span-7 flex flex-col">
               <NewsCard
-                article={article}
-                variant="grid"
+                article={leadArticle}
+                variant="secondary"
+                className="h-full"
               />
-            </MotionStaggerItem>
-          ))}
-        </MotionStaggerGrid>
+            </div>
+
+            {/* Right Sub-Stories Stack (Col 8 to 12) */}
+            <div className="md:col-span-5 flex flex-col gap-3 justify-between">
+              {sideArticles.map((article) => (
+                <NewsCard
+                  key={article.id}
+                  article={article}
+                  variant="horizontal"
+                  className="flex-1"
+                />
+              ))}
+            </div>
+          </div>
+        ) : (
+          /* Standard Grid of Articles */
+          <MotionStaggerGrid
+            className={columns === 2 ? 'grid grid-cols-1 sm:grid-cols-2 gap-5' : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5'}
+          >
+            {articles.slice(0, columns === 2 ? 2 : 3).map((article) => (
+              <MotionStaggerItem key={article.id}>
+                <NewsCard
+                  article={article}
+                  variant="grid"
+                />
+              </MotionStaggerItem>
+            ))}
+          </MotionStaggerGrid>
+        )}
       </div>
     </EditorialReveal>
   );

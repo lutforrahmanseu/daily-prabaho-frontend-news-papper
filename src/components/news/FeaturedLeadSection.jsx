@@ -6,7 +6,7 @@ import { toggleBookmark } from '../../store/newsSlice.js';
 import { useFeaturedArticles, usePublicArticles } from '../../hooks/usePortalData.js';
 import { useGetActiveExperimentsQuery, useTrackExperimentEventMutation } from '../../store/api/analyticsApi.js';
 import { canSendClientAnalyticsTelemetry } from '../../utils/analyticsHelpers.js';
-import { formatBengaliRelativeTime, calculateReadingTime } from '../../utils/bengaliFormatter.js';
+import { formatBengaliRelativeTime, calculateReadingTime, toBengaliNumber } from '../../utils/bengaliFormatter.js';
 import { Clock, Bookmark, Share2, Sparkles } from 'lucide-react';
 import { EDITORIAL_EASE } from '../common/MotionPrimitives.jsx';
 
@@ -68,9 +68,16 @@ export function FeaturedLeadSection() {
   const leadStory = articles.find((a) => a.isLead) || articles[0];
   
   // Secondary stories (next 3 featured or prominent articles)
-  const secondaryStories = articles
-    .filter((a) => a.id !== leadStory?.id && a.isFeatured)
-    .slice(0, 3);
+  const secondaryCandidates = articles.filter((a) => a.id !== leadStory?.id && a.isFeatured);
+  const secondaryStories = (secondaryCandidates.length >= 3
+    ? secondaryCandidates
+    : articles.filter((a) => a.id !== leadStory?.id)
+  ).slice(0, 3);
+
+  // Tertiary rapid highlights (next 4 curated stories)
+  const tertiaryStories = articles
+    .filter((a) => a.id !== leadStory?.id && !secondaryStories.some((s) => s.id === a.id))
+    .slice(0, 4);
 
   const isLeadBookmarked = leadStory ? savedArticleIds.includes(leadStory.id) : false;
 
@@ -240,6 +247,9 @@ export function FeaturedLeadSection() {
                 <div className="flex-1 flex flex-col justify-between">
                   <div>
                     <div className="flex items-center gap-2 text-[11px] text-rose-700 font-bold mb-1">
+                      <span className="w-5 h-5 rounded-md bg-stone-100 text-stone-700 text-[10px] font-mono font-black flex items-center justify-center">
+                        {isBn ? toBengaliNumber(`0${idx + 1}`) : `0${idx + 1}`}
+                      </span>
                       <span>{categoryName}</span>
                       <span className="text-stone-300">·</span>
                       <span className="text-stone-500 font-normal">{timeAgo}</span>
@@ -286,6 +296,54 @@ export function FeaturedLeadSection() {
         </div>
 
       </div>
+
+      {/* Tertiary Rapid Highlights Bar (4 Highlights) */}
+      {tertiaryStories.length > 0 && (
+        <div className="mt-6 pt-5 border-t border-stone-200">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="w-2 h-2 rounded-full bg-rose-700"></span>
+            <h3 className="text-xs sm:text-sm font-bold text-stone-900 font-serif-bn tracking-wide">
+              {isBn ? 'আজকের নির্বাচিত আরও ৪টি খবর' : "Today's Curated 4 Highlights"}
+            </h3>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {tertiaryStories.map((story, idx) => {
+              const title = isBn ? story.title : (story.titleEn || story.title);
+              const categoryName = isBn ? story.categoryName : (story.categoryNameEn || story.categoryName);
+              const timeAgo = isBn ? formatBengaliRelativeTime(story.publishedAt) : 'Recently';
+
+              return (
+                <div
+                  key={story.id}
+                  onClick={() => {
+                    trackLayoutOrHeadlineClick(story);
+                    navigate(`/news/${story.slug || story.id}`);
+                  }}
+                  className="group cursor-pointer p-3.5 rounded-xl bg-stone-50/80 hover:bg-white border border-stone-200/90 hover:border-stone-300 hover:shadow-xs transition-all flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="flex items-center gap-2 text-[10px] text-stone-500 mb-1.5 flex-wrap">
+                      <span className="w-4 h-4 rounded-full bg-rose-100 text-rose-800 text-[10px] font-mono font-bold flex items-center justify-center shrink-0">
+                        {isBn ? toBengaliNumber(idx + 1) : idx + 1}
+                      </span>
+                      <span className="font-bold text-rose-700">{categoryName}</span>
+                      <span>·</span>
+                      <span>{timeAgo}</span>
+                    </div>
+                    <h4 className="text-xs sm:text-sm font-bold text-stone-900 group-hover:text-rose-800 transition-colors font-serif-bn leading-snug line-clamp-2">
+                      {title}
+                    </h4>
+                  </div>
+                  <div className="mt-2.5 pt-2 border-t border-stone-200/60 flex items-center justify-between text-[11px] text-stone-500">
+                    <span className="truncate">{story.author}</span>
+                    <span className="text-rose-700 font-bold group-hover:translate-x-0.5 transition-transform">→</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </section>
   );
 }

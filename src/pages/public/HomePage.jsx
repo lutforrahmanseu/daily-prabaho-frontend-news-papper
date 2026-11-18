@@ -7,6 +7,7 @@ import LatestNewsGrid from '../../components/news/LatestNewsGrid.jsx';
 import CategorySection from '../../components/news/CategorySection.jsx';
 import VideoNewsSection from '../../components/news/VideoNewsSection.jsx';
 import OpinionSection from '../../components/news/OpinionSection.jsx';
+import VisualShowcaseSection from '../../components/news/VisualShowcaseSection.jsx';
 import Sidebar from '../../components/layout/Sidebar.jsx';
 import AdPlacement from '../../components/common/AdPlacement.jsx';
 import PersonalizedFeedSection from '../../components/reader/PersonalizedFeedSection.jsx';
@@ -151,6 +152,9 @@ export function HomePage() {
 
           {/* 6. Latest News Grid */}
           <LatestNewsGrid />
+
+          {/* 7. Visual Showcase & Photojournalism Ribbon */}
+          <VisualShowcaseSection fallbackArticles={articles} />
 
           {/* Main 2-Column Grid (8 cols Content Streams vs 4 cols Sidebar) */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
