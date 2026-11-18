@@ -790,37 +790,33 @@ export function AdminGlobalNewsWirePage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12 font-sans">
       
-      {/* 1. Header Banner with Dark Futuristic Glowing Aesthetic */}
-      <div className="relative overflow-hidden rounded-3xl bg-[#0a0d14] border border-stone-800 text-white p-6 sm:p-8 shadow-2xl">
-        {/* Glow Spheres */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-emerald-600/10 rounded-full blur-3xl pointer-events-none" />
-
+      {/* 1. Header Banner Synced with Standard CMS Card Styling */}
+      <div className="bg-white rounded-2xl border border-stone-200 text-stone-900 p-6 sm:p-7 shadow-xs relative overflow-hidden">
         <div className="relative z-10 flex flex-wrap items-center justify-between gap-5">
           
           {/* Brand & Heading */}
           <div className="space-y-2">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-600/30">
-                <Globe className="w-4 h-4 text-white animate-spin-slow" />
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <div className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-xs">
+                <Globe className="w-4 h-4 text-white" />
               </div>
-              <span className="text-xs font-bold tracking-wider uppercase font-mono bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+              <span className="text-xs font-bold tracking-wider uppercase font-mono text-blue-700">
                 Global AI News Wire Hub • v1.0
               </span>
-              <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-mono font-bold flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-mono font-bold flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
                 <span>অটো-হার্ভেস্টার সক্রিয়</span>
               </span>
-              <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-cyan-300 border border-cyan-500/30 text-[10px] font-mono font-bold flex items-center gap-1">
-                <ShieldCheck className="w-3 h-3 text-cyan-400" />
+              <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-mono font-bold flex items-center gap-1">
+                <ShieldCheck className="w-3 h-3 text-blue-600" />
                 <span>কপিরাইট শিল্ড সক্রিয় (100% Fair Use)</span>
               </span>
             </div>
 
-            <h1 className="text-2xl sm:text-3xl font-black font-serif-bn tracking-tight text-stone-100">
+            <h1 className="text-2xl sm:text-3xl font-black font-serif-bn tracking-tight text-stone-950">
               বিশ্ব সংবাদ অটোমেশন ও এআই রিপোর্টার
             </h1>
-            <p className="text-xs sm:text-sm text-stone-400 max-w-2xl font-normal leading-relaxed">
+            <p className="text-xs sm:text-sm text-stone-600 max-w-2xl font-normal leading-relaxed">
               সারা বিশ্বের শীর্ষ সংবাদ সংস্থা (Reuters, BBC, Al Jazeera, AP, Bloomberg) থেকে প্রতি ১৫ মিনিটে খবর সংগ্রহ, প্রমিত বাংলায় সাংবাদিকতা মানের প্রতিবেদন রচনা ও সিএমএস-এ সরাসরি আপলোড।
             </p>
           </div>
@@ -829,8 +825,8 @@ export function AdminGlobalNewsWirePage() {
           <div className="flex flex-wrap items-center gap-3">
             
             {/* Auto-Pilot Toggle */}
-            <div className="flex items-center gap-2 bg-stone-900/90 border border-stone-800 px-3.5 py-2 rounded-xl text-xs">
-              <span className="text-stone-300 font-bold">অটো-পাবলিশ মোড:</span>
+            <div className="flex items-center gap-2 bg-stone-50 border border-stone-200 px-3.5 py-2 rounded-xl text-xs">
+              <span className="text-stone-700 font-bold">অটো-পাবলিশ মোড:</span>
               <button
                 type="button"
                 onClick={() => {
@@ -843,11 +839,11 @@ export function AdminGlobalNewsWirePage() {
                   );
                 }}
                 className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out focus:outline-none ${
-                  autoPilotGlobalToggle ? 'bg-emerald-600' : 'bg-stone-700'
+                  autoPilotGlobalToggle ? 'bg-emerald-600' : 'bg-stone-300'
                 }`}
               >
                 <span
-                  className={`pointer-events-none inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow-lg transition duration-200 ease-in-out mt-0.5 ml-0.5 ${
+                  className={`pointer-events-none inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow-md transition duration-200 ease-in-out mt-0.5 ml-0.5 ${
                     autoPilotGlobalToggle ? 'translate-x-4' : 'translate-x-0'
                   }`}
                 />
@@ -859,7 +855,7 @@ export function AdminGlobalNewsWirePage() {
               type="button"
               disabled={isFetchingNow}
               onClick={handleFetchGlobalWireNow}
-              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-blue-600/30 transition-all cursor-pointer group disabled:opacity-50"
+              className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-2 shadow-xs transition-all cursor-pointer group disabled:opacity-50"
             >
               {isFetchingNow ? (
                 <>
@@ -878,10 +874,10 @@ export function AdminGlobalNewsWirePage() {
             <button
               type="button"
               onClick={() => setAddSourceModalOpen(true)}
-              className="p-2.5 rounded-xl bg-stone-900 border border-stone-800 hover:bg-stone-800 text-stone-200 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+              className="p-2.5 rounded-xl bg-white border border-stone-200 hover:bg-stone-50 text-stone-700 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
               title="নতুন আরএসএস সোর্স যুক্ত করুন"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-4 h-4 text-stone-600" />
               <span className="hidden sm:inline">+ সোর্স</span>
             </button>
 
@@ -890,66 +886,66 @@ export function AdminGlobalNewsWirePage() {
         </div>
 
         {/* 2. Top Metric KPI Row */}
-        <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-3.5 mt-6 pt-6 border-t border-stone-800/80">
+        <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-3.5 mt-6 pt-6 border-t border-stone-100">
           
-          <div className="bg-[#101420]/80 p-3.5 rounded-2xl border border-stone-800/80 space-y-1">
-            <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wider font-mono">
+          <div className="bg-stone-50/70 p-3.5 rounded-xl border border-stone-200 space-y-1">
+            <p className="text-[10px] font-bold text-stone-500 uppercase tracking-wider font-mono">
               আন্তর্জাতিক সোর্স
             </p>
-            <p className="text-xl sm:text-2xl font-black text-white font-mono">
+            <p className="text-xl sm:text-2xl font-black text-stone-900 font-mono">
               {toBengaliNumber(metrics.activeSources)} <span className="text-xs font-normal text-stone-500">/ {toBengaliNumber(metrics.totalSources)} টি</span>
             </p>
-            <p className="text-[10px] text-blue-400 font-mono">Reuters, BBC, Al Jazeera, AP</p>
+            <p className="text-[10px] text-blue-600 font-mono font-medium">Reuters, BBC, Al Jazeera, AP</p>
           </div>
 
-          <div className="bg-[#101420]/80 p-3.5 rounded-2xl border border-stone-800/80 space-y-1">
-            <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wider font-mono">
+          <div className="bg-stone-50/70 p-3.5 rounded-xl border border-stone-200 space-y-1">
+            <p className="text-[10px] font-bold text-stone-500 uppercase tracking-wider font-mono">
               আজকের সংগৃহীত খবর
             </p>
-            <p className="text-xl sm:text-2xl font-black text-cyan-400 font-mono">
+            <p className="text-xl sm:text-2xl font-black text-blue-700 font-mono">
               {toBengaliNumber(metrics.totalHarvested)} <span className="text-xs font-normal text-stone-500">টি ওয়্যার</span>
             </p>
-            <p className="text-[10px] text-stone-400 font-mono">রিয়েলটাইম ফিড থেকে ফিল্টারকৃত</p>
+            <p className="text-[10px] text-stone-500 font-mono">রিয়েলটাইম ফিড থেকে ফিল্টারকৃত</p>
           </div>
 
-          <div className="bg-[#101420]/80 p-3.5 rounded-2xl border border-stone-800/80 space-y-1">
-            <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wider font-mono">
+          <div className="bg-stone-50/70 p-3.5 rounded-xl border border-stone-200 space-y-1">
+            <p className="text-[10px] font-bold text-stone-500 uppercase tracking-wider font-mono">
               সিএমএস খসড়া (Drafts)
             </p>
-            <p className="text-xl sm:text-2xl font-black text-amber-400 font-mono">
+            <p className="text-xl sm:text-2xl font-black text-amber-700 font-mono">
               {toBengaliNumber(metrics.draftsCount)} <span className="text-xs font-normal text-stone-500">টি প্রস্তুত</span>
             </p>
-            <p className="text-[10px] text-stone-400 font-mono">সম্পাদকীয় অনুমোদনের অপেক্ষায়</p>
+            <p className="text-[10px] text-stone-500 font-mono">সম্পাদকীয় অনুমোদনের অপেক্ষায়</p>
           </div>
 
-          <div className="bg-[#101420]/80 p-3.5 rounded-2xl border border-stone-800/80 space-y-1">
-            <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wider font-mono">
+          <div className="bg-stone-50/70 p-3.5 rounded-xl border border-stone-200 space-y-1">
+            <p className="text-[10px] font-bold text-stone-500 uppercase tracking-wider font-mono">
               লাইভ প্রকাশিত (Published)
             </p>
-            <p className="text-xl sm:text-2xl font-black text-emerald-400 font-mono">
+            <p className="text-xl sm:text-2xl font-black text-emerald-700 font-mono">
               {toBengaliNumber(metrics.publishedCount)} <span className="text-xs font-normal text-stone-500">টি লাইভ</span>
             </p>
-            <p className="text-[10px] text-emerald-400 font-mono">ডেইলি প্রবাহ পোর্টালে সরাসরি আপলোড</p>
+            <p className="text-[10px] text-emerald-700 font-mono font-medium">ডেইলি প্রবাহ পোর্টালে সরাসরি আপলোড</p>
           </div>
 
         </div>
 
         {/* 3. Navigation Mode Tabs */}
-        <div className="relative z-10 mt-6 pt-4 border-t border-stone-800/60 flex flex-wrap items-center justify-between gap-3">
+        <div className="relative z-10 mt-6 pt-4 border-t border-stone-100 flex flex-wrap items-center justify-between gap-3">
           
-          <div className="flex items-center gap-1.5 bg-stone-900/90 p-1 rounded-xl border border-stone-800">
+          <div className="flex items-center gap-1.5 bg-stone-100 p-1 rounded-xl">
             <button
               type="button"
               onClick={() => setActiveTab('stream')}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                 activeTab === 'stream'
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'text-stone-400 hover:text-stone-200'
+                  ? 'bg-white text-stone-900 shadow-xs'
+                  : 'text-stone-600 hover:text-stone-900'
               }`}
             >
-              <Radio className="w-3.5 h-3.5 text-cyan-300 animate-pulse" />
+              <Radio className="w-3.5 h-3.5 text-blue-600" />
               <span>লাইভ ওয়্যার ও এআই সংবাদ স্ট্রিম</span>
-              <span className="w-4 h-4 rounded-full bg-blue-900/80 text-[10px] flex items-center justify-center font-mono">
+              <span className="w-4 h-4 rounded-full bg-blue-100 text-blue-800 text-[10px] flex items-center justify-center font-mono font-bold">
                 {harvestedItems.length}
               </span>
             </button>
@@ -959,11 +955,11 @@ export function AdminGlobalNewsWirePage() {
               onClick={() => setActiveTab('sources')}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                 activeTab === 'sources'
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'text-stone-400 hover:text-stone-200'
+                  ? 'bg-white text-stone-900 shadow-xs'
+                  : 'text-stone-600 hover:text-stone-900'
               }`}
             >
-              <Rss className="w-3.5 h-3.5" />
+              <Rss className="w-3.5 h-3.5 text-blue-600" />
               <span>আন্তর্জাতিক বার্তা সংস্থা ও সোর্স ({wireSources.length})</span>
             </button>
 
@@ -972,11 +968,11 @@ export function AdminGlobalNewsWirePage() {
               onClick={() => setActiveTab('policy')}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                 activeTab === 'policy'
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'text-stone-400 hover:text-stone-200'
+                  ? 'bg-white text-stone-900 shadow-xs'
+                  : 'text-stone-600 hover:text-stone-900'
               }`}
             >
-              <SlidersHorizontal className="w-3.5 h-3.5" />
+              <SlidersHorizontal className="w-3.5 h-3.5 text-stone-600" />
               <span>অটো-পাইলট ও সম্পাদকীয় নীতিমালা</span>
             </button>
           </div>
@@ -984,19 +980,19 @@ export function AdminGlobalNewsWirePage() {
           {/* Search Box */}
           {activeTab === 'stream' && (
             <div className="relative w-full sm:w-64">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-stone-500" />
+              <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-stone-400" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="ওয়্যার বা শিরোনাম খুঁজুন..."
-                className="w-full pl-8 pr-7 py-1.5 bg-stone-900 border border-stone-800 rounded-xl text-xs text-stone-200 focus:outline-none focus:border-blue-500"
+                className="w-full pl-8 pr-7 py-1.5 bg-stone-50 border border-stone-200 rounded-xl text-xs text-stone-900 focus:outline-none focus:border-blue-500 shadow-2xs"
               />
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-2.5 top-2 text-stone-400 hover:text-stone-200 cursor-pointer"
+                  className="absolute right-2.5 top-2 text-stone-400 hover:text-stone-600 cursor-pointer"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -1013,7 +1009,7 @@ export function AdminGlobalNewsWirePage() {
         <div className="space-y-4">
           
           {/* Quick Trigger By Specific Source */}
-          <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 bg-gradient-to-r from-blue-50/80 via-indigo-50/60 to-white rounded-2xl border border-blue-200/80 shadow-2xs">
+          <div className="flex flex-wrap items-center justify-between gap-3 p-4 bg-white rounded-2xl border border-stone-200 shadow-xs">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-xs">
                 <Zap className="w-4 h-4 text-amber-300 fill-amber-300" />

@@ -72,7 +72,7 @@ export function HomePage() {
       {/* If Filter / Search Mode is Active */}
       {isFiltered ? (
         <div className="space-y-6">
-          <div className="p-4 rounded-xl bg-stone-100 border border-stone-200 flex items-center justify-between">
+          <div className="p-4 rounded-xl bg-white border border-stone-200 shadow-xs flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Layers className="w-5 h-5 text-rose-700" />
               <div>

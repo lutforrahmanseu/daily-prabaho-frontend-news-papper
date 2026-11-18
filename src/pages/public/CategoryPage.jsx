@@ -169,29 +169,24 @@ export function CategoryPage() {
         )}
       </nav>
 
-      {/* Category Header Banner */}
-      <header className="bg-gradient-to-r from-stone-900 via-stone-800 to-stone-900 text-white rounded-2xl p-6 sm:p-8 mb-8 relative overflow-hidden shadow-md">
-        <div
-          className="absolute top-0 right-0 w-64 h-64 bg-rose-600/15 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"
-          aria-hidden="true"
-        />
-
+      {/* Category Header Banner Synced with Standard Normal Card Styling */}
+      <header className="bg-white text-stone-900 rounded-2xl p-6 sm:p-8 mb-8 relative overflow-hidden border border-stone-200 shadow-xs">
         <div className="relative z-10 max-w-3xl">
           <div className="flex items-center gap-2 mb-2">
             <span
               className="w-3 h-3 rounded-full"
               style={{ backgroundColor: categoryConfig.color || '#dc2626' }}
             />
-            <span className="text-xs uppercase font-bold tracking-wider text-stone-300 font-sans">
+            <span className="text-xs uppercase font-bold tracking-wider text-rose-700 font-sans">
               {categoryConfig.nameEn} Section
             </span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-serif-bn tracking-tight mb-3">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-serif-bn tracking-tight text-stone-950 mb-3">
             {subcategoryTitle ? `${categoryTitle} · ${subcategoryTitle}` : categoryTitle}
           </h1>
 
-          <p className="text-sm sm:text-base text-stone-300 font-serif-bn leading-relaxed">
+          <p className="text-sm sm:text-base text-stone-700 font-serif-bn leading-relaxed">
             {categoryDescription}
           </p>
 
@@ -207,8 +202,8 @@ export function CategoryPage() {
 
         {/* Subcategories Pills Navigation */}
         {subcategoriesList.length > 0 && (
-          <div className="mt-6 pt-5 border-t border-stone-700/80 flex items-center gap-2 overflow-x-auto no-scrollbar relative z-10">
-            <span className="text-xs font-bold text-stone-400 shrink-0 font-sans">
+          <div className="mt-6 pt-5 border-t border-stone-200 flex items-center gap-2 overflow-x-auto no-scrollbar relative z-10">
+            <span className="text-xs font-bold text-stone-500 shrink-0 font-sans">
               {isBn ? 'উপ-বিভাগ:' : 'Subcategories:'}
             </span>
 
@@ -218,7 +213,7 @@ export function CategoryPage() {
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors shrink-0 ${
                 !subcategory
                   ? 'bg-rose-700 text-white shadow-xs'
-                  : 'bg-stone-800/80 hover:bg-stone-700 text-stone-200'
+                  : 'bg-stone-100 hover:bg-stone-200 text-stone-700'
               }`}
             >
               {isBn ? 'সব খবর' : 'All Stories'}
@@ -233,7 +228,7 @@ export function CategoryPage() {
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors shrink-0 ${
                     isActive
                       ? 'bg-rose-700 text-white shadow-xs'
-                      : 'bg-stone-800/80 hover:bg-stone-700 text-stone-200'
+                      : 'bg-stone-100 hover:bg-stone-200 text-stone-700'
                   }`}
                 >
                   {isBn ? sub.name : sub.nameEn}

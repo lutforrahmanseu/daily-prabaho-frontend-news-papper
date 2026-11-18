@@ -34,7 +34,7 @@ export function PopularNews({
   return (
     <div className={`bg-white border border-stone-200 rounded-xl overflow-hidden shadow-xs ${className}`}>
       {/* Header with Title and Timeframe Toggle */}
-      <div className="p-4 bg-gradient-to-r from-rose-50/80 to-stone-50 border-b border-stone-200 flex items-center justify-between">
+      <div className="p-4 bg-white border-b border-stone-200 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="p-1.5 rounded-lg bg-rose-700 text-white shadow-2xs">
             <Flame className="w-4 h-4 fill-current" />

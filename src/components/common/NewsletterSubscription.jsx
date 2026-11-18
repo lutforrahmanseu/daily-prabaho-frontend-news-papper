@@ -95,21 +95,19 @@ export function NewsletterSubscription({
   // 2. Banner Variant (Full width horizontal banner)
   if (variant === 'banner') {
     return (
-      <div className={`relative overflow-hidden bg-gradient-to-br from-stone-900 via-stone-800 to-rose-950 text-white rounded-2xl p-6 sm:p-8 shadow-lg ${className}`}>
-        <div className="absolute top-0 right-0 w-80 h-80 bg-rose-700/15 rounded-full blur-3xl pointer-events-none" />
-
+      <div className={`relative overflow-hidden bg-white text-stone-900 rounded-2xl p-6 sm:p-8 border border-stone-200 shadow-xs ${className}`}>
         <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
           <div className="lg:col-span-7 space-y-2">
-            <div className="flex items-center gap-2 text-rose-400 text-xs font-bold uppercase tracking-wider">
+            <div className="flex items-center gap-2 text-rose-700 text-xs font-bold uppercase tracking-wider">
               <Mail className="w-4 h-4" />
               <span>{isBn ? 'দৈনিক নিউজলেটার' : 'Daily Newsletter'}</span>
             </div>
-            <h3 className="text-xl sm:text-2xl font-bold font-serif-bn leading-snug">
+            <h3 className="text-xl sm:text-2xl font-bold font-serif-bn leading-snug text-stone-950">
               {isBn
                 ? 'সকালের প্রধান খবর সরাসরি আপনার ইনবক্সে'
                 : 'Get Curated Morning Briefings Delivered Daily'}
             </h3>
-            <p className="text-xs sm:text-sm text-stone-300 font-serif-bn max-w-xl">
+            <p className="text-xs sm:text-sm text-stone-700 font-serif-bn max-w-xl">
               {isBn
                 ? 'সারাদেশ ও বিশ্ব রাজনীতি, বাণিজ্য ও প্রযুক্তির সবচেয়ে গুরুত্বপূর্ণ খবরের সত্যনিষ্ঠ বিশ্লেষণ প্রতি সকাল ৭টায়।'
                 : 'Start your morning informed with balanced investigative reporting and key developments.'}
@@ -122,17 +120,17 @@ export function NewsletterSubscription({
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={FAST_TRANSITION}
-                className="p-4 rounded-xl bg-emerald-900/60 border border-emerald-500/80 text-emerald-200 text-xs space-y-2"
+                className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs space-y-2"
               >
-                <div className="flex items-center gap-2 font-bold text-sm text-emerald-300">
-                  <Check className="w-5 h-5 text-emerald-400" />
+                <div className="flex items-center gap-2 font-bold text-sm text-emerald-700">
+                  <Check className="w-5 h-5 text-emerald-600" />
                   <span>{isBn ? 'সাবস্ক্রিপশন সফল হয়েছে!' : 'Subscription Confirmed!'}</span>
                 </div>
                 <p className="text-xs leading-relaxed">{feedbackMessage}</p>
                 <button
                   type="button"
                   onClick={() => setStatus('idle')}
-                  className="mt-2 text-[11px] underline text-emerald-300 hover:text-white cursor-pointer"
+                  className="mt-2 text-[11px] underline text-emerald-700 hover:text-emerald-900 cursor-pointer"
                 >
                   {isBn ? 'আরেকটি ইমেইল যুক্ত করুন' : 'Add another email'}
                 </button>
@@ -150,12 +148,12 @@ export function NewsletterSubscription({
                     placeholder={isBn ? 'ইমেইল অ্যাড্রেস লিখুন...' : 'Enter your email...'}
                     disabled={status === 'loading'}
                     required
-                    className="flex-1 px-3.5 py-2.5 rounded-xl bg-stone-800/90 border border-stone-600 text-white placeholder-stone-400 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 font-sans"
+                    className="flex-1 px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 placeholder-stone-500 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 font-sans shadow-2xs"
                   />
                   <button
                     type="submit"
                     disabled={status === 'loading'}
-                    className="px-5 py-2.5 rounded-xl bg-rose-700 hover:bg-rose-600 text-white text-xs sm:text-sm font-semibold flex items-center gap-1.5 shrink-0 transition-colors cursor-pointer shadow-md"
+                    className="px-5 py-2.5 rounded-xl bg-rose-700 hover:bg-rose-800 text-white text-xs sm:text-sm font-semibold flex items-center gap-1.5 shrink-0 transition-colors cursor-pointer shadow-xs"
                   >
                     {status === 'loading' ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
@@ -169,14 +167,14 @@ export function NewsletterSubscription({
                 </div>
 
                 {status === 'error' && (
-                  <div className="flex items-center gap-1.5 text-xs text-rose-300">
+                  <div className="flex items-center gap-1.5 text-xs text-rose-700">
                     <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                     <span>{feedbackMessage}</span>
                   </div>
                 )}
 
-                <div className="flex items-center gap-2 text-[11px] text-stone-400">
-                  <Sparkles className="w-3 h-3 text-amber-400" />
+                <div className="flex items-center gap-2 text-[11px] text-stone-500">
+                  <Sparkles className="w-3 h-3 text-rose-600" />
                   <span>{isBn ? 'কোনো স্প্যাম নয়। যেকোনো সময় আনসাবস্ক্রাইব করতে পারবেন।' : 'No spam. Unsubscribe anytime in one click.'}</span>
                 </div>
               </form>
@@ -189,28 +187,28 @@ export function NewsletterSubscription({
 
   // 3. Card Variant (Default for sidebars)
   return (
-    <div className={`bg-gradient-to-br from-stone-900 to-stone-800 text-white rounded-xl p-5 shadow-md ${className}`}>
-      <div className="flex items-center gap-2 mb-2 text-rose-400">
+    <div className={`bg-white text-stone-900 rounded-xl p-5 shadow-xs border border-stone-200 ${className}`}>
+      <div className="flex items-center gap-2 mb-2 text-rose-700">
         <Mail className="w-4 h-4" />
         <span className="text-xs font-bold uppercase tracking-wider font-sans">
           {isBn ? 'দৈনিক নিউজলেটার' : 'Daily Newsletter'}
         </span>
       </div>
 
-      <h4 className="text-base font-bold font-serif-bn mb-1.5">
+      <h4 className="text-base font-bold font-serif-bn mb-1.5 text-stone-950">
         {isBn ? 'সকালের প্রধান খবর সরাসরি আপনার ইমেইলে' : 'Morning Briefing in Your Inbox'}
       </h4>
 
-      <p className="text-stone-300 text-xs mb-4 font-serif-bn leading-relaxed">
+      <p className="text-stone-700 text-xs mb-4 font-serif-bn leading-relaxed">
         {isBn
           ? 'প্রতিদিন সকাল ৭টায় এক নজরে সারাদিনের গুরুত্বপূর্ণ ঘটনা ও বিশ্লেষণ।'
           : 'Curated morning briefing of major national & global news.'}
       </p>
 
       {status === 'success' ? (
-        <div className="p-3.5 rounded-lg bg-emerald-900/60 border border-emerald-500/80 text-emerald-200 text-xs space-y-1.5">
-          <div className="flex items-center gap-1.5 font-bold text-emerald-300">
-            <Check className="w-4 h-4 text-emerald-400" />
+        <div className="p-3.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs space-y-1.5">
+          <div className="flex items-center gap-1.5 font-bold text-emerald-700">
+            <Check className="w-4 h-4 text-emerald-600" />
             <span>{isBn ? 'সাবস্ক্রিপশন সম্পন্ন!' : 'Subscribed!'}</span>
           </div>
           <p className="text-[11px] leading-relaxed">{feedbackMessage}</p>
@@ -219,7 +217,7 @@ export function NewsletterSubscription({
         <form onSubmit={handleSubmit} className="space-y-3">
           {/* Topic Pills */}
           <div className="space-y-1.5">
-            <span className="text-[10px] text-stone-400 font-bold uppercase block">
+            <span className="text-[10px] text-stone-500 font-bold uppercase block">
               {isBn ? 'পছন্দের বিষয় নির্বাচন করুন:' : 'Preferred topics:'}
             </span>
             <div className="flex flex-wrap gap-1.5">
@@ -233,7 +231,7 @@ export function NewsletterSubscription({
                     className={`text-[11px] font-medium px-2 py-0.5 rounded transition-colors cursor-pointer ${
                       active
                         ? 'bg-rose-700 text-white font-bold'
-                        : 'bg-stone-800 text-stone-300 hover:bg-stone-700'
+                        : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
                     }`}
                   >
                     {isBn ? t.nameBn : t.nameEn}
@@ -255,12 +253,12 @@ export function NewsletterSubscription({
               placeholder={isBn ? 'ইমেইল লিখুন...' : 'Your email...'}
               disabled={status === 'loading'}
               required
-              className="w-full px-3 py-2 text-xs rounded-lg bg-stone-800 border border-stone-700 text-white placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-rose-500 font-sans"
+              className="w-full px-3 py-2 text-xs rounded-lg bg-stone-50 border border-stone-200 text-stone-900 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-rose-500 font-sans shadow-2xs"
             />
           </div>
 
           {status === 'error' && (
-            <p className="text-[11px] text-rose-300 flex items-center gap-1">
+            <p className="text-[11px] text-rose-700 flex items-center gap-1">
               <AlertCircle className="w-3 h-3" />
               <span>{feedbackMessage}</span>
             </p>
@@ -269,7 +267,7 @@ export function NewsletterSubscription({
           <button
             type="submit"
             disabled={status === 'loading'}
-            className="w-full py-2 px-3 rounded-lg bg-rose-700 hover:bg-rose-600 text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+            className="w-full py-2 px-3 rounded-lg bg-rose-700 hover:bg-rose-800 text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-xs"
           >
             {status === 'loading' ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />

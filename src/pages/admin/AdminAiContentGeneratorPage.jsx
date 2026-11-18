@@ -418,8 +418,8 @@ export function AdminAiContentGeneratorPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12 font-sans">
       
-      {/* 1. Header with Dark Glowing Masthead aesthetic */}
-      <div className="relative overflow-hidden rounded-3xl bg-[#0c0d12] border border-stone-800 text-white p-6 sm:p-8 shadow-2xl">
+      {/* 1. Header Synced with Standard CMS Card Styling */}
+      <div className="bg-white rounded-2xl border border-stone-200 text-stone-900 p-6 sm:p-7 shadow-xs relative overflow-hidden">
         {/* Ambient Gradient Glows */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-purple-600/15 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-rose-600/10 rounded-full blur-3xl pointer-events-none" />
@@ -437,10 +437,10 @@ export function AdminAiContentGeneratorPage() {
               </span>
             </div>
             
-            <h1 className="text-2xl sm:text-3xl font-black font-serif-bn tracking-tight text-stone-100">
+            <h1 className="text-2xl sm:text-3xl font-black font-serif-bn tracking-tight text-stone-950">
               Create Content
             </h1>
-            <p className="text-xs sm:text-sm text-stone-400 max-w-xl font-normal">
+            <p className="text-xs sm:text-sm text-stone-600 max-w-xl font-normal">
               Choose a template to get started with AI-powered content generation for newsroom, blogs, social & marketing.
             </p>
           </div>
@@ -467,13 +467,13 @@ export function AdminAiContentGeneratorPage() {
               <Bell className="w-4 h-4" />
             </button>
 
-            {/* User Profile matching screenshot */}
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-stone-900/80 border border-stone-800 text-xs">
-              <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center font-bold text-white text-[10px] font-mono">
+            {/* User Profile */}
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-stone-50 border border-stone-200 text-xs">
+              <div className="w-6 h-6 rounded-full bg-purple-600 flex items-center justify-center font-bold text-white text-[10px] font-mono">
                 {(authState?.user?.name || 'A').charAt(0).toUpperCase()}
               </div>
               <div className="hidden sm:block text-left">
-                <p className="font-bold text-stone-200 text-[11px] leading-tight">
+                <p className="font-bold text-stone-800 text-[11px] leading-tight">
                   {authState?.user?.name || 'লুতফর রহমান'}
                 </p>
                 <p className="text-[9px] text-stone-500 font-mono leading-tight">
@@ -488,8 +488,8 @@ export function AdminAiContentGeneratorPage() {
               onClick={() => setShowFilters(!showFilters)}
               className={`px-3.5 py-2 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer ${
                 showFilters
-                  ? 'bg-stone-800 border-purple-500/50 text-white'
-                  : 'bg-stone-900/90 border-stone-800 text-stone-300 hover:bg-stone-800'
+                  ? 'bg-purple-50 border-purple-300 text-purple-800'
+                  : 'bg-white border-stone-200 text-stone-700 hover:bg-stone-50'
               }`}
             >
               <Filter className="w-3.5 h-3.5" />
@@ -510,17 +510,17 @@ export function AdminAiContentGeneratorPage() {
         </div>
 
         {/* Top Mode Navigation Tabs */}
-        <div className="relative z-10 mt-6 pt-5 border-t border-stone-800/80 flex flex-wrap items-center justify-between gap-3">
+        <div className="relative z-10 mt-6 pt-5 border-t border-stone-100 flex flex-wrap items-center justify-between gap-3">
           
           {/* Main Navigation */}
-          <div className="flex items-center gap-1.5 bg-stone-900/80 p-1 rounded-xl border border-stone-800">
+          <div className="flex items-center gap-1.5 bg-stone-100 p-1 rounded-xl">
             <button
               type="button"
               onClick={() => setActiveMainTab('templates')}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 activeMainTab === 'templates'
-                  ? 'bg-purple-600 text-white shadow-sm'
-                  : 'text-stone-400 hover:text-stone-200'
+                  ? 'bg-white text-stone-900 shadow-xs'
+                  : 'text-stone-600 hover:text-stone-900'
               }`}
             >
               টেমপ্লেট নির্বাচন
@@ -530,13 +530,13 @@ export function AdminAiContentGeneratorPage() {
               onClick={() => setActiveMainTab('library')}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                 activeMainTab === 'library'
-                  ? 'bg-purple-600 text-white shadow-sm'
-                  : 'text-stone-400 hover:text-stone-200'
+                  ? 'bg-white text-stone-900 shadow-xs'
+                  : 'text-stone-600 hover:text-stone-900'
               }`}
             >
               <span>কনটেন্ট লাইব্রেরি</span>
               {savedLibrary.length > 0 && (
-                <span className="w-4 h-4 rounded-full bg-stone-800 text-[10px] flex items-center justify-center font-mono">
+                <span className="w-4 h-4 rounded-full bg-stone-200 text-stone-700 text-[10px] flex items-center justify-center font-mono font-bold">
                   {toBengaliNumber(savedLibrary.length)}
                 </span>
               )}
@@ -546,8 +546,8 @@ export function AdminAiContentGeneratorPage() {
               onClick={() => setActiveMainTab('brand_voice')}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 activeMainTab === 'brand_voice'
-                  ? 'bg-purple-600 text-white shadow-sm'
-                  : 'text-stone-400 hover:text-stone-200'
+                  ? 'bg-white text-stone-900 shadow-xs'
+                  : 'text-stone-600 hover:text-stone-900'
               }`}
             >
               ব্র্যান্ড ভয়েস ও টোন
@@ -557,19 +557,19 @@ export function AdminAiContentGeneratorPage() {
           {/* Quick Search */}
           {activeMainTab === 'templates' && (
             <div className="relative w-full sm:w-64">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-stone-500" />
+              <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-stone-400" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="টেমপ্লেট বা কিওয়ার্ড খুঁজুন..."
-                className="w-full pl-8 pr-7 py-1.5 bg-stone-900/90 border border-stone-800 rounded-xl text-xs text-stone-200 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                className="w-full pl-8 pr-7 py-1.5 bg-stone-50 border border-stone-200 rounded-xl text-xs text-stone-900 focus:outline-none focus:border-purple-500 shadow-2xs"
               />
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-2.5 top-2 text-stone-500 hover:text-stone-300"
+                  className="absolute right-2.5 top-2 text-stone-400 hover:text-stone-600"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -588,7 +588,7 @@ export function AdminAiContentGeneratorPage() {
           {/* Category Filter Pills (Toggled by Filter button) */}
           {showFilters && (
             <div className="flex items-center justify-between gap-3 flex-wrap">
-              <div className="flex items-center gap-1.5 p-1 bg-[#12131c] border border-stone-800 rounded-2xl shadow-md overflow-x-auto max-w-full">
+              <div className="flex items-center gap-1.5 p-1 bg-stone-100 border border-stone-200 rounded-2xl shadow-2xs overflow-x-auto max-w-full">
                 {FILTER_TABS.map((tab) => {
                   const isActive = activeCategory === tab.id;
                   return (
@@ -599,7 +599,7 @@ export function AdminAiContentGeneratorPage() {
                       className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
                         isActive
                           ? 'bg-purple-600 text-white shadow-xs'
-                          : 'text-stone-400 hover:text-stone-100 hover:bg-stone-800/60'
+                          : 'text-stone-600 hover:text-stone-900'
                       }`}
                     >
                       {tab.label}
@@ -608,13 +608,13 @@ export function AdminAiContentGeneratorPage() {
                 })}
               </div>
 
-              <div className="text-xs text-stone-400 font-mono">
+              <div className="text-xs text-stone-500 font-mono">
                 মোট <strong>{toBengaliNumber(filteredTemplates.length)}</strong> টি টেমপ্লেট
               </div>
             </div>
           )}
 
-          {/* Template Cards Grid (Matching the Dark Modern Glass Aesthetic) */}
+          {/* Template Cards Grid (Synced with Normal Card Styling) */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {filteredTemplates.map((tpl) => {
               const IconComponent = tpl.icon;
@@ -624,36 +624,33 @@ export function AdminAiContentGeneratorPage() {
                   whileHover={{ y: -3 }}
                   transition={{ duration: 0.18, ease: EDITORIAL_EASE }}
                   onClick={() => handleOpenTemplate(tpl)}
-                  className="relative group rounded-3xl bg-[#111218] border border-stone-800 hover:border-purple-500/40 p-6 flex flex-col justify-between shadow-xl shadow-black/20 transition-all overflow-hidden cursor-pointer"
+                  className="relative group rounded-2xl bg-white border border-stone-200 hover:border-purple-400 hover:shadow-md p-6 flex flex-col justify-between shadow-xs transition-all overflow-hidden cursor-pointer"
                 >
-                  {/* Subtle Top-Right Ambient Light */}
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-white/2 rounded-full blur-2xl group-hover:bg-purple-600/10 transition-colors pointer-events-none" />
-
                   {/* Top Content Area */}
                   <div className="space-y-4 text-center">
                     
                     {/* Centered Colorful Square Icon */}
-                    <div className="mx-auto w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-105"
+                    <div className="mx-auto w-12 h-12 rounded-2xl flex items-center justify-center shadow-xs transition-transform group-hover:scale-105"
                       style={{ backgroundColor: tpl.iconBg.replace('bg-', '') }}
                     >
-                      <div className={`w-12 h-12 rounded-2xl ${tpl.iconBg} flex items-center justify-center shadow-md`}>
+                      <div className={`w-12 h-12 rounded-2xl ${tpl.iconBg} flex items-center justify-center shadow-xs`}>
                         <IconComponent className={`w-6 h-6 ${tpl.iconColor}`} />
                       </div>
                     </div>
 
                     {/* Title & Description */}
                     <div className="space-y-1">
-                      <h3 className="text-lg font-bold text-stone-100 font-serif-bn tracking-tight">
+                      <h3 className="text-lg font-bold text-stone-950 font-serif-bn tracking-tight group-hover:text-purple-700 transition-colors">
                         {tpl.title}
                       </h3>
-                      <p className="text-xs text-stone-400 font-normal leading-relaxed">
+                      <p className="text-xs text-stone-600 font-normal leading-relaxed">
                         {tpl.description}
                       </p>
                     </div>
 
                     {/* Bengali Purpose subtitle badge */}
                     <div className="pt-1">
-                      <span className="inline-block text-[11px] font-serif-bn text-stone-400 bg-stone-900/90 border border-stone-800/80 px-2.5 py-1 rounded-full">
+                      <span className="inline-block text-[11px] font-serif-bn text-stone-600 bg-stone-50 border border-stone-200 px-2.5 py-1 rounded-full">
                         {tpl.titleBn}
                       </span>
                     </div>
@@ -661,14 +658,14 @@ export function AdminAiContentGeneratorPage() {
                   </div>
 
                   {/* Bottom Action Button */}
-                  <div className="pt-6 mt-4 border-t border-stone-800/60">
+                  <div className="pt-6 mt-4 border-t border-stone-100">
                     <button
                       type="button"
                       onClick={() => handleOpenTemplate(tpl)}
                       className={`w-full py-2.5 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                         tpl.btnVariant === 'filled-purple'
-                          ? 'bg-purple-600 hover:bg-purple-700 text-white shadow-md shadow-purple-600/30'
-                          : 'bg-stone-900/90 hover:bg-stone-800 border border-stone-700/80 hover:border-purple-500/50 text-stone-200'
+                          ? 'bg-purple-600 hover:bg-purple-700 text-white shadow-xs'
+                          : 'bg-stone-100 hover:bg-stone-200 border border-stone-200 text-stone-800'
                       }`}
                     >
                       <span>Create</span>
@@ -681,17 +678,17 @@ export function AdminAiContentGeneratorPage() {
             })}
           </div>
 
-          {/* Upgrade to Pro Banner matching bottom-left card in screenshot */}
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-purple-950/60 via-[#12131c] to-stone-900 border border-purple-500/30 p-6 flex flex-wrap items-center justify-between gap-4 shadow-xl">
+          {/* Upgrade to Pro Banner synced with clean card styling */}
+          <div className="relative overflow-hidden rounded-2xl bg-white border border-stone-200 p-6 flex flex-wrap items-center justify-between gap-4 shadow-xs">
             <div className="flex items-center gap-3.5">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center text-white shadow-lg shadow-purple-600/30 shrink-0">
-                <Crown className="w-5 h-5 text-amber-300" />
+              <div className="w-10 h-10 rounded-2xl bg-purple-100 flex items-center justify-center text-purple-700 shadow-2xs shrink-0">
+                <Crown className="w-5 h-5 text-purple-700" />
               </div>
               <div>
-                <h4 className="text-sm font-bold text-white font-serif-bn">
+                <h4 className="text-sm font-bold text-stone-950 font-serif-bn">
                   Upgrade to Pro Plan
                 </h4>
-                <p className="text-xs text-stone-400">
+                <p className="text-xs text-stone-600">
                   আনলিমিটেড এআই কনটেন্ট তৈরি, জিপিটি-৪ও ইন্টিগ্রেশন এবং স্বয়ংক্রিয় ফ্যাক্ট-চেক ফিচার আনলক করুন।
                 </p>
               </div>
@@ -700,7 +697,7 @@ export function AdminAiContentGeneratorPage() {
             <button
               type="button"
               onClick={() => sweetAlert.info('AI Pro প্ল্যান', 'দৈনিক বার্তা প্রবাহ এআই প্রো সাবস্ক্রিপশনে আনলিমিটেড কনটেন্ট, কাস্টম ফাইন-টিউনিং এবং টিম কলাবোরেশন সুবিধা অন্তর্ভুক্ত রয়েছে।')}
-              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white text-xs font-bold flex items-center gap-2 shadow-md shadow-purple-600/30 transition-all cursor-pointer"
+              className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold flex items-center gap-2 shadow-xs transition-all cursor-pointer"
             >
               <Sparkles className="w-4 h-4 text-amber-300" />
               <span>Upgrade Plan</span>

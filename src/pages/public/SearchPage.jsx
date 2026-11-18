@@ -194,15 +194,13 @@ export function SearchPage() {
         )}
       </nav>
 
-      {/* Search Header Banner & Form */}
-      <div className="bg-gradient-to-r from-stone-900 via-stone-800 to-stone-900 text-white rounded-2xl p-6 sm:p-8 mb-8 shadow-md relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-72 h-72 bg-rose-600/15 rounded-full blur-3xl pointer-events-none" />
-
+      {/* Search Header Banner & Form Synced with Standard Normal Card Styling */}
+      <div className="bg-white text-stone-900 rounded-2xl p-6 sm:p-8 mb-8 shadow-xs border border-stone-200 relative overflow-hidden">
         <div className="relative z-10 max-w-3xl mb-6">
-          <h1 className="text-2xl sm:text-4xl font-extrabold font-serif-bn tracking-tight mb-2">
+          <h1 className="text-2xl sm:text-4xl font-extrabold font-serif-bn tracking-tight text-stone-950 mb-2">
             {isBn ? 'দৈনিক বার্তা প্রবাহ অনুসন্ধান পোর্টাল' : 'Daily Prabaho Search Portal'}
           </h1>
-          <p className="text-xs sm:text-sm text-stone-300 font-serif-bn leading-relaxed">
+          <p className="text-xs sm:text-sm text-stone-700 font-serif-bn leading-relaxed">
             {isBn
               ? 'হাজারো নির্ভরযোগ্য সংবাদ, সম্পাদকীয়, ছবি ও ভিডিও প্রতিবেদন থেকে দ্রুততম সময়ে আপনার কাঙ্ক্ষিত খবরটি খুঁজে নিন।'
               : 'Explore comprehensive national & global news archives with smart category, keyword, and date filters.'}
@@ -219,7 +217,7 @@ export function SearchPage() {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder={isBn ? 'কী খুঁজতে চান? শিরোনাম, বিষয় বা যেকোনো শব্দ লিখুন...' : 'Search news headlines, topics, or keywords...'}
-                className="w-full pl-12 pr-10 py-3 rounded-xl bg-white text-stone-900 placeholder-stone-400 text-sm focus:outline-none focus:ring-3 focus:ring-rose-500 font-sans shadow-inner"
+                className="w-full pl-12 pr-10 py-3 rounded-xl bg-stone-50 border border-stone-200 text-stone-900 placeholder-stone-500 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 font-sans shadow-2xs"
               />
               {inputValue && (
                 <button

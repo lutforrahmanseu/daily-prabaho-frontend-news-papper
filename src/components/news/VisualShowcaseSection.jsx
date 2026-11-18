@@ -39,27 +39,24 @@ export function VisualShowcaseSection({ fallbackArticles = [] }) {
 
   return (
     <EditorialReveal as="section" className="my-10">
-      <div className="bg-gradient-to-br from-stone-950 via-stone-900 to-stone-950 text-white rounded-3xl p-6 sm:p-8 border border-stone-800 shadow-xl overflow-hidden relative">
-        {/* Ambient glow accent */}
-        <div className="absolute top-0 right-1/4 w-96 h-96 rounded-full bg-rose-600/10 blur-3xl pointer-events-none" />
-
+      <div className="bg-white text-stone-900 rounded-2xl p-6 sm:p-7 border border-stone-200 shadow-xs overflow-hidden relative">
         {/* Section Header */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pb-4 mb-6 border-b border-stone-800/80 relative z-10">
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-4 mb-6 border-b border-stone-200 relative z-10">
           <div className="flex items-center gap-3">
             <span className="p-2 rounded-xl bg-rose-700 text-white shadow-md">
               <Camera className="w-5 h-5" />
             </span>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-xl sm:text-2xl font-black font-serif-bn tracking-tight">
+                <h2 className="text-xl sm:text-2xl font-black font-serif-bn tracking-tight text-stone-950">
                   {isBn ? 'ছবিতে আজকের বাংলাদেশ ও বিশ্ব' : 'Visual Stories & Photojournalism'}
                 </h2>
-                <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[10px] font-bold font-mono">
-                  <Sparkles className="w-2.5 h-2.5 text-amber-300" />
+                <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 text-[10px] font-bold font-mono">
+                  <Sparkles className="w-2.5 h-2.5 text-rose-600" />
                   <span>ফটোগ্যালারি</span>
                 </span>
               </div>
-              <p className="text-xs sm:text-sm text-stone-300 font-serif-bn mt-0.5">
+              <p className="text-xs sm:text-sm text-stone-600 font-serif-bn mt-0.5">
                 {isBn ? 'ক্যামেরার লেন্সে ধরা পড়া আজকের সেরা চিত্রসংবাদ' : 'Striking visual storytelling from around the nation and globe'}
               </p>
             </div>
@@ -67,7 +64,7 @@ export function VisualShowcaseSection({ fallbackArticles = [] }) {
 
           <Link
             to="/multimedia"
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-stone-800 hover:bg-rose-700 text-stone-200 hover:text-white text-xs font-bold transition-all shadow-xs"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-stone-100 hover:bg-rose-700 text-stone-800 hover:text-white text-xs font-bold transition-all shadow-xs border border-stone-200"
           >
             <span>{isBn ? 'সব ছবির অ্যালবাম' : 'View All Galleries'}</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -76,35 +73,34 @@ export function VisualShowcaseSection({ fallbackArticles = [] }) {
 
         {/* 4 Photo Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 relative z-10">
-          {items.map((item, idx) => (
+          {items.map((item) => (
             <div
               key={item.id}
               onClick={() => navigate(item.url)}
-              className="group cursor-pointer rounded-2xl overflow-hidden bg-stone-900 border border-stone-800 hover:border-rose-500/60 transition-all flex flex-col justify-between"
+              className="group cursor-pointer rounded-xl overflow-hidden bg-white border border-stone-200 hover:border-stone-300 hover:shadow-md transition-all flex flex-col justify-between"
             >
-              <div className="relative aspect-16/10 overflow-hidden bg-stone-950">
+              <div className="relative aspect-16/10 overflow-hidden bg-stone-100">
                 <img
                   src={item.imageUrl}
                   alt={item.title}
                   loading="lazy"
-                  className="w-full h-full object-cover group-hover:scale-106 transition-transform duration-500 opacity-90 group-hover:opacity-100"
+                  className="w-full h-full object-cover group-hover:scale-106 transition-transform duration-500"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/20 to-transparent" />
                 
                 {/* Photo Count Badge */}
-                <div className="absolute top-2.5 right-2.5 flex items-center gap-1 px-2 py-1 rounded-md bg-stone-950/80 backdrop-blur-xs text-white text-[11px] font-mono font-bold border border-white/10">
+                <div className="absolute top-2.5 right-2.5 flex items-center gap-1 px-2 py-1 rounded-md bg-stone-900/80 backdrop-blur-xs text-white text-[11px] font-mono font-bold">
                   <ImageIcon className="w-3 h-3 text-rose-400" />
                   <span>{isBn ? toBengaliNumber(item.count) : item.count}</span>
                 </div>
               </div>
 
               <div className="p-4 flex-1 flex flex-col justify-between">
-                <h3 className="text-sm sm:text-base font-extrabold font-serif-bn text-white group-hover:text-rose-400 transition-colors line-clamp-2 leading-snug mb-2">
+                <h3 className="text-sm sm:text-base font-extrabold font-serif-bn text-stone-950 group-hover:text-rose-700 transition-colors line-clamp-2 leading-snug mb-2">
                   {item.title}
                 </h3>
-                <div className="pt-2 border-t border-stone-800/80 flex items-center justify-between text-xs text-stone-300 font-medium">
+                <div className="pt-2 border-t border-stone-100 flex items-center justify-between text-xs text-stone-600 font-medium">
                   <span className="truncate">{item.photographer}</span>
-                  <span className="text-rose-400 font-bold group-hover:translate-x-1 transition-transform">
+                  <span className="text-rose-700 font-bold group-hover:translate-x-1 transition-transform">
                     →
                   </span>
                 </div>

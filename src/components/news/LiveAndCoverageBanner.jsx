@@ -29,7 +29,7 @@ export function LiveAndCoverageBanner() {
     <section className="my-5 space-y-4">
       {/* Active Live Blogs Strip */}
       {liveBlogs.length > 0 && (
-        <div className="rounded-xl border border-rose-200 dark:border-rose-900/70 bg-gradient-to-r from-rose-50 via-white to-stone-50 dark:from-rose-950/30 dark:via-stone-900 dark:to-stone-900 p-4 shadow-xs">
+        <div className="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-4 shadow-xs">
           <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
             <div className="flex items-center gap-2">
               <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-rose-700 text-white">

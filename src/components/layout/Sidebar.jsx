@@ -30,28 +30,27 @@ export function Sidebar() {
       <PopularNews limit={5} />
 
       {/* 2. Today's E-Paper Edition Preview Card */}
-      <div className="bg-gradient-to-br from-stone-900 via-stone-900 to-rose-950 text-white rounded-2xl p-5 shadow-md border border-stone-800 space-y-3 relative overflow-hidden group">
-        <div className="absolute top-0 right-0 -mr-6 -mt-6 w-24 h-24 rounded-full bg-rose-600/10 blur-xl pointer-events-none" />
+      <div className="bg-white text-stone-900 rounded-xl p-5 shadow-xs border border-stone-200 space-y-3 relative overflow-hidden group hover:shadow-md transition-shadow">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="p-1.5 rounded-lg bg-rose-700 text-white">
               <Newspaper className="w-4 h-4" />
             </span>
             <div>
-              <h3 className="text-sm font-bold font-serif-bn leading-tight">
+              <h3 className="text-sm font-bold font-serif-bn leading-tight text-stone-950">
                 {isBn ? 'আজকের মুদ্রিত ই-পেপার' : "Today's E-Paper Edition"}
               </h3>
-              <p className="text-xs text-stone-300 font-medium">
+              <p className="text-xs text-stone-600 font-medium">
                 {isBn ? 'অনলাইন ডিজিটাল প্রিন্ট সংস্করণ' : 'Digital Broad-sheet Replica'}
               </p>
             </div>
           </div>
-          <span className="px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[10px] font-bold font-mono">
+          <span className="px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 text-[10px] font-bold font-mono">
             {isBn ? 'ই-সংস্করণ' : 'E-PRINT'}
           </span>
         </div>
 
-        <p className="text-xs sm:text-sm text-stone-100 font-serif-bn leading-relaxed">
+        <p className="text-xs sm:text-sm text-stone-700 font-serif-bn leading-relaxed">
           {isBn
             ? 'কাগজের পত্রিকার মতোই পৃষ্ঠা উল্টে ঝকঝকে ফন্ট ও ছবিতে পড়ুন আজকের পুরো পত্রিকা।'
             : 'Turn pages like a real printed newspaper in ultra-high resolution.'}
@@ -60,7 +59,7 @@ export function Sidebar() {
         <button
           type="button"
           onClick={() => dispatch(setEpaperModalOpen(true))}
-          className="w-full py-2.5 px-4 rounded-xl bg-rose-700 hover:bg-rose-600 active:scale-98 text-white text-xs font-bold font-serif-bn flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md"
+          className="w-full py-2.5 px-4 rounded-xl bg-rose-700 hover:bg-rose-800 active:scale-98 text-white text-xs font-bold font-serif-bn flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
         >
           <BookOpen className="w-4 h-4" />
           <span>{isBn ? 'ই-পেপার পড়ুন (ক্লিক করুন)' : 'Open E-Paper Reader'}</span>

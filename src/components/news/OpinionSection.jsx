@@ -56,7 +56,7 @@ export function OpinionSection() {
           <article
             key={col.id}
             onClick={() => navigate(`/news/${col.slug}`)}
-            className="group cursor-pointer bg-[#faf8f5] border border-stone-200/90 rounded-2xl p-6 hover:bg-white hover:shadow-lg hover:border-stone-300 transition-all duration-300 flex flex-col justify-between"
+            className="group cursor-pointer bg-white border border-stone-200 rounded-2xl p-6 hover:shadow-lg hover:border-stone-300 transition-all duration-300 flex flex-col justify-between"
           >
             <div>
               {/* Quote icon & reading time */}

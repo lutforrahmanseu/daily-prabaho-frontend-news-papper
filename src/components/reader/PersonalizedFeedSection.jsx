@@ -25,18 +25,18 @@ export function PersonalizedFeedSection() {
 
   if (!isReaderAuth) {
     return (
-      <section className="rounded-2xl bg-gradient-to-r from-stone-900 via-stone-800 to-rose-950 text-white p-5 sm:p-6 shadow-md border border-stone-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <section className="rounded-2xl bg-white border border-stone-200 text-stone-900 p-5 sm:p-6 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="space-y-1.5">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-700/40 border border-rose-500/40 text-rose-200 text-[11px] font-bold">
-            <Sparkles className="w-3.5 h-3.5" />
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-50 border border-rose-200 text-rose-700 text-[11px] font-bold">
+            <Sparkles className="w-3.5 h-3.5 text-rose-600" />
             <span>{isBn ? 'ব্যক্তিগতকৃত সংবাদ অভিজ্ঞতা' : 'Personalized Newsroom Experience'}</span>
           </div>
-          <h2 className="text-lg sm:text-xl font-bold font-serif-bn">
+          <h2 className="text-lg sm:text-xl font-bold font-serif-bn text-stone-950">
             {isBn
               ? 'আপনার পছন্দের বিভাগ, লেখক ও বিষয় অনুযায়ী সংবাদ পাতা সাজিয়ে নিন'
               : 'Personalize your front page by following topics, sections & journalists'}
           </h2>
-          <p className="text-xs sm:text-sm text-stone-200 font-serif-bn">
+          <p className="text-xs sm:text-sm text-stone-700 font-serif-bn leading-relaxed">
             {isBn
               ? 'বুকমার্ক, পড়ার ইতিহাস, নিউজলেটার ও পুশ নোটিফিকেশন নিয়ন্ত্রণ করুন পূর্ণ প্রাইভেসি সুরক্ষাসহ।'
               : 'Sync bookmarks, reading history, and digest controls across devices with strict privacy protection.'}
@@ -46,14 +46,14 @@ export function PersonalizedFeedSection() {
         <div className="flex flex-wrap items-center gap-2.5 shrink-0">
           <Link
             to="/reader/register"
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-rose-700 hover:bg-rose-600 text-white text-xs font-bold transition-colors shadow-xs"
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-rose-700 hover:bg-rose-800 text-white text-xs font-bold transition-colors shadow-xs"
           >
             <UserPlus className="w-3.5 h-3.5" />
             <span>{isBn ? 'বিনামূল্যে নিবন্ধন করুন' : 'Create Reader Account'}</span>
           </Link>
           <Link
             to="/reader/login"
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-colors"
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-semibold border border-stone-200 transition-colors"
           >
             <span>{isBn ? 'পাঠক লগইন' : 'Reader Sign In'}</span>
           </Link>

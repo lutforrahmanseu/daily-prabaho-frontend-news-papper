@@ -319,7 +319,7 @@ export function FeaturedLeadSection() {
                     trackLayoutOrHeadlineClick(story);
                     navigate(`/news/${story.slug || story.id}`);
                   }}
-                  className="group cursor-pointer p-3.5 rounded-xl bg-stone-50/80 hover:bg-white border border-stone-200/90 hover:border-stone-300 hover:shadow-xs transition-all flex flex-col justify-between"
+                  className="group cursor-pointer p-3.5 rounded-xl bg-white hover:shadow-md border border-stone-200 hover:border-stone-300 transition-all flex flex-col justify-between"
                 >
                   <div>
                     <div className="flex items-center gap-1.5 text-xs text-stone-700 font-medium mb-1.5 flex-wrap">
