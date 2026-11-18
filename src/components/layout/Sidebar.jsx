@@ -41,7 +41,7 @@ export function Sidebar() {
               <h3 className="text-sm font-bold font-serif-bn leading-tight">
                 {isBn ? 'আজকের মুদ্রিত ই-পেপার' : "Today's E-Paper Edition"}
               </h3>
-              <p className="text-[10px] text-stone-400">
+              <p className="text-xs text-stone-300 font-medium">
                 {isBn ? 'অনলাইন ডিজিটাল প্রিন্ট সংস্করণ' : 'Digital Broad-sheet Replica'}
               </p>
             </div>
@@ -51,7 +51,7 @@ export function Sidebar() {
           </span>
         </div>
 
-        <p className="text-xs text-stone-300 font-serif-bn leading-relaxed">
+        <p className="text-xs sm:text-sm text-stone-100 font-serif-bn leading-relaxed">
           {isBn
             ? 'কাগজের পত্রিকার মতোই পৃষ্ঠা উল্টে ঝকঝকে ফন্ট ও ছবিতে পড়ুন আজকের পুরো পত্রিকা।'
             : 'Turn pages like a real printed newspaper in ultra-high resolution.'}

@@ -117,18 +117,18 @@ export function PopularNews({
 
                 {/* Story Details */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 text-[11px] text-stone-500 mb-1 flex-wrap">
+                  <div className="flex items-center gap-2 text-xs text-stone-700 mb-1 flex-wrap font-medium">
                     <span className="text-rose-700 font-bold">{story.categoryName}</span>
-                    <span>·</span>
+                    <span className="text-stone-400 font-bold">·</span>
                     <span className="flex items-center gap-0.5">
-                      <Eye className="w-3 h-3 text-stone-400" />
+                      <Eye className="w-3.5 h-3.5 text-stone-500" />
                       <span className="font-serif-bn">{views} {isBn ? 'পঠিত' : 'reads'}</span>
                     </span>
-                    <span className="hidden sm:inline">·</span>
-                    <span className="hidden sm:inline text-stone-400 font-serif-bn">{timeAgo}</span>
+                    <span className="hidden sm:inline text-stone-400 font-bold">·</span>
+                    <span className="hidden sm:inline text-stone-600 font-serif-bn">{timeAgo}</span>
                   </div>
 
-                  <h4 className="text-xs sm:text-sm font-bold text-stone-900 group-hover:text-rose-800 font-serif-bn leading-snug line-clamp-2">
+                  <h4 className="text-xs sm:text-sm font-bold text-stone-950 group-hover:text-rose-800 font-serif-bn leading-snug line-clamp-2">
                     {title}
                   </h4>
                 </div>

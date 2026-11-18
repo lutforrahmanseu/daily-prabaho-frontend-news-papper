@@ -92,24 +92,24 @@ export function NewsCard({
             >
               {categoryName}
             </Link>
-            <span className="text-stone-300" aria-hidden="true">·</span>
-            <span className="text-stone-500 font-normal">{timeAgo}</span>
-            <span className="text-stone-300" aria-hidden="true">·</span>
-            <span className="text-stone-500 font-normal flex items-center gap-1 font-serif-bn">
-              <Clock className="w-3 h-3" />
+            <span className="text-stone-400 font-bold" aria-hidden="true">·</span>
+            <span className="text-stone-700 font-medium">{timeAgo}</span>
+            <span className="text-stone-400 font-bold" aria-hidden="true">·</span>
+            <span className="text-stone-700 font-medium flex items-center gap-1 font-serif-bn">
+              <Clock className="w-3 h-3 text-rose-600" />
               {readingTime}
             </span>
           </div>
 
-          <h2 className="text-2xl sm:text-3xl lg:text-3xl font-bold text-stone-900 group-hover:text-rose-800 transition-colors font-serif-bn leading-tight mb-3">
+          <h2 className="text-2xl sm:text-3xl lg:text-3xl font-bold text-stone-950 group-hover:text-rose-800 transition-colors font-serif-bn leading-tight mb-3">
             {article.isSponsored && (
-              <span className="inline-flex items-center gap-1 mr-2 align-middle px-2 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-300 text-xs font-sans font-extrabold">
+              <span className="inline-flex items-center gap-1 mr-2 align-middle px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300 text-xs font-sans font-extrabold">
                 <Megaphone className="w-3 h-3" />
                 <span>{article.sponsoredLabel || (isBn ? 'স্পনসরড' : 'Sponsored')}</span>
               </span>
             )}
             {article.isPremium && (
-              <span className="inline-flex items-center gap-1 mr-2 align-middle px-2 py-0.5 rounded bg-purple-100 text-purple-800 border border-purple-300 text-xs font-sans font-extrabold">
+              <span className="inline-flex items-center gap-1 mr-2 align-middle px-2 py-0.5 rounded bg-purple-100 text-purple-900 border border-purple-300 text-xs font-sans font-extrabold">
                 <Crown className="w-3 h-3" />
                 <span>{isBn ? 'প্রিমিয়াম' : 'Premium'}</span>
               </span>
@@ -117,7 +117,7 @@ export function NewsCard({
             {title}
           </h2>
 
-          <p className="text-stone-600 text-sm sm:text-base leading-relaxed line-clamp-3 mb-4 font-serif-bn">
+          <p className="text-stone-800 text-sm sm:text-base leading-relaxed line-clamp-3 mb-4 font-serif-bn">
             {excerpt}
           </p>
 
@@ -126,12 +126,12 @@ export function NewsCard({
               <Link
                 to={`/author/${article.authorSlug || 'rep-01'}`}
                 onClick={(e) => e.stopPropagation()}
-                className="text-xs font-semibold text-stone-800 hover:text-rose-700 transition-colors"
+                className="text-xs font-bold text-stone-900 hover:text-rose-700 transition-colors"
               >
                 {article.author}
               </Link>
               {article.authorRole && (
-                <span className="text-stone-400 text-xs hidden sm:inline">| {article.authorRole}</span>
+                <span className="text-stone-500 text-xs hidden sm:inline">| {article.authorRole}</span>
               )}
             </div>
 
@@ -184,7 +184,7 @@ export function NewsCard({
         </div>
 
         <div className="p-4 flex flex-col flex-1">
-          <div className="flex items-center gap-2 text-[11px] text-rose-700 font-semibold mb-1.5 flex-wrap">
+          <div className="flex items-center gap-2 text-xs text-rose-700 font-semibold mb-1.5 flex-wrap">
             <Link
               to={`/category/${article.category}`}
               onClick={(e) => e.stopPropagation()}
@@ -193,34 +193,34 @@ export function NewsCard({
               {categoryName}
             </Link>
             {article.isSponsored && (
-              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200 text-[10px] font-bold">
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-200 text-[10px] font-bold">
                 <Megaphone className="w-2.5 h-2.5" />
                 <span>{article.sponsoredLabel || (isBn ? 'স্পনসরড' : 'Sponsored')}</span>
               </span>
             )}
             {article.isPremium && (
-              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-purple-100 text-purple-800 border border-purple-200 text-[10px] font-bold">
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-purple-100 text-purple-900 border border-purple-200 text-[10px] font-bold">
                 <Crown className="w-2.5 h-2.5" />
                 <span>{isBn ? 'প্রিমিয়াম' : 'Premium'}</span>
               </span>
             )}
-            <span className="text-stone-300" aria-hidden="true">·</span>
-            <span className="text-stone-500 font-normal">{timeAgo}</span>
+            <span className="text-stone-400 font-bold" aria-hidden="true">·</span>
+            <span className="text-stone-700 font-medium">{timeAgo}</span>
           </div>
 
-          <h3 className="text-base sm:text-lg font-bold text-stone-900 group-hover:text-rose-800 transition-colors font-serif-bn leading-snug mb-2 line-clamp-2">
+          <h3 className="text-base sm:text-lg font-bold text-stone-950 group-hover:text-rose-800 transition-colors font-serif-bn leading-snug mb-2 line-clamp-2">
             {title}
           </h3>
 
-          <p className="text-stone-600 text-xs sm:text-sm line-clamp-2 mb-3 font-serif-bn">
+          <p className="text-stone-800 text-xs sm:text-sm line-clamp-2 mb-3 font-serif-bn leading-relaxed">
             {excerpt}
           </p>
 
-          <div className="mt-auto flex items-center justify-between text-xs text-stone-500">
+          <div className="mt-auto flex items-center justify-between text-xs text-stone-700">
             <Link
               to={`/author/${article.authorSlug || 'rep-01'}`}
               onClick={(e) => e.stopPropagation()}
-              className="hover:text-rose-700"
+              className="font-medium hover:text-rose-700"
             >
               {article.author}
             </Link>
@@ -247,34 +247,36 @@ export function NewsCard({
         onClick={handleCardClick}
         className={`group cursor-pointer bg-white border border-stone-200 rounded-lg p-3 hover:border-stone-300 hover:shadow-xs transition-all flex gap-3.5 ${className}`}
       >
-        <div className="flex-1 flex flex-col">
-          <div className="flex items-center gap-1.5 text-[11px] text-rose-700 font-semibold mb-1 flex-wrap">
-            <Link
-              to={`/category/${article.category}`}
-              onClick={(e) => e.stopPropagation()}
-              className="hover:underline font-bold"
-            >
-              {categoryName}
-            </Link>
-            {article.isSponsored && (
-              <span className="px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 text-[10px] font-bold">
-                {article.sponsoredLabel || (isBn ? 'স্পনসরড' : 'Sponsored')}
-              </span>
-            )}
-            {article.isPremium && (
-              <span className="px-1.5 py-0.2 rounded bg-purple-100 text-purple-800 text-[10px] font-bold">
-                {isBn ? 'প্রিমিয়াম' : 'Premium'}
-              </span>
-            )}
-            <span className="text-stone-300">·</span>
-            <span className="text-stone-500 font-normal">{timeAgo}</span>
+        <div className="flex-1 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center gap-1.5 text-xs text-rose-700 font-semibold mb-1 flex-wrap">
+              <Link
+                to={`/category/${article.category}`}
+                onClick={(e) => e.stopPropagation()}
+                className="hover:underline font-bold"
+              >
+                {categoryName}
+              </Link>
+              {article.isSponsored && (
+                <span className="px-1.5 py-0.5 rounded bg-amber-100 text-amber-900 text-[10px] font-bold">
+                  {article.sponsoredLabel || (isBn ? 'স্পনসরড' : 'Sponsored')}
+                </span>
+              )}
+              {article.isPremium && (
+                <span className="px-1.5 py-0.5 rounded bg-purple-100 text-purple-900 text-[10px] font-bold">
+                  {isBn ? 'প্রিমিয়াম' : 'Premium'}
+                </span>
+              )}
+              <span className="text-stone-400 font-bold">·</span>
+              <span className="text-stone-700 font-medium">{timeAgo}</span>
+            </div>
+
+            <h4 className="text-sm font-bold text-stone-950 group-hover:text-rose-800 font-serif-bn leading-snug line-clamp-2 mb-1.5">
+              {title}
+            </h4>
           </div>
 
-          <h4 className="text-sm font-bold text-stone-900 group-hover:text-rose-800 font-serif-bn leading-snug line-clamp-2 mb-1.5">
-            {title}
-          </h4>
-
-          <div className="mt-auto text-[11px] text-stone-500">
+          <div className="mt-2 text-xs text-stone-700 font-medium">
             <Link
               to={`/author/${article.authorSlug || 'rep-01'}`}
               onClick={(e) => e.stopPropagation()}
@@ -304,14 +306,14 @@ export function NewsCard({
     return (
       <div
         onClick={handleCardClick}
-        className={`group cursor-pointer py-3 border-b border-stone-200 last:border-b-0 hover:bg-stone-50/60 px-2 rounded transition-colors ${className}`}
+        className={`group cursor-pointer py-3 border-b border-stone-200 last:border-b-0 hover:bg-stone-50/80 px-2 rounded-lg transition-colors ${className}`}
       >
-        <div className="flex items-center gap-1.5 text-[11px] text-stone-500 mb-1">
-          <span className="text-rose-700 font-semibold">{categoryName}</span>
-          <span className="text-stone-300">·</span>
+        <div className="flex items-center gap-1.5 text-xs text-stone-700 font-medium mb-1">
+          <span className="text-rose-700 font-bold">{categoryName}</span>
+          <span className="text-stone-400 font-bold">·</span>
           <span>{timeAgo}</span>
         </div>
-        <h4 className="text-sm font-semibold text-stone-900 group-hover:text-rose-800 font-serif-bn leading-snug line-clamp-2">
+        <h4 className="text-sm font-bold text-stone-950 group-hover:text-rose-800 font-serif-bn leading-snug line-clamp-2">
           {title}
         </h4>
       </div>
@@ -359,7 +361,7 @@ export function NewsCard({
       </div>
 
       <div className="p-4 flex flex-col flex-1">
-        <div className="flex items-center gap-2 text-[11px] text-rose-700 font-semibold mb-1.5">
+        <div className="flex items-center gap-2 text-xs text-rose-700 font-semibold mb-1.5">
           <Link
             to={`/category/${article.category}`}
             onClick={(e) => e.stopPropagation()}
@@ -367,15 +369,15 @@ export function NewsCard({
           >
             {categoryName}
           </Link>
-          <span className="text-stone-300">·</span>
-          <span className="text-stone-500 font-normal">{timeAgo}</span>
+          <span className="text-stone-400 font-bold">·</span>
+          <span className="text-stone-700 font-medium">{timeAgo}</span>
         </div>
 
-        <h3 className="text-base font-bold text-stone-900 group-hover:text-rose-800 transition-colors font-serif-bn leading-snug mb-2 line-clamp-2">
+        <h3 className="text-base font-bold text-stone-950 group-hover:text-rose-800 transition-colors font-serif-bn leading-snug mb-2 line-clamp-2">
           {title}
         </h3>
 
-        <p className="text-stone-600 text-xs line-clamp-2 mb-3 font-serif-bn leading-relaxed">
+        <p className="text-stone-800 text-xs sm:text-[13px] line-clamp-2 mb-3 font-serif-bn leading-relaxed">
           {excerpt}
         </p>
 

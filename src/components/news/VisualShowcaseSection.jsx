@@ -59,7 +59,7 @@ export function VisualShowcaseSection({ fallbackArticles = [] }) {
                   <span>ফটোগ্যালারি</span>
                 </span>
               </div>
-              <p className="text-xs text-stone-400 font-serif-bn">
+              <p className="text-xs sm:text-sm text-stone-300 font-serif-bn mt-0.5">
                 {isBn ? 'ক্যামেরার লেন্সে ধরা পড়া আজকের সেরা চিত্রসংবাদ' : 'Striking visual storytelling from around the nation and globe'}
               </p>
             </div>
@@ -99,10 +99,10 @@ export function VisualShowcaseSection({ fallbackArticles = [] }) {
               </div>
 
               <div className="p-4 flex-1 flex flex-col justify-between">
-                <h3 className="text-sm sm:text-base font-bold font-serif-bn text-stone-100 group-hover:text-rose-400 transition-colors line-clamp-2 leading-snug mb-2">
+                <h3 className="text-sm sm:text-base font-extrabold font-serif-bn text-white group-hover:text-rose-400 transition-colors line-clamp-2 leading-snug mb-2">
                   {item.title}
                 </h3>
-                <div className="pt-2 border-t border-stone-800/80 flex items-center justify-between text-[11px] text-stone-400">
+                <div className="pt-2 border-t border-stone-800/80 flex items-center justify-between text-xs text-stone-300 font-medium">
                   <span className="truncate">{item.photographer}</span>
                   <span className="text-rose-400 font-bold group-hover:translate-x-1 transition-transform">
                     →
@@ -118,3 +118,4 @@ export function VisualShowcaseSection({ fallbackArticles = [] }) {
 }
 
 export default VisualShowcaseSection;
+

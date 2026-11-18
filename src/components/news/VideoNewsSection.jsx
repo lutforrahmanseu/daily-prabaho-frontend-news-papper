@@ -113,7 +113,7 @@ export function VideoNewsSection() {
               <div className="flex items-center gap-2 text-rose-400 text-xs font-semibold mb-2">
                 <span>{isBn ? mainVideo.timeAgoBn : mainVideo.timeAgoEn}</span>
                 <span>·</span>
-                <span className="flex items-center gap-1 text-stone-400 font-normal">
+                <span className="flex items-center gap-1 text-stone-300 font-medium">
                   <Eye className="w-3.5 h-3.5" />
                   <span>{isBn ? mainVideo.viewsBn : mainVideo.viewsEn}</span>
                 </span>
@@ -123,12 +123,12 @@ export function VideoNewsSection() {
                 {isBn ? mainVideo.title : (mainVideo.titleEn || mainVideo.title)}
               </h3>
 
-              <p className="text-stone-300 text-xs sm:text-sm mt-2 line-clamp-2 leading-relaxed">
+              <p className="text-stone-200 text-xs sm:text-sm mt-2 line-clamp-2 leading-relaxed font-normal">
                 {mainVideo.summary}
               </p>
             </div>
 
-            <div className="pt-4 border-t border-stone-800 mt-4 flex items-center justify-between text-xs text-stone-400">
+            <div className="pt-4 border-t border-stone-800 mt-4 flex items-center justify-between text-xs text-stone-300 font-medium">
               <span>{isBn ? `উপস্থাপক: ${mainVideo.presenter}` : `Presenter: ${mainVideo.presenter}`}</span>
               <span className="text-rose-400 font-semibold group-hover:underline flex items-center gap-1">
                 {isBn ? 'ভিডিও চালান' : 'Watch Video'}
@@ -167,17 +167,17 @@ export function VideoNewsSection() {
               {/* Story summary */}
               <div className="flex-1 flex flex-col justify-between">
                 <div>
-                  <div className="flex items-center gap-2 text-[10px] text-rose-400 font-semibold mb-1">
+                  <div className="flex items-center gap-2 text-xs text-rose-400 font-semibold mb-1">
                     <span>{isBn ? vid.timeAgoBn : vid.timeAgoEn}</span>
-                    <span>·</span>
-                    <span className="text-stone-400">{isBn ? vid.viewsBn : vid.viewsEn}</span>
+                    <span className="text-stone-500">·</span>
+                    <span className="text-stone-300 font-medium">{isBn ? vid.viewsBn : vid.viewsEn}</span>
                   </div>
 
-                  <h4 className="text-xs sm:text-sm font-bold text-stone-100 group-hover:text-rose-300 font-serif-bn leading-snug line-clamp-2 mb-1.5">
+                  <h4 className="text-xs sm:text-sm font-bold text-white group-hover:text-rose-300 font-serif-bn leading-snug line-clamp-2 mb-1.5">
                     {isBn ? vid.title : (vid.titleEn || vid.title)}
                   </h4>
 
-                  <p className="text-stone-400 text-xs line-clamp-2">
+                  <p className="text-stone-300 text-xs sm:text-[13px] line-clamp-2 leading-relaxed font-normal">
                     {vid.summary}
                   </p>
                 </div>

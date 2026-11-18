@@ -75,9 +75,9 @@ export function LiveAndCoverageBanner() {
                     </h3>
                   </div>
 
-                  <div className="mt-3 pt-2 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between text-[11px] text-stone-500 dark:text-stone-400">
+                  <div className="mt-3 pt-2 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between text-xs text-stone-700 dark:text-stone-300 font-medium">
                     <span>{formatLiveTimestampBadge(blog.last_update_at || blog.started_at)}</span>
-                    <span className="font-semibold text-stone-700 dark:text-stone-300">
+                    <span className="font-bold text-stone-900 dark:text-stone-100">
                       {toBengaliNumber(blog.updates_count || 0)} আপডেট
                     </span>
                   </div>
@@ -100,7 +100,7 @@ export function LiveAndCoverageBanner() {
                 <h2 className="font-serif-bn text-base sm:text-lg font-extrabold text-stone-900 dark:text-stone-100">
                   বিশেষ আয়োজন ও পূর্ণাঙ্গ কাভারেজ
                 </h2>
-                <p className="text-[11px] text-stone-500 dark:text-stone-400">
+                <p className="text-xs text-stone-700 dark:text-stone-300 font-medium">
                   নির্বাচন, বাজেট, ক্রীড়া আসর, জাতীয় দিবস ও জরুরি বিষয়ের ডেডিকেটেড পাতা
                 </p>
               </div>

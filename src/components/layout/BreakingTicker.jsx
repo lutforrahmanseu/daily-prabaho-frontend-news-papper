@@ -56,7 +56,7 @@ export function BreakingTicker() {
         
         {/* Left: Breaking Badge */}
         <div className="flex items-center gap-2 shrink-0">
-          <span className="flex items-center gap-1.5 bg-rose-600 text-white text-[11px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider shadow-sm font-sans">
+          <span className="flex items-center gap-1.5 bg-rose-700 text-white text-xs font-black px-3 py-1 rounded-md uppercase tracking-wider shadow-sm font-sans">
             <Zap className="w-3.5 h-3.5 fill-current text-amber-300 animate-pulse" />
             <span>{isBn ? 'জরুরি সংবাদ' : 'BREAKING'}</span>
           </span>
@@ -78,7 +78,7 @@ export function BreakingTicker() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.22, ease: EDITORIAL_EASE }}
-              className="w-full text-xs sm:text-sm font-medium text-stone-100 truncate hover:text-rose-300 transition-colors font-serif-bn"
+              className="w-full text-sm sm:text-base font-bold text-white truncate hover:text-amber-300 transition-colors font-serif-bn"
             >
               {newsList[currentIndex]}
             </motion.p>
@@ -86,12 +86,12 @@ export function BreakingTicker() {
         </div>
 
         {/* Right: Pause/Play & Prev/Next Controls */}
-        <div className="flex items-center gap-1.5 shrink-0 text-stone-400">
+        <div className="flex items-center gap-1.5 shrink-0 text-stone-300">
           <button
             type="button"
             onClick={() => setIsPaused(!isPaused)}
             aria-label={isPaused ? 'Play breaking news ticker' : 'Pause breaking news ticker'}
-            className="p-1 rounded-md hover:bg-stone-800 text-stone-300 hover:text-white transition-colors cursor-pointer"
+            className="p-1 rounded-md hover:bg-stone-800 text-stone-200 hover:text-white transition-colors cursor-pointer"
             title={isPaused ? (isBn ? 'চালু করুন' : 'Resume') : (isBn ? 'বিরতি' : 'Pause')}
           >
             {isPaused ? <Play className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
@@ -101,18 +101,18 @@ export function BreakingTicker() {
             type="button"
             onClick={handlePrev}
             aria-label="Previous breaking news"
-            className="p-1 rounded-md hover:bg-stone-800 text-stone-300 hover:text-white transition-colors cursor-pointer"
+            className="p-1 rounded-md hover:bg-stone-800 text-stone-200 hover:text-white transition-colors cursor-pointer"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <span className="text-[11px] text-stone-400 font-mono select-none px-0.5">
+          <span className="text-xs text-stone-300 font-mono select-none px-1">
             {currentIndex + 1}/{newsList.length}
           </span>
           <button
             type="button"
             onClick={handleNext}
             aria-label="Next breaking news"
-            className="p-1 rounded-md hover:bg-stone-800 text-stone-300 hover:text-white transition-colors cursor-pointer"
+            className="p-1 rounded-md hover:bg-stone-800 text-stone-200 hover:text-white transition-colors cursor-pointer"
           >
             <ChevronRight className="w-4 h-4" />
           </button>

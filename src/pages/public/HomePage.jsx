@@ -138,23 +138,23 @@ export function HomePage() {
       ) : (
         /* Full Broad-Sheet News Layout (All 12 Sections) */
         <>
-          {/* Personalized Homepage Reader Experience (For You + Recently Viewed) */}
-          <PersonalizedFeedSection />
-
-          {/* Live Blogs & Special Coverage Highlights */}
-          <LiveAndCoverageBanner />
-
-          {/* 5. Featured News (Lead story + Secondary headlines) */}
+          {/* 1. Featured News (Lead story + Secondary headlines + 4 Highlights) */}
           <FeaturedLeadSection />
 
-          {/* In-Feed Mid Page Sponsored Ribbon */}
+          {/* 2. Live Blogs & Special Coverage Highlights */}
+          <LiveAndCoverageBanner />
+
+          {/* 3. In-Feed Mid Page Sponsored Ribbon */}
           <AdPlacement placement="in_feed" />
 
-          {/* 6. Latest News Grid */}
+          {/* 4. Latest News Grid */}
           <LatestNewsGrid />
 
-          {/* 7. Visual Showcase & Photojournalism Ribbon */}
+          {/* 5. Visual Showcase & Photojournalism Ribbon */}
           <VisualShowcaseSection fallbackArticles={articles} />
+
+          {/* 6. Personalized Homepage Reader Experience (For You + Recently Viewed) */}
+          <PersonalizedFeedSection />
 
           {/* Main 2-Column Grid (8 cols Content Streams vs 4 cols Sidebar) */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">

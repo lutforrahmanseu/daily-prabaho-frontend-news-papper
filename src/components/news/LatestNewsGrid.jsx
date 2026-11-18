@@ -119,24 +119,24 @@ export function LatestNewsGrid() {
 
               <div className="p-4 flex flex-col flex-1 justify-between">
                 <div>
-                  <div className="flex items-center gap-2 text-[11px] text-stone-500 mb-1.5 font-medium">
+                  <div className="flex items-center gap-2 text-xs text-stone-700 mb-1.5 font-semibold">
                     <Clock className="w-3 h-3 text-rose-600" />
                     <span>{timeAgo}</span>
                     <span>·</span>
                     <span>{story.author}</span>
                   </div>
 
-                  <h3 className="text-base font-bold text-stone-900 group-hover:text-rose-800 transition-colors font-serif-bn leading-snug line-clamp-2 mb-2">
+                  <h3 className="text-base font-bold text-stone-950 group-hover:text-rose-800 transition-colors font-serif-bn leading-snug line-clamp-2 mb-2">
                     {title}
                   </h3>
 
-                  <p className="text-stone-600 text-xs line-clamp-2 leading-relaxed">
+                  <p className="text-stone-800 text-xs sm:text-[13px] line-clamp-2 leading-relaxed">
                     {excerpt}
                   </p>
                 </div>
 
-                <div className="pt-3 border-t border-stone-100 flex items-center justify-between text-xs text-stone-500 mt-3">
-                  <span className="text-[11px] font-semibold text-rose-700 group-hover:underline flex items-center gap-0.5">
+                <div className="pt-3 border-t border-stone-100 flex items-center justify-between text-xs text-stone-700 font-medium mt-3">
+                  <span className="text-xs font-bold text-rose-700 group-hover:underline flex items-center gap-0.5">
                     {isBn ? 'বিস্তারিত পড়ুন' : 'Read Full Story'}
                     <ChevronRight className="w-3 h-3" />
                   </span>

@@ -36,7 +36,7 @@ export function PersonalizedFeedSection() {
               ? 'আপনার পছন্দের বিভাগ, লেখক ও বিষয় অনুযায়ী সংবাদ পাতা সাজিয়ে নিন'
               : 'Personalize your front page by following topics, sections & journalists'}
           </h2>
-          <p className="text-xs text-stone-300 font-serif-bn">
+          <p className="text-xs sm:text-sm text-stone-200 font-serif-bn">
             {isBn
               ? 'বুকমার্ক, পড়ার ইতিহাস, নিউজলেটার ও পুশ নোটিফিকেশন নিয়ন্ত্রণ করুন পূর্ণ প্রাইভেসি সুরক্ষাসহ।'
               : 'Sync bookmarks, reading history, and digest controls across devices with strict privacy protection.'}

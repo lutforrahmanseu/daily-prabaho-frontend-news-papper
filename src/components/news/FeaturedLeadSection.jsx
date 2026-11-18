@@ -149,13 +149,13 @@ export function FeaturedLeadSection() {
                 {/* Zero-Pill Editorial Metadata */}
                 <div className="flex items-center flex-wrap gap-2 text-xs text-rose-700 font-bold mb-2.5">
                   <span>{isBn ? leadStory.categoryName : (leadStory.categoryNameEn || leadStory.categoryName)}</span>
-                  <span className="text-stone-300" aria-hidden="true">·</span>
-                  <span className="text-stone-500 font-medium">
+                  <span className="text-stone-400 font-bold" aria-hidden="true">·</span>
+                  <span className="text-stone-700 font-semibold text-xs">
                     {isBn ? formatBengaliRelativeTime(leadStory.publishedAt) : 'Recently'}
                   </span>
-                  <span className="text-stone-300" aria-hidden="true">·</span>
-                  <span className="text-stone-500 font-medium flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5" />
+                  <span className="text-stone-400 font-bold" aria-hidden="true">·</span>
+                  <span className="text-stone-700 font-semibold text-xs flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5 text-rose-600" />
                     {isBn ? calculateReadingTime(leadStory.content) : '4 min read'}
                   </span>
                 </div>
@@ -168,7 +168,7 @@ export function FeaturedLeadSection() {
                 </h3>
 
                 {/* Short Description */}
-                <p className="text-stone-700 text-sm sm:text-base leading-relaxed line-clamp-3 mb-4">
+                <p className="text-stone-800 text-sm sm:text-base leading-relaxed line-clamp-3 mb-4 font-normal">
                   {isBn ? leadStory.excerpt : (leadStory.excerptEn || leadStory.excerpt)}
                 </p>
               </div>
@@ -183,7 +183,7 @@ export function FeaturedLeadSection() {
                     <h4 className="text-xs font-bold text-stone-900">
                       {leadStory.author}
                     </h4>
-                    <p className="text-[11px] text-stone-500">
+                    <p className="text-xs text-stone-600 font-medium">
                       {leadStory.authorRole}
                     </p>
                   </div>
@@ -322,19 +322,19 @@ export function FeaturedLeadSection() {
                   className="group cursor-pointer p-3.5 rounded-xl bg-stone-50/80 hover:bg-white border border-stone-200/90 hover:border-stone-300 hover:shadow-xs transition-all flex flex-col justify-between"
                 >
                   <div>
-                    <div className="flex items-center gap-2 text-[10px] text-stone-500 mb-1.5 flex-wrap">
+                    <div className="flex items-center gap-1.5 text-xs text-stone-700 font-medium mb-1.5 flex-wrap">
                       <span className="w-4 h-4 rounded-full bg-rose-100 text-rose-800 text-[10px] font-mono font-bold flex items-center justify-center shrink-0">
                         {isBn ? toBengaliNumber(idx + 1) : idx + 1}
                       </span>
                       <span className="font-bold text-rose-700">{categoryName}</span>
-                      <span>·</span>
+                      <span className="text-stone-400 font-bold">·</span>
                       <span>{timeAgo}</span>
                     </div>
-                    <h4 className="text-xs sm:text-sm font-bold text-stone-900 group-hover:text-rose-800 transition-colors font-serif-bn leading-snug line-clamp-2">
+                    <h4 className="text-sm font-bold text-stone-950 group-hover:text-rose-800 transition-colors font-serif-bn leading-snug line-clamp-2">
                       {title}
                     </h4>
                   </div>
-                  <div className="mt-2.5 pt-2 border-t border-stone-200/60 flex items-center justify-between text-[11px] text-stone-500">
+                  <div className="mt-2.5 pt-2 border-t border-stone-200/80 flex items-center justify-between text-xs text-stone-700 font-medium">
                     <span className="truncate">{story.author}</span>
                     <span className="text-rose-700 font-bold group-hover:translate-x-0.5 transition-transform">→</span>
                   </div>
