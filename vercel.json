@@ -5,7 +5,18 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
-      "source": "/((?!assets/|favicon\\.ico|robots\\.txt|sitemap\\.xml|sitemap-news\\.xml).*)",
+      "source": "/news/:slug",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": "(?i).*(facebookexternalhit|facebot|twitterbot|linkedinbot|whatsapp|telegrambot|discordbot|slackbot|skypeuripreview|viber|pinterest|redditbot|google-inspectiontool|applebot|embedly).*"
+        }
+      ],
+      "destination": "/api/news-meta?slug=:slug"
+    },
+    {
+      "source": "/((?!assets/|favicon\\.ico|robots\\.txt|sitemap\\.xml|sitemap-news\\.xml|api/|og-default\\.jpg).*)",
       "destination": "/index.html"
     }
   ],
@@ -16,6 +27,15 @@
         {
           "key": "Cache-Control",
           "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/og-default.jpg",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400"
         }
       ]
     },
@@ -38,4 +58,3 @@
     }
   ]
 }
-

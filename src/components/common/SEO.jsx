@@ -24,7 +24,7 @@ export function SEO({
   noindex = false
 }) {
   const siteName = 'দৈনিক বার্তা প্রবাহ (Daily Prabaho)';
-  const siteDomain = 'https://dailyprabaho.com';
+  const siteDomain = (typeof window !== 'undefined' && window.location.origin) || import.meta.env?.VITE_APP_URL || 'https://daily-prabaho-nine.vercel.app';
   const defaultDesc = 'বাংলাদেশ ও আন্তর্জাতিক বিশ্বের সর্বশেষ নির্ভরযোগ্য সংবাদ, রাজনীতি, বাণিজ্য, খেলাধুলা, বিজ্ঞান ও প্রযুক্তির সত্যনিষ্ঠ বিশ্লেষণ।';
   
   const finalTitle = title ? `${title} | ${siteName}` : siteName;
@@ -75,6 +75,9 @@ export function SEO({
     setMeta('property', 'og:type', article ? 'article' : 'website');
     setMeta('property', 'og:locale', 'bn_BD');
     setMeta('property', 'og:image', finalImage);
+    setMeta('property', 'og:image:secure_url', finalImage);
+    setMeta('property', 'og:image:width', '1200');
+    setMeta('property', 'og:image:height', '630');
     setMeta('property', 'og:image:alt', title || siteName);
 
     // 6. Twitter Card Tags
