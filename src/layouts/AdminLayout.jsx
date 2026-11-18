@@ -3,6 +3,7 @@ import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'motion/react';
 import { markAllNotificationsRead, addAuditLog } from '../store/adminSlice.js';
+import { toggleLanguage } from '../store/uiSlice.js';
 import { logout } from '../store/authSlice.js';
 import { useLogoutMutation } from '../store/api/authApi.js';
 import { useGetAdminNewsListQuery } from '../store/api/newsApi.js';
@@ -78,6 +79,8 @@ export function AdminLayout({ children }) {
 
   const authState = useSelector((state) => state.auth);
   const adminState = useSelector((state) => state.admin);
+  const { language } = useSelector((state) => state.ui || {});
+  const isBn = language === 'bn';
   const reduxNotifications = adminState?.notifications || [];
   const currentUser = authState?.user || adminState?.currentUser || {
     name: 'অ্যাডমিন',
@@ -493,42 +496,42 @@ export function AdminLayout({ children }) {
 
   // Route map for human-readable breadcrumb
   const BREADCRUMB_MAP = {
-    'admin': 'কন্ট্রোল রুম',
-    'dashboard': 'ড্যাশবোর্ড ওভারভিউ',
-    'news': 'সংবাদ ব্যবস্থাপনা',
-    'workflow': 'সম্পাদকীয় কাজের ধারা ও অনুমোদন',
-    'categories': 'বিভাগ ও বিষয়',
-    'tags': 'ট্যাগ তালিকা',
-    'reporters': 'প্রতিবেদক ও ব্যুরো',
-    'authors': 'কলামিস্ট ও লেখক',
-    'users': 'ব্যবহারকারী অ্যাকাউন্ট',
-    'roles': 'ভূমিকা ও এক্সেস কন্ট্রোল (RBAC)',
-    'media': 'মিডিয়া লাইব্রেরি',
-    'newsroom': 'নিউজরুম কমান্ড সেন্টার',
-    'assignments': 'অ্যাসাইনমেন্ট বোর্ড',
-    'planning': 'বার্তাকক্ষ পরিকল্পনা',
-    'sources': 'সংবাদ উৎস ডিরেক্টরি',
-    'corrections': 'সংবাদ সংশোধনী',
-    'embargoes': 'নিউজ এমবার্গো',
-    'live-desk': 'লাইভ নিউজ ডেস্ক',
-    'special-coverage': 'বিশেষ আয়োজন CMS',
-    'multimedia': 'মাল্টিমিডিয়া স্টুডিও',
-    'galleries': 'ফটো গ্যালারি ও স্টোরি',
-    'podcasts': 'পডকাস্ট ও অডিও',
-    'playlists': 'ভিডিও প্লেলিস্ট',
-    'timelines': 'ইন্টারঅ্যাক্টিভ টাইমলাইন',
-    'stories': 'স্টোরিটেলিং বিল্ডার',
-    'advertisements': 'বিজ্ঞাপন ক্যাম্পেইন',
-    'comments': 'মন্তব্য মডারেশন',
-    'polls': 'পাঠক মতামত জরিপ',
-    'epaper': 'ডিজিটাল ই-পেপার স্টুডিও',
-    'analytics': 'পাঠক অ্যানালিটিক্স',
-    'hyperlocal': 'হাইপারলোকাল ও আঞ্চলিক ডেস্ক',
-    'syndication': 'নিউজ API ও সিন্ডিকেশন',
-    'audit-logs': 'অডিট ট্রেইল লগ',
-    'reliability': 'সিস্টেম নির্ভরযোগ্যতা ও নিরাপত্তা',
-    'settings': 'সিস্টেম কনফিগারেশন',
-    'profile': 'আমার প্রোফাইল ও নিরাপত্তা'
+    'admin': isBn ? 'কন্ট্রোল রুম' : 'Control Room',
+    'dashboard': isBn ? 'ড্যাশবোর্ড ওভারভিউ' : 'Dashboard Overview',
+    'news': isBn ? 'সংবাদ ব্যবস্থাপনা' : 'News Management',
+    'workflow': isBn ? 'সম্পাদকীয় কাজের ধারা ও অনুমোদন' : 'Editorial Workflow & Approvals',
+    'categories': isBn ? 'বিভাগ ও বিষয়' : 'Categories & Taxonomy',
+    'tags': isBn ? 'ট্যাগ তালিকা' : 'Tags List',
+    'reporters': isBn ? 'প্রতিবেদক ও ব্যুরো' : 'Reporters & Bureau',
+    'authors': isBn ? 'কলামিস্ট ও লেখক' : 'Columnists & Authors',
+    'users': isBn ? 'ব্যবহারকারী অ্যাকাউন্ট' : 'User Accounts',
+    'roles': isBn ? 'ভূমিকা ও এক্সেস কন্ট্রোল (RBAC)' : 'Roles & RBAC Access',
+    'media': isBn ? 'মিডিয়া লাইব্রেরি' : 'Media Library',
+    'newsroom': isBn ? 'নিউজরুম কমান্ড সেন্টার' : 'Newsroom Command Center',
+    'assignments': isBn ? 'অ্যাসাইনমেন্ট বোর্ড' : 'Assignments Board',
+    'planning': isBn ? 'বার্তাকক্ষ পরিকল্পনা' : 'Newsroom Planning',
+    'sources': isBn ? 'সংবাদ উৎস ডিরেক্টরি' : 'News Sources Directory',
+    'corrections': isBn ? 'সংবাদ সংশোধনী' : 'Corrections & Retractions',
+    'embargoes': isBn ? 'নিউজ এমবার্গো' : 'News Embargoes',
+    'live-desk': isBn ? 'লাইভ নিউজ ডেস্ক' : 'Live News Desk',
+    'special-coverage': isBn ? 'বিশেষ আয়োজন CMS' : 'Special Coverage CMS',
+    'multimedia': isBn ? 'মাল্টিমিডিয়া স্টুডিও' : 'Multimedia Studio',
+    'galleries': isBn ? 'ফটো গ্যালারি ও স্টোরি' : 'Photo Galleries',
+    'podcasts': isBn ? 'পডকাস্ট ও অডিও' : 'Podcasts & Audio',
+    'playlists': isBn ? 'ভিডিও প্লেলিস্ট' : 'Video Playlists',
+    'timelines': isBn ? 'ইন্টারঅ্যাক্টিভ টাইমলাইন' : 'Interactive Timelines',
+    'stories': isBn ? 'স্টোরিটেলিং বিল্ডার' : 'Visual Storytelling',
+    'advertisements': isBn ? 'বিজ্ঞাপন ক্যাম্পেইন' : 'Ad Campaigns',
+    'comments': isBn ? 'মন্তব্য মডারেশন' : 'Comments Moderation',
+    'polls': isBn ? 'পাঠক মতামত জরিপ' : 'Reader Polls & Surveys',
+    'epaper': isBn ? 'ডিজিটাল ই-পেপার স্টুডিও' : 'Digital E-Paper Studio',
+    'analytics': isBn ? 'পাঠক অ্যানালিটিক্স' : 'Reader Analytics',
+    'hyperlocal': isBn ? 'হাইপারলোকাল ও আঞ্চলিক ডেস্ক' : 'Hyperlocal & Regional Desk',
+    'syndication': isBn ? 'নিউজ API ও সিন্ডিকেশন' : 'News API & Syndication',
+    'audit-logs': isBn ? 'অডিট ট্রেইল লগ' : 'Audit Trail Logs',
+    'reliability': isBn ? 'সিস্টেম নির্ভরযোগ্যতা ও নিরাপত্তা' : 'Reliability & Health',
+    'settings': isBn ? 'সিস্টেম কনফিগারেশন' : 'System Configuration',
+    'profile': isBn ? 'আমার প্রোফাইল ও নিরাপত্তা' : 'My Profile & Security'
   };
 
   const pathParts = location.pathname.split('/').filter(Boolean);
@@ -586,7 +589,7 @@ export function AdminLayout({ children }) {
               </div>
               <div className="flex flex-col leading-tight">
                 <span className="text-base font-bold font-serif-bn text-white tracking-wide">
-                  দৈনিক বার্তা প্রবাহ
+                  {isBn ? 'দৈনিক বার্তা প্রবাহ' : 'Daily Prabaho'}
                 </span>
                 <span className="text-[10px] text-stone-400 font-mono uppercase tracking-wider flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -628,12 +631,13 @@ export function AdminLayout({ children }) {
             const isExact = location.pathname === item.path;
             const isSub = item.path !== '/admin/dashboard' && item.path !== '/admin/newsroom' && location.pathname.startsWith(item.path);
             const isActive = isExact || isSub;
+            const itemName = isBn ? item.name : (item.nameEn || item.name);
 
             return (
               <Link
                 key={item.path}
                 to={item.path}
-                title={item.name}
+                title={itemName}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-colors group relative ${
                   isActive
                     ? 'text-white font-bold'
@@ -649,7 +653,7 @@ export function AdminLayout({ children }) {
                 )}
                 <Icon className={`relative z-10 w-4 h-4 shrink-0 transition-transform ${isActive ? 'text-white' : 'text-stone-400 group-hover:text-white group-hover:scale-105'}`} />
                 {(!collapsed || mobileOpen) && (
-                  <span className="relative z-10 flex-1 truncate">{item.name}</span>
+                  <span className="relative z-10 flex-1 truncate">{itemName}</span>
                 )}
                 {(!collapsed || mobileOpen) && item.badge && (
                   <span className={`relative z-10 text-[10px] px-1.5 py-0.2 rounded-full font-mono ${item.badgeColor || 'bg-stone-800 text-stone-300'}`}>
@@ -659,7 +663,7 @@ export function AdminLayout({ children }) {
                 {/* Collapsed Tooltip */}
                 {collapsed && !mobileOpen && (
                   <span className="absolute left-full ml-2 px-2 py-1 bg-stone-800 text-white text-[11px] rounded shadow-md whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none z-50 transition-opacity">
-                    {item.name}
+                    {itemName}
                   </span>
                 )}
               </Link>
@@ -679,7 +683,7 @@ export function AdminLayout({ children }) {
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-bold text-white truncate">{currentUser.name}</p>
                 <p className="text-[10px] text-stone-400 truncate">
-                  {currentRoleObj.nameBn}
+                  {isBn ? currentRoleObj.nameBn : (currentRoleObj.nameEn || currentRoleObj.nameBn)}
                 </p>
               </div>
             )}
@@ -711,7 +715,7 @@ export function AdminLayout({ children }) {
                 className="hover:text-rose-700 flex items-center gap-1 font-medium transition-colors shrink-0"
               >
                 <Home className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">সিএমএস</span>
+                <span className="hidden sm:inline">{isBn ? 'সিএমএস' : 'CMS'}</span>
               </Link>
               {pathParts.map((part, idx) => {
                 if (part === 'admin' && pathParts.length > 1) return null;
@@ -736,9 +740,23 @@ export function AdminLayout({ children }) {
             {/* Authenticated Database Role Indicator */}
             <div className="hidden md:flex items-center gap-1.5 bg-stone-50 border border-stone-200 rounded-lg px-2.5 py-1 text-xs">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-              <span className="text-stone-500 font-medium">রোল:</span>
-              <span className="font-semibold text-stone-800">{currentRoleObj.nameBn}</span>
+              <span className="text-stone-500 font-medium">{isBn ? 'রোল:' : 'Role:'}</span>
+              <span className="font-semibold text-stone-800">
+                {isBn ? currentRoleObj.nameBn : (currentRoleObj.nameEn || currentRoleObj.nameBn)}
+              </span>
             </div>
+
+            {/* Language Switcher */}
+            <button
+              type="button"
+              onClick={() => dispatch(toggleLanguage())}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-stone-300 hover:bg-stone-50 text-stone-700 text-xs font-semibold transition-colors cursor-pointer"
+              title={isBn ? 'Switch to English' : 'বাংলায় পরিবর্তন করুন'}
+              aria-label="Toggle Language"
+            >
+              <Globe className="w-3.5 h-3.5 text-rose-700" />
+              <span>{isBn ? 'English' : 'বাংলা'}</span>
+            </button>
 
             {/* Public Website Preview Link */}
             <Link
@@ -746,10 +764,10 @@ export function AdminLayout({ children }) {
               target="_blank"
               rel="noopener noreferrer"
               className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-stone-300 hover:bg-stone-50 text-stone-700 text-xs font-semibold transition-colors"
-              title="পাবলিক পোর্টাল দেখুন"
+              title={isBn ? 'পাবলিক পোর্টাল দেখুন' : 'View Public Portal'}
             >
               <ExternalLink className="w-3.5 h-3.5 text-stone-500" />
-              <span>পাবলিক পোর্টাল</span>
+              <span>{isBn ? 'পাবলিক পোর্টাল' : 'Public Portal'}</span>
             </Link>
 
             {/* Notifications Menu */}
@@ -758,7 +776,7 @@ export function AdminLayout({ children }) {
                 type="button"
                 onClick={() => setNotifDropdownOpen(!notifDropdownOpen)}
                 className="relative p-2 rounded-lg text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition-colors"
-                title="বিজ্ঞপ্তি"
+                title={isBn ? 'বিজ্ঞপ্তি' : 'Notifications'}
                 aria-label="Notifications"
               >
                 <Bell className="w-4 h-4" />
@@ -774,9 +792,9 @@ export function AdminLayout({ children }) {
               >
                   <div className="px-4 py-2 border-b border-stone-100 flex items-center justify-between">
                     <div>
-                      <h4 className="text-xs font-bold text-stone-900">বিজ্ঞপ্তি ও নোটিফিকেশন</h4>
+                      <h4 className="text-xs font-bold text-stone-900">{isBn ? 'বিজ্ঞপ্তি ও নোটিফিকেশন' : 'Notifications & Alerts'}</h4>
                       <p className="text-[10px] text-stone-500">
-                        {toBengaliNumber(unreadCount)} টি অপঠিত বার্তা
+                        {isBn ? `${toBengaliNumber(unreadCount)} টি অপঠিত বার্তা` : `${unreadCount} unread messages`}
                       </p>
                     </div>
                     {unreadCount > 0 && (
@@ -786,14 +804,14 @@ export function AdminLayout({ children }) {
                         className="text-[10px] text-rose-700 hover:underline flex items-center gap-1 font-semibold"
                       >
                         <CheckCheck className="w-3 h-3" />
-                        <span>সব পড়া হয়েছে</span>
+                        <span>{isBn ? 'সব পড়া হয়েছে' : 'Mark all read'}</span>
                       </button>
                     )}
                   </div>
 
                   <div className="max-h-72 overflow-y-auto divide-y divide-stone-100">
                     {notifications.length === 0 ? (
-                      <p className="p-4 text-center text-xs text-stone-400">কোনো নোটিফিকেশন নেই</p>
+                      <p className="p-4 text-center text-xs text-stone-400">{isBn ? 'কোনো নোটিফিকেশন নেই' : 'No notifications found'}</p>
                     ) : (
                       notifications.map((item) => (
                         <div
@@ -820,7 +838,7 @@ export function AdminLayout({ children }) {
                       onClick={() => setNotifDropdownOpen(false)}
                       className="text-xs font-semibold text-rose-700 hover:underline"
                     >
-                      সকল অডিট লগ ও অ্যাক্টিভিটি দেখুন →
+                      {isBn ? 'সকল অডিট লগ ও অ্যাক্টিভিটি দেখুন →' : 'View full audit logs & activity →'}
                     </Link>
                   </div>
               </MotionDropdown>
@@ -842,7 +860,7 @@ export function AdminLayout({ children }) {
                 <span className="hidden md:block text-left">
                   <p className="text-xs font-bold text-stone-800 leading-none">{currentUser.name}</p>
                   <p className="text-[10px] text-stone-500 font-medium leading-tight mt-0.5">
-                    {currentRoleObj.nameBn}
+                    {isBn ? currentRoleObj.nameBn : (currentRoleObj.nameEn || currentRoleObj.nameBn)}
                   </p>
                 </span>
               </button>
@@ -857,7 +875,7 @@ export function AdminLayout({ children }) {
                     <p className="text-[10px] text-stone-500 truncate font-mono">{currentUser.email}</p>
                     <div className="mt-1.5 flex items-center gap-1.5">
                       <span className={`text-[9px] font-mono uppercase px-2 py-0.5 rounded font-bold border ${currentRoleObj.badgeColor}`}>
-                        {currentRoleObj.nameBn}
+                        {isBn ? currentRoleObj.nameBn : (currentRoleObj.nameEn || currentRoleObj.nameBn)}
                       </span>
                     </div>
                   </div>
@@ -868,7 +886,7 @@ export function AdminLayout({ children }) {
                     className="flex items-center gap-2.5 px-4 py-2 text-xs text-stone-700 hover:bg-stone-50 font-medium transition-colors"
                   >
                     <User className="w-4 h-4 text-rose-700" />
-                    <span>আমার প্রোফাইল (My Profile)</span>
+                    <span>{isBn ? 'আমার প্রোফাইল (My Profile)' : 'My Profile'}</span>
                   </Link>
 
                   <Link
@@ -877,7 +895,7 @@ export function AdminLayout({ children }) {
                     className="flex items-center gap-2.5 px-4 py-2 text-xs text-stone-700 hover:bg-stone-50 font-medium transition-colors"
                   >
                     <KeyRound className="w-4 h-4 text-stone-400" />
-                    <span>পাসওয়ার্ড পরিবর্তন (Change Password)</span>
+                    <span>{isBn ? 'পাসওয়ার্ড পরিবর্তন (Change Password)' : 'Change Password'}</span>
                   </Link>
 
                   <Link
@@ -886,7 +904,7 @@ export function AdminLayout({ children }) {
                     className="flex items-center gap-2.5 px-4 py-2 text-xs text-stone-700 hover:bg-stone-50 font-medium transition-colors"
                   >
                     <UserCheck className="w-4 h-4 text-stone-400" />
-                    <span>ব্যবহারকারী ব্যবস্থাপনা</span>
+                    <span>{isBn ? 'ব্যবহারকারী ব্যবস্থাপনা' : 'User Management'}</span>
                   </Link>
 
                   <Link
@@ -895,7 +913,7 @@ export function AdminLayout({ children }) {
                     className="flex items-center gap-2.5 px-4 py-2 text-xs text-stone-700 hover:bg-stone-50 font-medium transition-colors"
                   >
                     <Settings className="w-4 h-4 text-stone-400" />
-                    <span>সিএমএস কনফিগারেশন</span>
+                    <span>{isBn ? 'সিএমএস কনফিগারেশন' : 'CMS Configuration'}</span>
                   </Link>
 
                   <div className="border-t border-stone-100 my-1"></div>
@@ -906,7 +924,7 @@ export function AdminLayout({ children }) {
                     className="w-full text-left flex items-center gap-2.5 px-4 py-2 text-xs text-rose-700 hover:bg-rose-50 font-bold transition-colors cursor-pointer"
                   >
                     <LogOut className="w-4 h-4 text-rose-600" />
-                    <span>লগআউট করুন (Sign Out)</span>
+                    <span>{isBn ? 'লগআউট করুন (Sign Out)' : 'Sign Out'}</span>
                   </button>
               </MotionDropdown>
             </div>

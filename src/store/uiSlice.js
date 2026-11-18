@@ -1,7 +1,19 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+const getInitialLanguage = () => {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const saved = window.localStorage.getItem('newsflow_language');
+      if (saved === 'en' || saved === 'bn') return saved;
+    }
+  } catch {
+    // Ignore localStorage errors
+  }
+  return 'bn';
+};
+
 const initialState = {
-  language: 'bn', // 'bn' | 'en'
+  language: getInitialLanguage(), // 'bn' | 'en'
   fontSize: 'normal', // 'normal' | 'large'
   activeView: 'public', // 'public' | 'admin'
   searchModalOpen: false,
@@ -19,9 +31,24 @@ export const uiSlice = createSlice({
   reducers: {
     setLanguage: (state, action) => {
       state.language = action.payload;
+      try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          window.localStorage.setItem('newsflow_language', action.payload);
+        }
+      } catch {
+        // Ignore localStorage errors
+      }
     },
     toggleLanguage: (state) => {
-      state.language = state.language === 'bn' ? 'en' : 'bn';
+      const next = state.language === 'bn' ? 'en' : 'bn';
+      state.language = next;
+      try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          window.localStorage.setItem('newsflow_language', next);
+        }
+      } catch {
+        // Ignore localStorage errors
+      }
     },
     setFontSize: (state, action) => {
       state.fontSize = action.payload;

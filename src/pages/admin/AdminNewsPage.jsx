@@ -35,6 +35,8 @@ import { Link } from 'react-router-dom';
 export function AdminNewsPage() {
   const authState = useSelector((state) => state.auth || {});
   const adminState = useSelector((state) => state.admin || {});
+  const { language } = useSelector((state) => state.ui || {});
+  const isBn = language === 'bn';
   const isSuperAdmin = getEffectiveRole(authState, adminState) === 'super_admin';
 
   // Pagination & Filter States
@@ -295,10 +297,12 @@ export function AdminNewsPage() {
       <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-stone-200 shadow-xs">
         <div>
           <h1 className="text-2xl font-black font-serif-bn text-stone-900 tracking-tight">
-            সংবাদ ব্যবস্থাপনা ও কনটেন্ট সিএমএস
+            {isBn ? 'সংবাদ ব্যবস্থাপনা ও কনটেন্ট সিএমএস' : 'News Management & Content CMS'}
           </h1>
           <p className="text-xs text-stone-500 mt-0.5">
-            ফিল্টারিং, বাল্ক একশন, রিচ-টেক্সট এডিটিং এবং প্রকাশনা ট্র্যাকিং
+            {isBn
+              ? 'ফিল্টারিং, বাল্ক একশন, রিচ-টেক্সট এডিটিং এবং প্রকাশনা ট্র্যাকিং'
+              : 'Filtering, bulk actions, rich-text editing and publication tracking'}
           </p>
         </div>
 
@@ -308,7 +312,7 @@ export function AdminNewsPage() {
           className="px-4 py-2.5 rounded-xl bg-rose-700 hover:bg-rose-800 text-white text-xs font-bold flex items-center gap-2 shadow-sm transition-colors cursor-pointer"
         >
           <Plus className="w-4 h-4" />
-          <span>নতুন সংবাদ প্রকাশ করুন</span>
+          <span>{isBn ? 'নতুন সংবাদ প্রকাশ করুন' : 'Create New Article'}</span>
         </button>
       </div>
 
@@ -322,8 +326,10 @@ export function AdminNewsPage() {
               : 'bg-white border-stone-200 text-stone-700 hover:border-stone-300'
             }`}
         >
-          <p className="text-[11px] font-semibold opacity-75">সর্বমোট সংবাদ</p>
-          <p className="text-xl font-extrabold font-serif-bn mt-0.5">{toBengaliNumber(totalCount)}টি</p>
+          <p className="text-[11px] font-semibold opacity-75">{isBn ? 'সর্বমোট সংবাদ' : 'All Articles'}</p>
+          <p className="text-xl font-extrabold font-serif-bn mt-0.5">
+            {isBn ? `${toBengaliNumber(totalCount)}টি` : `${totalCount}`}
+          </p>
         </button>
 
         <button
@@ -334,9 +340,9 @@ export function AdminNewsPage() {
               : 'bg-white border-stone-200 text-stone-700 hover:border-emerald-300'
             }`}
         >
-          <p className="text-[11px] font-semibold opacity-75">প্রকাশিত (Live)</p>
+          <p className="text-[11px] font-semibold opacity-75">{isBn ? 'প্রকাশিত (Live)' : 'Published (Live)'}</p>
           <p className="text-xl font-extrabold font-serif-bn mt-0.5 text-emerald-600">
-            {toBengaliNumber(publishedCount)}টি
+            {isBn ? `${toBengaliNumber(publishedCount)}টি` : `${publishedCount}`}
           </p>
         </button>
 
@@ -348,9 +354,9 @@ export function AdminNewsPage() {
               : 'bg-white border-stone-200 text-stone-700 hover:border-amber-300'
             }`}
         >
-          <p className="text-[11px] font-semibold opacity-75">পর্যালোচনায় (Review)</p>
+          <p className="text-[11px] font-semibold opacity-75">{isBn ? 'পর্যালোচনায় (Review)' : 'In Review'}</p>
           <p className={`text-xl font-extrabold font-serif-bn mt-0.5 ${statusFilter === 'review' ? 'text-white' : 'text-amber-600'}`}>
-            {toBengaliNumber(inReviewCount)}টি
+            {isBn ? `${toBengaliNumber(inReviewCount)}টি` : `${inReviewCount}`}
           </p>
         </button>
 
@@ -362,9 +368,9 @@ export function AdminNewsPage() {
               : 'bg-white border-stone-200 text-stone-700 hover:border-stone-300'
             }`}
         >
-          <p className="text-[11px] font-semibold opacity-75">খসড়া (Draft)</p>
+          <p className="text-[11px] font-semibold opacity-75">{isBn ? 'খসড়া (Draft)' : 'Drafts'}</p>
           <p className="text-xl font-extrabold font-serif-bn mt-0.5 text-stone-600">
-            {toBengaliNumber(draftCount)}টি
+            {isBn ? `${toBengaliNumber(draftCount)}টি` : `${draftCount}`}
           </p>
         </button>
 
@@ -376,9 +382,9 @@ export function AdminNewsPage() {
               : 'bg-white border-stone-200 text-stone-700 hover:border-blue-300'
             }`}
         >
-          <p className="text-[11px] font-semibold opacity-75">শিডিউল্ড (Scheduled)</p>
+          <p className="text-[11px] font-semibold opacity-75">{isBn ? 'শিডিউল্ড (Scheduled)' : 'Scheduled'}</p>
           <p className="text-xl font-extrabold font-serif-bn mt-0.5 text-blue-600">
-            {toBengaliNumber(scheduledCount)}টি
+            {isBn ? `${toBengaliNumber(scheduledCount)}টি` : `${scheduledCount}`}
           </p>
         </button>
       </div>
@@ -397,7 +403,7 @@ export function AdminNewsPage() {
                 setTableSearch(e.target.value);
                 setCurrentPage(1);
               }}
-              placeholder="শিরোনাম, প্রতিবেদক বা কিওয়ার্ড দিয়ে খুঁজুন..."
+              placeholder={isBn ? 'শিরোনাম, প্রতিবেদক বা কিওয়ার্ড দিয়ে খুঁজুন...' : 'Search by headline, reporter or keyword...'}
               className="w-full pl-9 pr-9 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-rose-500 focus:bg-white"
             />
             {tableSearch && (
@@ -408,7 +414,7 @@ export function AdminNewsPage() {
                   setCurrentPage(1);
                 }}
                 className="absolute right-3 top-2.5 text-stone-400 hover:text-stone-600 p-0.5 cursor-pointer"
-                title="অনুসন্ধান মুছুন"
+                title={isBn ? 'অনুসন্ধান মুছুন' : 'Clear search'}
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -429,10 +435,10 @@ export function AdminNewsPage() {
                 }}
                 className="bg-transparent font-semibold text-stone-700 focus:outline-none cursor-pointer"
               >
-                <option value="all">সকল বিভাগ (All Categories)</option>
+                <option value="all">{isBn ? 'সকল বিভাগ (All Categories)' : 'All Categories'}</option>
                 {categoriesList.map((cat) => (
                   <option key={cat.id || cat.slug} value={cat.slug}>
-                    {cat.name} ({cat.nameEn})
+                    {isBn ? `${cat.name} (${cat.nameEn})` : `${cat.nameEn || cat.name}`}
                   </option>
                 ))}
               </select>
@@ -449,17 +455,17 @@ export function AdminNewsPage() {
                 }}
                 className="bg-transparent font-semibold text-stone-700 focus:outline-none cursor-pointer"
               >
-                <option value="all">সকল সময়কাল (All Dates)</option>
-                <option value="today">আজকের সংবাদ (Today)</option>
-                <option value="this_week">গত ৭ দিন (This Week)</option>
-                <option value="this_month">এই মাস (This Month)</option>
-                <option value="custom">নির্দিষ্ট সময়সীমা (Custom Range)</option>
+                <option value="all">{isBn ? 'সকল সময়কাল (All Dates)' : 'All Dates'}</option>
+                <option value="today">{isBn ? 'আজকের সংবাদ (Today)' : 'Today'}</option>
+                <option value="this_week">{isBn ? 'গত ৭ দিন (This Week)' : 'Last 7 Days'}</option>
+                <option value="this_month">{isBn ? 'এই মাস (This Month)' : 'This Month'}</option>
+                <option value="custom">{isBn ? 'নির্দিষ্ট সময়সীমা (Custom Range)' : 'Custom Range'}</option>
               </select>
             </div>
 
             {/* Page Size Selector */}
             <div className="flex items-center gap-1 text-xs text-stone-500 bg-stone-50 border border-stone-200 px-2.5 py-1.5 rounded-xl">
-              <span>প্রতি পেজে:</span>
+              <span>{isBn ? 'প্রতি পেজে:' : 'Per page:'}</span>
               <select
                 value={pageSize}
                 onChange={(e) => {
@@ -468,9 +474,9 @@ export function AdminNewsPage() {
                 }}
                 className="bg-transparent font-bold text-stone-800 focus:outline-none cursor-pointer"
               >
-                <option value={10}>১০টি</option>
-                <option value={20}>২০টি</option>
-                <option value={50}>৫০টি</option>
+                <option value={10}>{isBn ? '১০টি' : '10'}</option>
+                <option value={20}>{isBn ? '২০টি' : '20'}</option>
+                <option value={50}>{isBn ? '৫০টি' : '50'}</option>
               </select>
             </div>
 
@@ -480,10 +486,10 @@ export function AdminNewsPage() {
                 type="button"
                 onClick={resetAllFilters}
                 className="flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition-colors cursor-pointer"
-                title="সকল ফিল্টার মুছুন ও পূর্ণ তালিকা দেখুন"
+                title={isBn ? 'সকল ফিল্টার মুছুন ও পূর্ণ তালিকা দেখুন' : 'Reset all filters'}
               >
                 <RotateCcw className="w-3.5 h-3.5" />
-                <span>রিসেট</span>
+                <span>{isBn ? 'রিসেট' : 'Reset'}</span>
               </button>
             )}
 
@@ -533,46 +539,48 @@ export function AdminNewsPage() {
           >
             <div className="flex items-center gap-3">
               <span className="w-7 h-7 rounded-lg bg-rose-700 text-white flex items-center justify-center font-bold text-xs font-mono">
-                {toBengaliNumber(selectedIds.length)}
+                {isBn ? toBengaliNumber(selectedIds.length) : selectedIds.length}
               </span>
               <span className="text-xs font-bold text-stone-200">
-                {toBengaliNumber(selectedIds.length)}টি সংবাদ নির্বাচিত হয়েছে
+                {isBn
+                  ? `${toBengaliNumber(selectedIds.length)}টি সংবাদ নির্বাচিত হয়েছে`
+                  : `${selectedIds.length} articles selected`}
               </span>
               <button
                 type="button"
                 onClick={() => setSelectedIds([])}
                 className="text-stone-400 hover:text-white text-xs underline cursor-pointer ml-1"
               >
-                নির্বাচন বাতিল
+                {isBn ? 'নির্বাচন বাতিল' : 'Deselect'}
               </button>
             </div>
 
             <div className="flex flex-wrap items-center gap-2 text-xs">
               <button
                 type="button"
-                onClick={() => handleBulkStatusChange('published', 'লাইভ প্রকাশিত')}
+                onClick={() => handleBulkStatusChange('published', isBn ? 'লাইভ প্রকাশিত' : 'Published')}
                 className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition-colors cursor-pointer flex items-center gap-1"
               >
                 <CheckCircle className="w-3.5 h-3.5" />
-                <span>সরাসরি প্রকাশ (Publish)</span>
+                <span>{isBn ? 'সরাসরি প্রকাশ (Publish)' : 'Publish Live'}</span>
               </button>
 
               <button
                 type="button"
-                onClick={() => handleBulkStatusChange('submitted', 'পর্যালোচনায়')}
+                onClick={() => handleBulkStatusChange('submitted', isBn ? 'পর্যালোচনায়' : 'In Review')}
                 className="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold transition-colors cursor-pointer flex items-center gap-1"
               >
                 <Clock className="w-3.5 h-3.5" />
-                <span>পর্যালোচনায় জমা (Review)</span>
+                <span>{isBn ? 'পর্যালোচনায় জমা (Review)' : 'Submit to Review'}</span>
               </button>
 
               <button
                 type="button"
-                onClick={() => handleBulkStatusChange('draft', 'খসড়া')}
+                onClick={() => handleBulkStatusChange('draft', isBn ? 'খসড়া' : 'Draft')}
                 className="px-3 py-1.5 rounded-lg bg-stone-700 hover:bg-stone-600 text-white font-bold transition-colors cursor-pointer flex items-center gap-1"
               >
                 <Layers className="w-3.5 h-3.5" />
-                <span>খসড়ায় নিন (Draft)</span>
+                <span>{isBn ? 'খসড়ায় নিন (Draft)' : 'Move to Draft'}</span>
               </button>
 
               <button
@@ -581,7 +589,7 @@ export function AdminNewsPage() {
                 className="px-3 py-1.5 rounded-lg bg-rose-700 hover:bg-rose-800 text-white font-bold transition-colors cursor-pointer flex items-center gap-1"
               >
                 <Trash2 className="w-3.5 h-3.5" />
-                <span>মুছে ফেলুন (Delete)</span>
+                <span>{isBn ? 'মুছে ফেলুন (Delete)' : 'Delete'}</span>
               </button>
             </div>
           </motion.div>
@@ -600,7 +608,7 @@ export function AdminNewsPage() {
                     type="button"
                     onClick={handleSelectAllToggle}
                     className="p-1 rounded text-stone-600 hover:text-stone-900 cursor-pointer"
-                    title={isAllCurrentSelected ? 'সব অনির্বাচন করুন' : 'সব নির্বাচন করুন'}
+                    title={isAllCurrentSelected ? (isBn ? 'সব অনির্বাচন করুন' : 'Deselect all') : (isBn ? 'সব নির্বাচন করুন' : 'Select all')}
                   >
                     {isAllCurrentSelected ? (
                       <CheckSquare className="w-4 h-4 text-rose-700" />
@@ -611,13 +619,13 @@ export function AdminNewsPage() {
                     )}
                   </button>
                 </th>
-                <th className="px-4 py-3.5">সংবাদ শিরোনাম ও বিবরণ</th>
-                <th className="px-4 py-3.5">বিভাগ</th>
-                <th className="px-4 py-3.5">প্রতিবেদক</th>
-                <th className="px-4 py-3.5">প্রকাশকাল</th>
-                <th className="px-4 py-3.5">ভিউ</th>
-                <th className="px-4 py-3.5">স্থিতি (Status)</th>
-                <th className="px-4 py-3.5 text-right">পদক্ষেপ</th>
+                <th className="px-4 py-3.5">{isBn ? 'সংবাদ শিরোনাম ও বিবরণ' : 'Article Headline & Excerpt'}</th>
+                <th className="px-4 py-3.5">{isBn ? 'বিভাগ' : 'Category'}</th>
+                <th className="px-4 py-3.5">{isBn ? 'প্রতিবেদক' : 'Reporter'}</th>
+                <th className="px-4 py-3.5">{isBn ? 'প্রকাশকাল' : 'Published'}</th>
+                <th className="px-4 py-3.5">{isBn ? 'ভিউ' : 'Views'}</th>
+                <th className="px-4 py-3.5">{isBn ? 'স্থিতি (Status)' : 'Status'}</th>
+                <th className="px-4 py-3.5 text-right">{isBn ? 'পদক্ষেপ' : 'Actions'}</th>
               </tr>
             </thead>
 
@@ -749,30 +757,30 @@ export function AdminNewsPage() {
                           <div className="flex items-center gap-1.5 mb-1">
                             {row.isLead && (
                               <span className="text-[10px] bg-rose-100 text-rose-800 font-bold px-1.5 py-0.2 rounded">
-                                ★ প্রধান শীর্ষ
+                                {isBn ? '★ প্রধান শীর্ষ' : '★ Lead'}
                               </span>
                             )}
                             {row.isBreaking && (
                               <span className="text-[10px] bg-amber-100 text-amber-800 font-bold px-1.5 py-0.2 rounded">
-                                ⚡ ব্রেকিং
+                                {isBn ? '⚡ ব্রেকিং' : '⚡ Breaking'}
                               </span>
                             )}
                             {row.isFeatured && (
                               <span className="text-[10px] bg-blue-100 text-blue-800 font-bold px-1.5 py-0.2 rounded">
-                                ✦ ফিচার্ড
+                                {isBn ? '✦ ফিচার্ড' : '✦ Featured'}
                               </span>
                             )}
                             {row.aiAssisted && (
                               <span className="text-[10px] bg-indigo-50 text-indigo-800 border border-indigo-200 font-bold px-1.5 py-0.2 rounded">
-                                AI সহায়তা
+                                {isBn ? 'AI সহায়তা' : 'AI Assisted'}
                               </span>
                             )}
                           </div>
                           <p className="font-bold text-stone-900 text-sm line-clamp-1 hover:text-rose-700 transition-colors">
-                            {row.title}
+                            {isBn ? row.title : (row.titleEn || row.title)}
                           </p>
                           <p className="text-[11px] text-stone-500 font-sans line-clamp-1 mt-0.5">
-                            {row.excerpt}
+                            {isBn ? row.excerpt : (row.excerptEn || row.excerpt)}
                           </p>
                         </div>
                       </td>
@@ -780,26 +788,28 @@ export function AdminNewsPage() {
                       {/* Category */}
                       <td className="px-4 py-3 whitespace-nowrap">
                         <span className="px-2.5 py-1 rounded-md bg-stone-100 text-stone-800 text-xs font-semibold">
-                          {row.categoryName}
+                          {isBn ? row.categoryName : (row.categoryNameEn || row.categoryName)}
                         </span>
                       </td>
 
                       {/* Reporter */}
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <span className="text-xs font-medium text-stone-700">{row.author}</span>
+                        <span className="text-xs font-medium text-stone-700">
+                          {row.author || (isBn ? 'স্টাফ রিপোর্টার' : 'Staff Reporter')}
+                        </span>
                       </td>
 
                       {/* Time */}
                       <td className="px-4 py-3 whitespace-nowrap">
                         <span className="text-xs text-stone-500 font-mono">
-                          {formatBengaliRelativeTime(row.publishedAt)}
+                          {isBn ? formatBengaliRelativeTime(row.publishedAt) : 'Recently'}
                         </span>
                       </td>
 
                       {/* Views */}
                       <td className="px-4 py-3 whitespace-nowrap">
                         <span className="font-mono text-xs font-bold text-stone-800">
-                          {toBengaliNumber(row.views || 0)}
+                          {isBn ? toBengaliNumber(row.views || 0) : (row.views || 0).toLocaleString()}
                         </span>
                       </td>
 
@@ -819,13 +829,13 @@ export function AdminNewsPage() {
                                     : 'bg-stone-100 text-stone-700 border-stone-300'
                             }`}
                         >
-                          <option value="published">লাইভ (Published)</option>
-                          <option value="submitted">জমাকৃত (Submitted)</option>
-                          <option value="under_review">পর্যালোচনায় (Under Review)</option>
-                          <option value="approved">অনুমোদিত (Approved)</option>
-                          <option value="draft">খসড়া (Draft)</option>
-                          <option value="scheduled">শিডিউল্ড (Scheduled)</option>
-                          <option value="archived">আর্কাইভ (Archived)</option>
+                          <option value="published">{isBn ? 'লাইভ (Published)' : 'Published'}</option>
+                          <option value="submitted">{isBn ? 'জমাকৃত (Submitted)' : 'Submitted'}</option>
+                          <option value="under_review">{isBn ? 'পর্যালোচনায় (Under Review)' : 'Under Review'}</option>
+                          <option value="approved">{isBn ? 'অনুমোদিত (Approved)' : 'Approved'}</option>
+                          <option value="draft">{isBn ? 'খসড়া (Draft)' : 'Draft'}</option>
+                          <option value="scheduled">{isBn ? 'শিডিউল্ড (Scheduled)' : 'Scheduled'}</option>
+                          <option value="archived">{isBn ? 'আর্কাইভ (Archived)' : 'Archived'}</option>
                         </select>
                       </td>
 
@@ -836,7 +846,7 @@ export function AdminNewsPage() {
                             to={`/news/${row.slug}`}
                             target="_blank"
                             className="p-1.5 rounded-lg text-stone-500 hover:text-stone-900 hover:bg-stone-100 transition-colors"
-                            title="পাবলিক পেজ দেখুন"
+                            title={isBn ? 'পাবলিক পেজ দেখুন' : 'View Public Page'}
                           >
                             <ExternalLink className="w-3.5 h-3.5" />
                           </Link>
@@ -844,7 +854,7 @@ export function AdminNewsPage() {
                             type="button"
                             onClick={() => handleEdit(row)}
                             className="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"
-                            title="সম্পাদনা করুন"
+                            title={isBn ? 'সম্পাদনা করুন' : 'Edit'}
                           >
                             <Edit className="w-3.5 h-3.5" />
                           </button>
@@ -852,7 +862,7 @@ export function AdminNewsPage() {
                             type="button"
                             onClick={() => handleDelete(row.id, row.title)}
                             className="p-1.5 rounded-lg text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
-                            title="মুছে ফেলুন"
+                            title={isBn ? 'মুছে ফেলুন' : 'Delete'}
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -869,9 +879,19 @@ export function AdminNewsPage() {
         {/* 6. Pagination Footer */}
         <div className="p-4 border-t border-stone-200 bg-stone-50 flex flex-wrap items-center justify-between gap-3 text-xs">
           <p className="text-stone-500 font-mono">
-            মোট <strong>{toBengaliNumber(filteredArticles.length)}</strong> টি সংবাদের মধ্যে{' '}
-            <strong>{toBengaliNumber(Math.min((currentPage - 1) * pageSize + 1, filteredArticles.length))}</strong> থেকে{' '}
-            <strong>{toBengaliNumber(Math.min(currentPage * pageSize, filteredArticles.length))}</strong> প্রদর্শন
+            {isBn ? (
+              <>
+                মোট <strong>{toBengaliNumber(filteredArticles.length)}</strong> টি সংবাদের মধ্যে{' '}
+                <strong>{toBengaliNumber(Math.min((currentPage - 1) * pageSize + 1, filteredArticles.length))}</strong> থেকে{' '}
+                <strong>{toBengaliNumber(Math.min(currentPage * pageSize, filteredArticles.length))}</strong> প্রদর্শন
+              </>
+            ) : (
+              <>
+                Showing <strong>{Math.min((currentPage - 1) * pageSize + 1, filteredArticles.length)}</strong> to{' '}
+                <strong>{Math.min(currentPage * pageSize, filteredArticles.length)}</strong> of{' '}
+                <strong>{filteredArticles.length}</strong> articles
+              </>
+            )}
           </p>
 
           <div className="flex items-center gap-1.5">
@@ -880,13 +900,13 @@ export function AdminNewsPage() {
               disabled={currentPage <= 1}
               onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
               className="p-1.5 rounded-lg border border-stone-300 bg-white hover:bg-stone-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-              title="পূর্ববর্তী পেজ"
+              title={isBn ? 'পূর্ববর্তী পেজ' : 'Previous page'}
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
 
             <span className="px-3 py-1 rounded-lg bg-stone-200 font-bold font-mono text-stone-800">
-              {toBengaliNumber(currentPage)} / {toBengaliNumber(totalPages)}
+              {isBn ? toBengaliNumber(currentPage) : currentPage} / {isBn ? toBengaliNumber(totalPages) : totalPages}
             </span>
 
             <button
@@ -894,7 +914,7 @@ export function AdminNewsPage() {
               disabled={currentPage >= totalPages}
               onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
               className="p-1.5 rounded-lg border border-stone-300 bg-white hover:bg-stone-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-              title="পরবর্তী পেজ"
+              title={isBn ? 'পরবর্তী পেজ' : 'Next page'}
             >
               <ChevronRight className="w-4 h-4" />
             </button>

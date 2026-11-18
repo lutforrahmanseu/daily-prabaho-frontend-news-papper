@@ -47,14 +47,17 @@ import {
 } from 'lucide-react';
 
 const BENGALI_DAYS = ['রবি', 'সোম', 'মঙ্গল', 'বুধ', 'বৃহঃ', 'শুক্র', 'শনি'];
+const ENGLISH_DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const CATEGORY_COLORS = ['#be123c', '#2563eb', '#059669', '#d97706', '#7c3aed', '#0891b2'];
 
 export function AdminDashboardOverview() {
   const authState = useSelector((state) => state.auth || {});
   const adminState = useSelector((state) => state.admin || {});
+  const { language } = useSelector((state) => state.ui || {});
+  const isBn = language === 'bn';
   const authUser = authState?.user;
   const currentUser = adminState?.currentUser;
-  const activeUserName = authUser?.name || currentUser?.name || 'সম্পাদক';
+  const activeUserName = authUser?.name || currentUser?.name || (isBn ? 'সম্পাদক' : 'Editor');
 
   const effectiveRole = getEffectiveRole(authState, adminState);
   const isSuperAdmin = effectiveRole === 'super_admin';
@@ -132,7 +135,8 @@ export function AdminDashboardOverview() {
 
   // Weekly Readership Aggregated by Weekday
   const weeklyChartData = useMemo(() => {
-    const map = BENGALI_DAYS.map((day, idx) => ({
+    const days = isBn ? BENGALI_DAYS : ENGLISH_DAYS;
+    const map = days.map((day, idx) => ({
       dayIndex: idx,
       day,
       views: 0,
@@ -147,7 +151,7 @@ export function AdminDashboardOverview() {
       map[idx].count += 1;
     });
     return map;
-  }, [articles]);
+  }, [articles, isBn]);
 
   const [selectedDayIndex, setSelectedDayIndex] = useState(() => new Date().getDay());
   const selectedDay = weeklyChartData[selectedDayIndex] || weeklyChartData[0];
@@ -190,8 +194,9 @@ export function AdminDashboardOverview() {
     const total = articles.length || 1;
     const rows = (roots.length > 0 ? roots : Object.keys(counts).map((slug) => ({ slug, name: slug }))).map((cat, idx) => {
       const count = counts[cat.slug] ?? cat.newsCount ?? 0;
+      const catName = isBn ? (cat.name || cat.nameBn || cat.slug) : (cat.nameEn || cat.name || cat.slug);
       return {
-        name: cat.name,
+        name: catName,
         slug: cat.slug,
         count,
         percentage: Math.min(100, Math.round((count / total) * 100)),
@@ -199,7 +204,7 @@ export function AdminDashboardOverview() {
       };
     });
     return rows.sort((a, b) => b.count - a.count).slice(0, 5);
-  }, [rawCategories, articles]);
+  }, [rawCategories, articles, isBn]);
 
   // Quick Approve Workflow Action
   const handleQuickApprove = async (item) => {
@@ -241,20 +246,32 @@ export function AdminDashboardOverview() {
         <div>
           <div className="flex flex-wrap items-center gap-2.5">
             <h1 className="text-xl sm:text-2xl font-black font-serif-bn text-stone-900 tracking-tight">
-              সম্পাদকীয় ওভারভিউ ড্যাশবোর্ড
+              {isBn ? 'সম্পাদকীয় ওভারভিউ ড্যাশবোর্ড' : 'Editorial Overview Dashboard'}
             </h1>
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
               <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
-              <span>{toBengaliNumber(activeReaders)} জন পাঠক লাইভ অনলাইনে</span>
+              <span>
+                {isBn
+                  ? `${toBengaliNumber(activeReaders)} জন পাঠক লাইভ অনলাইনে`
+                  : `${activeReaders.toLocaleString()} Readers Online Now`}
+              </span>
             </span>
           </div>
 
           <div className="flex flex-wrap items-center gap-2 mt-1.5 text-xs text-stone-500">
-            <span className="font-serif-bn font-semibold text-stone-700">{todayNewspaperDate}</span>
+            <span className="font-serif-bn font-semibold text-stone-700">
+              {isBn ? todayNewspaperDate : new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+            </span>
             <span className="text-stone-300">•</span>
-            <span className="font-serif-bn text-stone-500">{todayBanglaDate}</span>
-            <span className="text-stone-300">•</span>
-            <span className="font-mono text-[11px]">ঢাকা সময় (UTC+6)</span>
+            <span className="font-serif-bn text-stone-500">
+              {isBn ? todayBanglaDate : 'Dhaka Time (UTC+6)'}
+            </span>
+            {isBn && (
+              <>
+                <span className="text-stone-300">•</span>
+                <span className="font-mono text-[11px]">ঢাকা সময় (UTC+6)</span>
+              </>
+            )}
           </div>
         </div>
 
@@ -270,7 +287,7 @@ export function AdminDashboardOverview() {
                   : 'text-stone-600 hover:text-stone-900'
               }`}
             >
-              আজকের চিত্র
+              {isBn ? 'আজকের চিত্র' : 'Today'}
             </button>
             <button
               type="button"
@@ -281,7 +298,7 @@ export function AdminDashboardOverview() {
                   : 'text-stone-600 hover:text-stone-900'
               }`}
             >
-              গত ৭ দিন
+              {isBn ? 'গত ৭ দিন' : 'Last 7 Days'}
             </button>
             <button
               type="button"
@@ -292,7 +309,7 @@ export function AdminDashboardOverview() {
                   : 'text-stone-600 hover:text-stone-900'
               }`}
             >
-              এই মাস
+              {isBn ? 'এই মাস' : 'This Month'}
             </button>
           </div>
 
@@ -301,7 +318,7 @@ export function AdminDashboardOverview() {
             onClick={handleRefreshAll}
             disabled={isRefreshing}
             className="p-2 rounded-xl border border-stone-200 bg-white hover:bg-stone-50 text-stone-600 transition-colors cursor-pointer shadow-2xs disabled:opacity-50"
-            title="লাইভ ডেটা রিফ্রেশ করুন"
+            title={isBn ? 'লাইভ ডেটা রিফ্রেশ করুন' : 'Refresh Live Metrics'}
           >
             <RotateCcw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-rose-700' : ''}`} />
           </button>
@@ -315,21 +332,23 @@ export function AdminDashboardOverview() {
         <MotionStaggerItem>
           <div className="bg-white p-4 sm:p-4.5 rounded-2xl border border-stone-200 shadow-xs hover:border-emerald-300 transition-all h-full flex flex-col justify-between">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider">মোট পাঠক ভিউ</span>
+              <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider">
+                {isBn ? 'মোট পাঠক ভিউ' : 'Total Views'}
+              </span>
               <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
                 <Eye className="w-4 h-4" />
               </div>
             </div>
             <div className="mt-3">
               <h3 className="text-2xl sm:text-3xl font-extrabold text-stone-900 font-mono tracking-tight">
-                {isOverviewLoading && isNewsLoading ? '...' : toBengaliNumber(totalViews)}
+                {isOverviewLoading && isNewsLoading ? '...' : (isBn ? toBengaliNumber(totalViews) : totalViews.toLocaleString())}
               </h3>
               <div className="flex items-center gap-1.5 mt-1 text-[11px]">
                 <span className="font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded font-mono flex items-center gap-0.5">
                   <ArrowUpRight className="w-3 h-3" />
-                  <span>+{toBengaliNumber(viewsToday)}</span>
+                  <span>+{isBn ? toBengaliNumber(viewsToday) : viewsToday.toLocaleString()}</span>
                 </span>
-                <span className="text-stone-400">আজকের ভিউ</span>
+                <span className="text-stone-400">{isBn ? 'আজকের ভিউ' : "Today's Views"}</span>
               </div>
             </div>
           </div>
@@ -339,20 +358,25 @@ export function AdminDashboardOverview() {
         <MotionStaggerItem>
           <div className="bg-white p-4 sm:p-4.5 rounded-2xl border border-stone-200 shadow-xs hover:border-rose-300 transition-all h-full flex flex-col justify-between">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider">প্রকাশিত সংবাদ</span>
+              <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider">
+                {isBn ? 'প্রকাশিত সংবাদ' : 'Published News'}
+              </span>
               <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-700 flex items-center justify-center">
                 <FileText className="w-4 h-4" />
               </div>
             </div>
             <div className="mt-3">
               <h3 className="text-2xl sm:text-3xl font-extrabold text-stone-900 font-serif-bn tracking-tight">
-                {toBengaliNumber(publishedCount)} <span className="text-sm font-normal text-stone-500">টি</span>
+                {isBn ? toBengaliNumber(publishedCount) : publishedCount}{' '}
+                <span className="text-sm font-normal text-stone-500">{isBn ? 'টি' : 'articles'}</span>
               </h3>
               <div className="flex items-center gap-1.5 mt-1 text-[11px]">
                 <span className="font-bold text-rose-700 bg-rose-50 px-1.5 py-0.2 rounded font-mono">
-                  +{toBengaliNumber(publishedToday)} আজ
+                  +{isBn ? toBengaliNumber(publishedToday) : publishedToday} {isBn ? 'আজ' : 'today'}
                 </span>
-                <span className="text-stone-400">মোট {toBengaliNumber(totalArticles)}টি</span>
+                <span className="text-stone-400">
+                  {isBn ? `মোট ${toBengaliNumber(totalArticles)}টি` : `Total ${totalArticles}`}
+                </span>
               </div>
             </div>
           </div>
@@ -365,17 +389,20 @@ export function AdminDashboardOverview() {
             className="bg-white p-4 sm:p-4.5 rounded-2xl border border-stone-200 shadow-xs hover:border-amber-300 hover:shadow-sm transition-all h-full flex flex-col justify-between group"
           >
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider">পর্যালোচনায় অপেক্ষমাণ</span>
+              <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider">
+                {isBn ? 'পর্যালোচনায় অপেক্ষমাণ' : 'Pending Review'}
+              </span>
               <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center group-hover:scale-105 transition-transform">
                 <Clock className="w-4 h-4" />
               </div>
             </div>
             <div className="mt-3">
               <h3 className="text-2xl sm:text-3xl font-extrabold text-amber-700 font-mono tracking-tight">
-                {toBengaliNumber(pendingReviewCount)} <span className="text-sm font-normal text-stone-500 font-serif-bn">টি</span>
+                {isBn ? toBengaliNumber(pendingReviewCount) : pendingReviewCount}{' '}
+                {isBn && <span className="text-sm font-normal text-stone-500 font-serif-bn">টি</span>}
               </h3>
               <p className="text-[11px] text-amber-800 font-medium mt-1 flex items-center gap-1">
-                <span>সিদ্ধান্তের অপেক্ষায়</span>
+                <span>{isBn ? 'সিদ্ধান্তের অপেক্ষায়' : 'Action Required'}</span>
                 <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
               </p>
             </div>
@@ -389,16 +416,21 @@ export function AdminDashboardOverview() {
             className="bg-white p-4 sm:p-4.5 rounded-2xl border border-stone-200 shadow-xs hover:border-blue-300 transition-all h-full flex flex-col justify-between"
           >
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider">সক্রিয় নিউজরুম কর্মী</span>
+              <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider">
+                {isBn ? 'সক্রিয় নিউজরুম কর্মী' : 'Active Reporters'}
+              </span>
               <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center">
                 <ShieldCheck className="w-4 h-4" />
               </div>
             </div>
             <div className="mt-3">
               <h3 className="text-2xl sm:text-3xl font-extrabold text-stone-900 font-serif-bn tracking-tight">
-                {toBengaliNumber(activeReportersCount)} <span className="text-sm font-normal text-stone-500">জন</span>
+                {isBn ? toBengaliNumber(activeReportersCount) : activeReportersCount}{' '}
+                <span className="text-sm font-normal text-stone-500">{isBn ? 'জন' : 'active'}</span>
               </h3>
-              <p className="text-[11px] text-stone-400 mt-1">মাঠপর্যায়ে নিয়োজিত</p>
+              <p className="text-[11px] text-stone-400 mt-1">
+                {isBn ? 'মাঠপর্যায়ে নিয়োজিত' : 'On Newsroom Roster'}
+              </p>
             </div>
           </Link>
         </MotionStaggerItem>
@@ -407,16 +439,20 @@ export function AdminDashboardOverview() {
         <MotionStaggerItem className="col-span-2 sm:col-span-1">
           <div className="bg-white p-4 sm:p-4.5 rounded-2xl border border-stone-200 shadow-xs hover:border-purple-300 transition-all h-full flex flex-col justify-between">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider">সোশ্যাল শেয়ার</span>
+              <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider">
+                {isBn ? 'সোশ্যাল শেয়ার' : 'Social Shares'}
+              </span>
               <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center">
                 <Share2 className="w-4 h-4" />
               </div>
             </div>
             <div className="mt-3">
               <h3 className="text-2xl sm:text-3xl font-extrabold text-stone-900 font-mono tracking-tight">
-                {toBengaliNumber(totalShares)}
+                {isBn ? toBengaliNumber(totalShares) : totalShares.toLocaleString()}
               </h3>
-              <p className="text-[11px] text-stone-400 mt-1">পাঠক প্রতিক্রিয়া ও প্রচার</p>
+              <p className="text-[11px] text-stone-400 mt-1">
+                {isBn ? 'পাঠক প্রতিক্রিয়া ও প্রচার' : 'Audience Reach'}
+              </p>
             </div>
           </div>
         </MotionStaggerItem>
@@ -429,14 +465,16 @@ export function AdminDashboardOverview() {
           <div className="flex items-center gap-2">
             <Layers className="w-4 h-4 text-rose-700" />
             <h3 className="text-sm font-bold font-serif-bn text-stone-900">
-              সম্পাদকীয় কাজের ধারা ও প্রকাশনা পাইপলাইন (Editorial Pipeline Health)
+              {isBn
+                ? 'সম্পাদকীয় কাজের ধারা ও প্রকাশনা পাইপলাইন (Editorial Pipeline Health)'
+                : 'Editorial Workflow & Publishing Pipeline Health'}
             </h3>
           </div>
           <Link
             to="/admin/workflow"
             className="text-xs font-bold text-rose-700 hover:text-rose-800 inline-flex items-center gap-1 group"
           >
-            <span>অনুমোদন ডেস্কে যান</span>
+            <span>{isBn ? 'অনুমোদন ডেস্কে যান' : 'Go to Workflow Desk'}</span>
             <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
           </Link>
         </div>
@@ -444,51 +482,51 @@ export function AdminDashboardOverview() {
         {/* Step Flow Indicators */}
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
           <div className="p-2.5 rounded-xl bg-stone-50 border border-stone-200 text-left">
-            <span className="text-[10px] font-semibold text-stone-500">১. খসড়া</span>
+            <span className="text-[10px] font-semibold text-stone-500">{isBn ? '১. খসড়া' : '1. Draft'}</span>
             <p className="text-base font-extrabold font-mono text-stone-800 mt-0.5">
-              {toBengaliNumber(pipelineStats.draft)}
+              {isBn ? toBengaliNumber(pipelineStats.draft) : pipelineStats.draft}
             </p>
           </div>
 
           <div className="p-2.5 rounded-xl bg-blue-50/60 border border-blue-200 text-left">
-            <span className="text-[10px] font-semibold text-blue-700">২. জমা পড়া</span>
+            <span className="text-[10px] font-semibold text-blue-700">{isBn ? '২. জমা পড়া' : '2. Submitted'}</span>
             <p className="text-base font-extrabold font-mono text-blue-900 mt-0.5">
-              {toBengaliNumber(pipelineStats.submitted)}
+              {isBn ? toBengaliNumber(pipelineStats.submitted) : pipelineStats.submitted}
             </p>
           </div>
 
           <div className="p-2.5 rounded-xl bg-amber-50/60 border border-amber-200 text-left">
-            <span className="text-[10px] font-semibold text-amber-700">৩. পর্যালোচনায়</span>
+            <span className="text-[10px] font-semibold text-amber-700">{isBn ? '৩. পর্যালোচনায়' : '3. In Review'}</span>
             <p className="text-base font-extrabold font-mono text-amber-900 mt-0.5">
-              {toBengaliNumber(pipelineStats.under_review)}
+              {isBn ? toBengaliNumber(pipelineStats.under_review) : pipelineStats.under_review}
             </p>
           </div>
 
           <div className="p-2.5 rounded-xl bg-orange-50/60 border border-orange-200 text-left">
-            <span className="text-[10px] font-semibold text-orange-700">৪. সংশোধনে</span>
+            <span className="text-[10px] font-semibold text-orange-700">{isBn ? '৪. সংশোধনে' : '4. Returned'}</span>
             <p className="text-base font-extrabold font-mono text-orange-900 mt-0.5">
-              {toBengaliNumber(pipelineStats.returned)}
+              {isBn ? toBengaliNumber(pipelineStats.returned) : pipelineStats.returned}
             </p>
           </div>
 
           <div className="p-2.5 rounded-xl bg-emerald-50/60 border border-emerald-200 text-left">
-            <span className="text-[10px] font-semibold text-emerald-700">৫. অনুমোদিত</span>
+            <span className="text-[10px] font-semibold text-emerald-700">{isBn ? '৫. অনুমোদিত' : '5. Approved'}</span>
             <p className="text-base font-extrabold font-mono text-emerald-900 mt-0.5">
-              {toBengaliNumber(pipelineStats.approved)}
+              {isBn ? toBengaliNumber(pipelineStats.approved) : pipelineStats.approved}
             </p>
           </div>
 
           <div className="p-2.5 rounded-xl bg-indigo-50/60 border border-indigo-200 text-left">
-            <span className="text-[10px] font-semibold text-indigo-700">৬. শিডিউল্ড</span>
+            <span className="text-[10px] font-semibold text-indigo-700">{isBn ? '৬. শিডিউল্ড' : '6. Scheduled'}</span>
             <p className="text-base font-extrabold font-mono text-indigo-900 mt-0.5">
-              {toBengaliNumber(pipelineStats.scheduled)}
+              {isBn ? toBengaliNumber(pipelineStats.scheduled) : pipelineStats.scheduled}
             </p>
           </div>
 
           <div className="p-2.5 rounded-xl bg-emerald-700 text-white text-left">
-            <span className="text-[10px] font-medium text-emerald-100">৭. লাইভ প্রকাশিত</span>
+            <span className="text-[10px] font-medium text-emerald-100">{isBn ? '৭. লাইভ প্রকাশিত' : '7. Live Published'}</span>
             <p className="text-base font-extrabold font-mono mt-0.5">
-              {toBengaliNumber(pipelineStats.published)}
+              {isBn ? toBengaliNumber(pipelineStats.published) : pipelineStats.published}
             </p>
           </div>
         </div>
@@ -504,18 +542,24 @@ export function AdminDashboardOverview() {
               <div className="flex items-center gap-2">
                 <BarChart3 className="w-4 h-4 text-rose-700" />
                 <h3 className="text-base font-bold font-serif-bn text-stone-900">
-                  সাপ্তাহিক পাঠক এনগেজমেন্ট ও ভিউজ ধারা
+                  {isBn ? 'সাপ্তাহিক পাঠক এনগেজমেন্ট ও ভিউজ ধারা' : 'Weekly Reader Engagement & Views Trend'}
                 </h3>
               </div>
               <p className="text-xs text-stone-500 mt-0.5">
-                প্রতিদিনের মোট পাঠক সংখ্যা ও সর্বোচ্চ সক্রিয়তা পর্যবেক্ষণ
+                {isBn
+                  ? 'প্রতিদিনের মোট পাঠক সংখ্যা ও সর্বোচ্চ সক্রিয়তা পর্যবেক্ষণ'
+                  : 'Daily readership count and peak activity monitoring'}
               </p>
             </div>
 
             {peakDay && (
               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200">
                 <Flame className="w-3.5 h-3.5 text-rose-600" />
-                <span>পিক ডে: {peakDay.day}বার ({toBengaliNumber(peakDay.views)} ভিউ)</span>
+                <span>
+                  {isBn
+                    ? `পিক ডে: ${peakDay.day}বার (${toBengaliNumber(peakDay.views)} ভিউ)`
+                    : `Peak Day: ${peakDay.day} (${peakDay.views.toLocaleString()} views)`}
+                </span>
               </span>
             )}
           </div>
@@ -538,7 +582,7 @@ export function AdminDashboardOverview() {
                       <span className={`text-[10px] font-mono font-bold transition-opacity ${
                         isSelected ? 'text-rose-700 opacity-100' : 'text-stone-400 opacity-0 group-hover:opacity-100'
                       }`}>
-                        {toBengaliNumber(d.views)}
+                        {isBn ? toBengaliNumber(d.views) : d.views.toLocaleString()}
                       </span>
                     </div>
 
@@ -569,12 +613,23 @@ export function AdminDashboardOverview() {
             <div className="mt-3.5 p-3 rounded-xl bg-stone-50 border border-stone-200 flex flex-wrap items-center justify-between gap-3 text-xs">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-rose-700"></span>
-                <span className="font-bold text-stone-800">{selectedDay.day}বারের পাঠক সারসংক্ষেপ:</span>
+                <span className="font-bold text-stone-800">
+                  {isBn ? `${selectedDay.day}বারের পাঠক সারসংক্ষেপ:` : `${selectedDay.day} Reader Summary:`}
+                </span>
               </div>
               <div className="flex items-center gap-4 text-stone-600 font-mono">
-                <span>মোট ভিউ: <strong className="text-stone-900">{toBengaliNumber(selectedDay.views)}</strong></span>
-                <span>প্রকাশিত সংবাদ: <strong className="text-stone-900">{toBengaliNumber(selectedDay.count)}</strong> টি</span>
-                <span>শেয়ার: <strong className="text-stone-900">{toBengaliNumber(selectedDay.shares)}</strong></span>
+                <span>
+                  {isBn ? 'মোট ভিউ:' : 'Total Views:'}{' '}
+                  <strong className="text-stone-900">{isBn ? toBengaliNumber(selectedDay.views) : selectedDay.views.toLocaleString()}</strong>
+                </span>
+                <span>
+                  {isBn ? 'প্রকাশিত সংবাদ:' : 'Published:'}{' '}
+                  <strong className="text-stone-900">{isBn ? `${toBengaliNumber(selectedDay.count)} টি` : `${selectedDay.count} articles`}</strong>
+                </span>
+                <span>
+                  {isBn ? 'শেয়ার:' : 'Shares:'}{' '}
+                  <strong className="text-stone-900">{isBn ? toBengaliNumber(selectedDay.shares) : selectedDay.shares.toLocaleString()}</strong>
+                </span>
               </div>
             </div>
           </div>
@@ -585,12 +640,14 @@ export function AdminDashboardOverview() {
           <div>
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold font-serif-bn text-stone-900">
-                পাঠকপ্রিয় বিভাগসমূহ
+                {isBn ? 'পাঠকপ্রিয় বিভাগসমূহ' : 'Popular Categories'}
               </h3>
-              <span className="text-[11px] font-mono font-bold text-stone-500">শীর্ষ ক্যাটাগরি</span>
+              <span className="text-[11px] font-mono font-bold text-stone-500">
+                {isBn ? 'শীর্ষ ক্যাটাগরি' : 'Top Categories'}
+              </span>
             </div>
             <p className="text-xs text-stone-500 mt-0.5">
-              মোট সংবাদের শতকরা হার ও পাঠক সম্পৃক্ততা
+              {isBn ? 'মোট সংবাদের শতকরা হার ও পাঠক সম্পৃক্ততা' : 'Share of published articles & audience readership'}
             </p>
 
             <div className="space-y-3.5 mt-5">
@@ -599,7 +656,9 @@ export function AdminDashboardOverview() {
                   <div className="flex items-center justify-between text-xs">
                     <span className="font-serif-bn font-bold text-stone-800">{cat.name}</span>
                     <span className="font-mono text-stone-500 text-[11px]">
-                      {toBengaliNumber(cat.count)} টি ({toBengaliNumber(cat.percentage)}%)
+                      {isBn
+                        ? `${toBengaliNumber(cat.count)} টি (${toBengaliNumber(cat.percentage)}%)`
+                        : `${cat.count} articles (${cat.percentage}%)`}
                     </span>
                   </div>
                   <div className="h-2 bg-stone-100 rounded-full overflow-hidden">
@@ -621,7 +680,7 @@ export function AdminDashboardOverview() {
               to="/admin/categories"
               className="text-xs font-bold text-rose-700 hover:underline inline-flex items-center gap-1"
             >
-              <span>সকল বিভাগ ব্যবস্থাপনা</span>
+              <span>{isBn ? 'সকল বিভাগ ব্যবস্থাপনা' : 'Manage All Categories'}</span>
               <ChevronRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -638,14 +697,14 @@ export function AdminDashboardOverview() {
             <div className="flex items-center gap-2">
               <Award className="w-4 h-4 text-amber-600" />
               <h3 className="text-base font-bold font-serif-bn text-stone-900">
-                শীর্ষ পাঠকপ্রিয় সংবাদ (Top Read Stories)
+                {isBn ? 'শীর্ষ পাঠকপ্রিয় সংবাদ (Top Read Stories)' : 'Top Read Stories'}
               </h3>
             </div>
             <Link
               to="/admin/analytics"
               className="text-xs font-bold text-rose-700 hover:underline flex items-center gap-1"
             >
-              <span>বিস্তারিত অ্যানালিটিক্স</span>
+              <span>{isBn ? 'বিস্তারিত অ্যানালিটিক্স' : 'Full Analytics'}</span>
               <ArrowUpRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -661,7 +720,7 @@ export function AdminDashboardOverview() {
                         ? 'bg-stone-200 text-stone-800'
                         : 'bg-stone-100 text-stone-600'
                   }`}>
-                    {toBengaliNumber(idx + 1)}
+                    {isBn ? toBengaliNumber(idx + 1) : idx + 1}
                   </span>
 
                   <div className="min-w-0">
@@ -671,14 +730,14 @@ export function AdminDashboardOverview() {
                       className="font-bold font-serif-bn text-stone-900 text-xs hover:text-rose-700 line-clamp-1 transition-colors"
                       title={story.title}
                     >
-                      {story.title}
+                      {isBn ? story.title : (story.titleEn || story.title)}
                     </Link>
                     <div className="flex items-center gap-2 text-[10px] text-stone-400 font-mono mt-0.5">
                       <span className="font-serif-bn text-stone-600 font-medium">
-                        {story.categoryName || 'জাতীয়'}
+                        {isBn ? (story.categoryName || 'জাতীয়') : (story.categoryNameEn || story.categoryName || 'National')}
                       </span>
                       <span>•</span>
-                      <span>{story.author || 'স্টাফ রিপোর্টার'}</span>
+                      <span>{story.author || (isBn ? 'স্টাফ রিপোর্টার' : 'Staff Reporter')}</span>
                     </div>
                   </div>
                 </div>
@@ -686,7 +745,7 @@ export function AdminDashboardOverview() {
                 <div className="text-right shrink-0">
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-stone-100 text-stone-800 text-[11px] font-mono font-bold">
                     <Eye className="w-3 h-3 text-stone-500" />
-                    <span>{toBengaliNumber(story.views || 0)}</span>
+                    <span>{isBn ? toBengaliNumber(story.views || 0) : (story.views || 0).toLocaleString()}</span>
                   </span>
                 </div>
               </div>
@@ -703,10 +762,10 @@ export function AdminDashboardOverview() {
               <div className="flex items-center justify-between">
                 <h3 className="text-base font-bold font-serif-bn text-stone-900 flex items-center gap-2">
                   <Clock className="w-4 h-4 text-amber-600" />
-                  <span>দ্রুত অনুমোদনের অপেক্ষমাণ</span>
+                  <span>{isBn ? 'দ্রুত অনুমোদনের অপেক্ষমাণ' : 'Pending Fast-Track Approvals'}</span>
                 </h3>
                 <span className="text-[11px] font-mono font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
-                  {toBengaliNumber(pendingApprovalList.length)} টি জরুরি
+                  {isBn ? `${toBengaliNumber(pendingApprovalList.length)} টি জরুরি` : `${pendingApprovalList.length} Urgent`}
                 </span>
               </div>
 
@@ -718,10 +777,10 @@ export function AdminDashboardOverview() {
                   >
                     <div className="min-w-0">
                       <p className="font-bold font-serif-bn text-stone-900 line-clamp-1">
-                        {item.title}
+                        {isBn ? item.title : (item.titleEn || item.title)}
                       </p>
                       <p className="text-[10px] text-stone-500 mt-0.5">
-                        প্রতিবেদক: <strong className="text-stone-700">{item.author || 'নিজস্ব প্রতিবেদক'}</strong> ({formatBengaliRelativeTime(item.publishedAt)})
+                        {isBn ? 'প্রতিবেদক:' : 'Reporter:'} <strong className="text-stone-700">{item.author || (isBn ? 'নিজস্ব প্রতিবেদক' : 'Staff Reporter')}</strong> ({isBn ? formatBengaliRelativeTime(item.publishedAt) : 'Recently'})
                       </p>
                     </div>
 
@@ -731,7 +790,7 @@ export function AdminDashboardOverview() {
                       className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors cursor-pointer shrink-0 shadow-2xs flex items-center gap-1"
                     >
                       <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>অনুমোদন</span>
+                      <span>{isBn ? 'অনুমোদন' : 'Approve'}</span>
                     </button>
                   </div>
                 ))}
@@ -744,9 +803,9 @@ export function AdminDashboardOverview() {
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold font-serif-bn text-stone-900 flex items-center gap-2">
                 <Layers className="w-4 h-4 text-rose-700" />
-                <span>সম্পাদকীয় অপারেশন হাব (Editorial Hub)</span>
+                <span>{isBn ? 'সম্পাদকীয় অপারেশন হাব (Editorial Hub)' : 'Editorial Operations Hub'}</span>
               </h3>
-              <span className="text-[10px] text-stone-400 font-mono">কুইক অ্যাক্সেস</span>
+              <span className="text-[10px] text-stone-400 font-mono">{isBn ? 'কুইক অ্যাক্সেস' : 'Quick Access'}</span>
             </div>
 
             <div className="grid grid-cols-2 gap-2.5">
@@ -756,12 +815,12 @@ export function AdminDashboardOverview() {
               >
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-stone-800 font-serif-bn group-hover:text-rose-700 transition-colors">
-                    সম্পাদকীয় ধারা
+                    {isBn ? 'সম্পাদকীয় ধারা' : 'Editorial Workflow'}
                   </span>
                   <ChevronRight className="w-3.5 h-3.5 text-stone-400 group-hover:text-rose-700 transition-colors" />
                 </div>
                 <p className="text-[10px] text-stone-500 mt-1 line-clamp-1">
-                  পদবি ও কর্মী অনুযায়ী পাইপলাইন
+                  {isBn ? 'পদবি ও কর্মী অনুযায়ী পাইপলাইন' : 'Pipeline by designation & staff'}
                 </p>
               </Link>
 
@@ -771,12 +830,12 @@ export function AdminDashboardOverview() {
               >
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-stone-800 font-serif-bn group-hover:text-rose-700 transition-colors">
-                    কনটেন্ট সিএমএস
+                    {isBn ? 'কনটেন্ট সিএমএস' : 'Content CMS'}
                   </span>
                   <ChevronRight className="w-3.5 h-3.5 text-stone-400 group-hover:text-rose-700 transition-colors" />
                 </div>
                 <p className="text-[10px] text-stone-500 mt-1 line-clamp-1">
-                  সংবাদ সম্পাদনা ও পূর্ণ আর্কাইভ
+                  {isBn ? 'সংবাদ সম্পাদনা ও পূর্ণ আর্কাইভ' : 'Article editing & full archive'}
                 </p>
               </Link>
 
@@ -786,12 +845,12 @@ export function AdminDashboardOverview() {
               >
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-stone-800 font-serif-bn group-hover:text-rose-700 transition-colors">
-                    পাঠক অ্যানালিটিক্স
+                    {isBn ? 'পাঠক অ্যানালিটিক্স' : 'Reader Analytics'}
                   </span>
                   <ChevronRight className="w-3.5 h-3.5 text-stone-400 group-hover:text-rose-700 transition-colors" />
                 </div>
                 <p className="text-[10px] text-stone-500 mt-1 line-clamp-1">
-                  রিয়েলটাইম ট্রাফিক ও পাঠক ডেটা
+                  {isBn ? 'রিয়েলটাইম ট্রাফিক ও পাঠক ডেটা' : 'Real-time traffic & metrics'}
                 </p>
               </Link>
 
@@ -801,12 +860,12 @@ export function AdminDashboardOverview() {
               >
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-stone-800 font-serif-bn group-hover:text-rose-700 transition-colors">
-                    ই-পেপার সংস্করণ
+                    {isBn ? 'ই-পেপার সংস্করণ' : 'E-Paper Studio'}
                   </span>
                   <ChevronRight className="w-3.5 h-3.5 text-stone-400 group-hover:text-rose-700 transition-colors" />
                 </div>
                 <p className="text-[10px] text-stone-500 mt-1 line-clamp-1">
-                  ডিজিটাল সংস্করণ ও আর্কাইভ
+                  {isBn ? 'ডিজিটাল সংস্করণ ও আর্কাইভ' : 'Digital editions & broadsheet'}
                 </p>
               </Link>
             </div>
