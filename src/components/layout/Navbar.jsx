@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
@@ -26,7 +26,9 @@ import {
   LogOut,
   Bookmark,
   CheckCircle2,
-  ChevronDown
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 
 /**
@@ -45,9 +47,82 @@ export function Navbar() {
   const { categories, isLoading } = usePortalCategories();
 
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const scrollContainerRef = useRef(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
 
   const isBn = language === 'bn';
   const isHome = location.pathname === '/' || location.pathname === '';
+
+  const updateScrollState = useCallback(() => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    setCanScrollLeft(scrollLeft > 2);
+    setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 2);
+  }, []);
+
+  // Update scroll indicators on resize and category data changes
+  useEffect(() => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+
+    updateScrollState();
+
+    const handleResize = () => updateScrollState();
+    window.addEventListener('resize', handleResize);
+
+    let observer;
+    if (typeof ResizeObserver !== 'undefined') {
+      observer = new ResizeObserver(() => updateScrollState());
+      observer.observe(el);
+    }
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (observer) observer.disconnect();
+    };
+  }, [categories, updateScrollState]);
+
+  // Smooth mouse-wheel scrolling for category list
+  useEffect(() => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+
+    const handleWheelScroll = (e) => {
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX) && el.scrollWidth > el.clientWidth) {
+        const canScroll =
+          (e.deltaY > 0 && el.scrollLeft + el.clientWidth < el.scrollWidth - 1) ||
+          (e.deltaY < 0 && el.scrollLeft > 1);
+
+        if (canScroll) {
+          e.preventDefault();
+          el.scrollLeft += e.deltaY;
+          updateScrollState();
+        }
+      }
+    };
+
+    el.addEventListener('wheel', handleWheelScroll, { passive: false });
+    return () => el.removeEventListener('wheel', handleWheelScroll);
+  }, [updateScrollState]);
+
+  // Auto-scroll active category into view upon navigation
+  useEffect(() => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    const activeEl = el.querySelector('[data-active="true"]');
+    if (activeEl) {
+      activeEl.scrollIntoView({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
+    }
+  }, [location.pathname]);
+
+  const scrollCategories = (direction) => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    const offset = direction === 'left' ? -220 : 220;
+    el.scrollBy({ left: offset, behavior: 'smooth' });
+  };
 
   const handleReaderLogout = async () => {
     setUserDropdownOpen(false);
@@ -73,84 +148,126 @@ export function Navbar() {
   return (
     <nav className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-stone-200 shadow-2xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center justify-between gap-2 min-w-0">
           
-          {/* Left Side: Scrollable Categories (Prothom Alo broadsheet taxonomy) */}
-          <div className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto no-scrollbar py-2.5 min-w-0">
-            {/* 1. সর্বশেষ / Home */}
-            <Link
-              to="/"
-              onClick={() => dispatch(setSelectedCategory('all'))}
-              className={`relative px-2.5 py-1 text-sm font-bold whitespace-nowrap transition-colors shrink-0 cursor-pointer ${
-                isHome
-                  ? 'text-rose-700 font-extrabold'
-                  : 'text-stone-800 hover:text-rose-700'
-              }`}
-            >
-              <span>{isBn ? 'সর্বশেষ' : 'Latest'}</span>
-              {isHome && (
-                <motion.span
-                  layoutId="public-navbar-indicator"
-                  transition={SPRING_SNAPPY}
-                  className="absolute bottom-0 left-2 right-2 h-0.5 bg-rose-700 rounded-full"
-                />
-              )}
-            </Link>
-
-            {/* 2. Canonical News Categories */}
-            {navMenuItems.map((item) => {
-              const isActive = location.pathname === item.path || (item.path !== '/' && location.pathname.startsWith(item.path));
-              return (
-                <Link
-                  key={item.id}
-                  to={item.path}
-                  onClick={() => dispatch(setSelectedCategory(item.slug || 'all'))}
-                  className={`relative px-2.5 py-1 text-sm font-semibold whitespace-nowrap transition-colors shrink-0 cursor-pointer ${
-                    isActive
-                      ? 'text-rose-700 font-extrabold'
-                      : 'text-stone-800 hover:text-rose-700'
-                  }`}
+          {/* Left Side: Scrollable Categories with Smooth Navigation Controls */}
+          <div className="relative flex-1 min-w-0 flex items-center">
+            
+            {/* Left Scroll Navigation Button with Subtle Gradient Mask */}
+            {canScrollLeft && (
+              <div className="absolute left-0 top-0 bottom-0 z-10 flex items-center pr-4 bg-gradient-to-r from-white via-white/95 to-transparent pointer-events-none">
+                <button
+                  type="button"
+                  onClick={() => scrollCategories('left')}
+                  className="pointer-events-auto p-1 rounded-full bg-white shadow-xs border border-stone-200 text-stone-600 hover:text-rose-700 hover:border-rose-300 transition-all cursor-pointer focus:outline-hidden"
+                  aria-label={isBn ? 'পূর্ববর্তী বিভাগসমূহ' : 'Scroll categories left'}
+                  title={isBn ? 'পূর্ববর্তী বিভাগ' : 'Previous categories'}
                 >
-                  {isBn ? item.labelBn : item.labelEn}
-                  {isActive && (
-                    <motion.span
-                      layoutId="public-navbar-indicator"
-                      transition={SPRING_SNAPPY}
-                      className="absolute bottom-0 left-2 right-2 h-0.5 bg-rose-700 rounded-full"
-                    />
-                  )}
-                </Link>
-              );
-            })}
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+              </div>
+            )}
 
-            {/* 3. ভিডিও / মাল্টিমিডিয়া */}
-            <Link
-              to="/multimedia"
-              className={`relative px-2.5 py-1 text-sm font-semibold whitespace-nowrap transition-colors shrink-0 cursor-pointer ${
-                location.pathname.startsWith('/multimedia')
-                  ? 'text-rose-700 font-extrabold'
-                  : 'text-stone-800 hover:text-rose-700'
-              }`}
+            {/* Inner Horizontal Scroll Container */}
+            <div
+              ref={scrollContainerRef}
+              onScroll={updateScrollState}
+              className="flex items-center gap-0.5 sm:gap-1 overflow-x-auto no-scrollbar py-2.5 min-w-0 scroll-smooth w-full"
             >
-              <span>{isBn ? 'ভিডিও' : 'Video'}</span>
-            </Link>
+              {/* 1. সর্বশেষ / Home */}
+              <Link
+                to="/"
+                data-active={isHome ? 'true' : 'false'}
+                onClick={() => dispatch(setSelectedCategory('all'))}
+                className={`relative px-2 xl:px-2.5 py-1 text-[13px] xl:text-sm font-semibold whitespace-nowrap transition-colors shrink-0 cursor-pointer ${
+                  isHome
+                    ? 'text-rose-700 font-extrabold'
+                    : 'text-stone-800 hover:text-rose-700'
+                }`}
+              >
+                <span>{isBn ? 'সর্বশেষ' : 'Latest'}</span>
+                {isHome && (
+                  <motion.span
+                    layoutId="public-navbar-indicator"
+                    transition={SPRING_SNAPPY}
+                    className="absolute bottom-0 left-2 right-2 h-0.5 bg-rose-700 rounded-full"
+                  />
+                )}
+              </Link>
 
-            {/* 4. সরাসরি (Live Updates) */}
-            <Link
-              to="/live"
-              className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold shrink-0 whitespace-nowrap transition-all cursor-pointer ml-1 ${
-                location.pathname.startsWith('/live')
-                  ? 'bg-rose-700 text-white shadow-2xs'
-                  : 'bg-rose-600 hover:bg-rose-700 text-white shadow-2xs'
-              }`}
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse shrink-0"></span>
-              <span>{isBn ? 'সরাসরি' : 'Live'}</span>
-            </Link>
+              {/* 2. Canonical News Categories */}
+              {navMenuItems.map((item) => {
+                const isActive = location.pathname === item.path || (item.path !== '/' && location.pathname.startsWith(item.path));
+                return (
+                  <Link
+                    key={item.id}
+                    to={item.path}
+                    data-active={isActive ? 'true' : 'false'}
+                    onClick={() => dispatch(setSelectedCategory(item.slug || 'all'))}
+                    className={`relative px-2 xl:px-2.5 py-1 text-[13px] xl:text-sm font-semibold whitespace-nowrap transition-colors shrink-0 cursor-pointer ${
+                      isActive
+                        ? 'text-rose-700 font-extrabold'
+                        : 'text-stone-800 hover:text-rose-700'
+                    }`}
+                  >
+                    {isBn ? item.labelBn : item.labelEn}
+                    {isActive && (
+                      <motion.span
+                        layoutId="public-navbar-indicator"
+                        transition={SPRING_SNAPPY}
+                        className="absolute bottom-0 left-2 right-2 h-0.5 bg-rose-700 rounded-full"
+                      />
+                    )}
+                  </Link>
+                );
+              })}
+
+              {/* 3. ভিডিও / মাল্টিমিডিয়া */}
+              <Link
+                to="/multimedia"
+                data-active={location.pathname.startsWith('/multimedia') ? 'true' : 'false'}
+                className={`relative px-2 xl:px-2.5 py-1 text-[13px] xl:text-sm font-semibold whitespace-nowrap transition-colors shrink-0 cursor-pointer ${
+                  location.pathname.startsWith('/multimedia')
+                    ? 'text-rose-700 font-extrabold'
+                    : 'text-stone-800 hover:text-rose-700'
+                }`}
+              >
+                <span>{isBn ? 'ভিডিও' : 'Video'}</span>
+              </Link>
+
+              {/* 4. সরাসরি (Live Updates) */}
+              <Link
+                to="/live"
+                data-active={location.pathname.startsWith('/live') ? 'true' : 'false'}
+                className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold shrink-0 whitespace-nowrap transition-all cursor-pointer ml-1 ${
+                  location.pathname.startsWith('/live')
+                    ? 'bg-rose-700 text-white shadow-2xs'
+                    : 'bg-rose-600 hover:bg-rose-700 text-white shadow-2xs'
+                }`}
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse shrink-0"></span>
+                <span>{isBn ? 'সরাসরি' : 'Live'}</span>
+              </Link>
+            </div>
+
+            {/* Right Scroll Navigation Button with Subtle Gradient Mask */}
+            {canScrollRight && (
+              <div className="absolute right-0 top-0 bottom-0 z-10 flex items-center pl-4 bg-gradient-to-l from-white via-white/95 to-transparent pointer-events-none">
+                <button
+                  type="button"
+                  onClick={() => scrollCategories('right')}
+                  className="pointer-events-auto p-1 rounded-full bg-white shadow-xs border border-stone-200 text-stone-600 hover:text-rose-700 hover:border-rose-300 transition-all cursor-pointer focus:outline-hidden"
+                  aria-label={isBn ? 'পরবর্তী বিভাগসমূহ' : 'Scroll categories right'}
+                  title={isBn ? 'পরবর্তী বিভাগ' : 'Next categories'}
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Right Side: Prothom Alo-Style Integrated Utilities Toolbar */}
-          <div className="hidden lg:flex items-center gap-1 xl:gap-2 shrink-0 border-l border-stone-200 pl-3 py-1.5">
+          <div className="hidden lg:flex items-center gap-1 xl:gap-2 shrink-0 border-l border-stone-200 pl-3 py-1.5 bg-white z-20">
             {/* 1. খুঁজুন (Search Trigger) */}
             <button
               type="button"
