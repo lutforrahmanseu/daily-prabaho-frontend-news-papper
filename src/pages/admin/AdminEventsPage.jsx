@@ -197,7 +197,7 @@ export function AdminEventsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs p-5 sm:p-6 space-y-6">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>

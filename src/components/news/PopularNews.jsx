@@ -6,6 +6,7 @@ import { usePopularArticles, usePublicArticles } from '../../hooks/usePortalData
 import { toBengaliNumber, formatBengaliRelativeTime } from '../../utils/bengaliFormatter.js';
 import { Flame, Eye, Clock, TrendingUp } from 'lucide-react';
 import { EDITORIAL_EASE, SPRING_SNAPPY } from '../common/MotionPrimitives.jsx';
+import { SidebarPopularSkeleton } from '../common/NewsSkeletons.jsx';
 
 export function PopularNews({
   category = null,
@@ -16,9 +17,10 @@ export function PopularNews({
   const { language } = useSelector((state) => state.ui);
   const [timeframe, setTimeframe] = useState('24h'); // '24h' | '7d' | '30d'
   const days = timeframe === '24h' ? 1 : timeframe === '7d' ? 7 : 30;
-  const { articles: popularRaw } = usePopularArticles({ limit: limit * 2, days });
-  const { articles: fallbackRaw } = usePublicArticles({ per_page: 20 });
+  const { articles: popularRaw, isLoading: popularLoading } = usePopularArticles({ limit: limit * 2, days });
+  const { articles: fallbackRaw, isLoading: fallbackLoading } = usePublicArticles({ per_page: 20 });
   const articles = popularRaw.length > 0 ? popularRaw : fallbackRaw;
+  const isLoading = (popularLoading || fallbackLoading) && articles.length === 0;
   const isBn = language === 'bn';
 
   // Filter by category if requested
@@ -81,15 +83,18 @@ export function PopularNews({
       </div>
 
       {/* Ranked News List */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={timeframe}
-          initial={{ opacity: 0, y: 4 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -4 }}
-          transition={{ duration: 0.16, ease: EDITORIAL_EASE }}
-          className="divide-y divide-stone-100 p-2"
-        >
+      {isLoading ? (
+        <SidebarPopularSkeleton count={limit} />
+      ) : (
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={timeframe}
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.16, ease: EDITORIAL_EASE }}
+            className="divide-y divide-stone-100 p-2"
+          >
           {popularArticles.map((story, index) => {
             const rank = isBn ? toBengaliNumber(index + 1) : index + 1;
             const title = isBn ? story.title : (story.titleEn || story.title);
@@ -118,7 +123,7 @@ export function PopularNews({
                 {/* Story Details */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 text-xs text-stone-700 mb-1 flex-wrap font-medium">
-                    <span className="text-rose-700 font-bold">{story.categoryName}</span>
+                    <span className="text-rose-700 font-bold">{isBn ? story.categoryName : (story.categoryNameEn || story.categoryName)}</span>
                     <span className="text-stone-400 font-bold">·</span>
                     <span className="flex items-center gap-0.5">
                       <Eye className="w-3.5 h-3.5 text-stone-500" />
@@ -136,7 +141,8 @@ export function PopularNews({
             );
           })}
         </motion.div>
-      </AnimatePresence>
+        </AnimatePresence>
+      )}
     </div>
   );
 }

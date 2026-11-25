@@ -5,8 +5,10 @@ import { motion } from 'motion/react';
 import { useReaderBookmark } from '../../hooks/useReaderBookmark.js';
 import {
   formatBengaliRelativeTime,
+  formatEnglishRelativeTime,
   toBengaliNumber,
-  calculateReadingTime
+  calculateReadingTime,
+  calculateEnglishReadingTime
 } from '../../utils/bengaliFormatter.js';
 import { Bookmark, Clock, Share2, Crown, Megaphone } from 'lucide-react';
 
@@ -28,8 +30,11 @@ export function NewsCard({
   const categoryName = isBn ? article.categoryName : (article.categoryNameEn || article.categoryName);
   const timeAgo = isBn
     ? formatBengaliRelativeTime(article.publishedAt)
-    : 'Recently';
-  const readingTime = isBn ? calculateReadingTime(article.content) : '3 min read';
+    : formatEnglishRelativeTime(article.publishedAt);
+  const readingTime = isBn
+    ? calculateReadingTime(article.content)
+    : calculateEnglishReadingTime(article.content);
+  const authorName = isBn ? article.author : (article.authorEn || article.author);
   const articleUrl = `/news/${article.slug || article.id}`;
 
   const handleCardClick = () => {
@@ -128,7 +133,7 @@ export function NewsCard({
                 onClick={(e) => e.stopPropagation()}
                 className="text-xs font-bold text-stone-900 hover:text-rose-700 transition-colors"
               >
-                {article.author}
+                {authorName}
               </Link>
               {article.authorRole && (
                 <span className="text-stone-500 text-xs hidden sm:inline">| {article.authorRole}</span>
@@ -141,7 +146,7 @@ export function NewsCard({
                 type="button"
                 onClick={handleBookmarkClick}
                 className="p-1.5 rounded-full hover:bg-stone-100 hover:text-rose-700 transition-colors cursor-pointer"
-                title={isBookmarked ? 'সংরক্ষিত' : 'সংরক্ষণ করুন'}
+                title={isBookmarked ? (isBn ? 'সংরক্ষিত' : 'Saved') : (isBn ? 'সংরক্ষণ করুন' : 'Save')}
                 aria-label="Bookmark article"
               >
                 <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-rose-700 text-rose-700' : ''}`} />
@@ -151,7 +156,7 @@ export function NewsCard({
                 type="button"
                 onClick={handleShareClick}
                 className="p-1.5 rounded-full hover:bg-stone-100 hover:text-rose-700 transition-colors cursor-pointer"
-                title="শেয়ার করুন"
+                title={isBn ? 'শেয়ার করুন' : 'Share'}
                 aria-label="Share article"
               >
                 <Share2 className="w-4 h-4" />

@@ -255,7 +255,7 @@ export default function AdminSourcesPage() {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs p-5 sm:p-6 space-y-5">
       {/* Header & Controls */}
       <div className="bg-white p-5 rounded-xl border border-stone-200 shadow-2xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">

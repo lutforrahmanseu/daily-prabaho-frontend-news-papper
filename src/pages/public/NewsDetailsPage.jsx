@@ -25,9 +25,11 @@ import ArticleReactionsBar from '../../components/reader/ArticleReactionsBar.jsx
 import ArticleCommentsSection from '../../components/reader/ArticleCommentsSection.jsx';
 import {
   formatBengaliRelativeTime,
+  formatEnglishRelativeTime,
   formatBengaliFullDateTime,
   toBengaliNumber,
-  calculateReadingTime
+  calculateReadingTime,
+  calculateEnglishReadingTime
 } from '../../utils/bengaliFormatter.js';
 import { stripHtmlTags } from '../../utils/securitySanitizer.js';
 import { getArticlePrimaryGeo } from '../../utils/hyperlocalHelpers.js';
@@ -237,10 +239,11 @@ export function NewsDetailsPage() {
 
   const baseTitle = isBn ? article.title : (article.titleEn || article.title);
   const title = isBn ? (activeHeadlineExp?.payload?.title || baseTitle) : baseTitle;
-  const subheadline = activeHeadlineExp?.payload?.subheadline || article.subheadline;
+  const baseSubheadline = isBn ? article.subheadline : (article.subheadlineEn || article.subheadline);
+  const subheadline = isBn ? (activeHeadlineExp?.payload?.subheadline || baseSubheadline) : baseSubheadline;
   const displayFeaturedImage = activeImageExp?.payload?.featured_image || article.image;
   const content = isBn ? article.content : (article.contentEn || article.content);
-  const timeAgo = isBn ? formatBengaliRelativeTime(article.publishedAt) : 'Recently';
+  const timeAgo = isBn ? formatBengaliRelativeTime(article.publishedAt) : formatEnglishRelativeTime(article.publishedAt);
   const fullPublishDate = isBn
     ? formatBengaliFullDateTime(article.publishedAt)
     : new Date(article.publishedAt).toLocaleString('en-US', {
@@ -262,10 +265,12 @@ export function NewsDetailsPage() {
         })
     : null;
 
-  const readingTime = isBn ? calculateReadingTime(content) : '3 min read';
+  const readingTime = isBn ? calculateReadingTime(content) : calculateEnglishReadingTime(content);
   const reporterData = article.reporterObj || article.authorObj || {
-    name: article.author || article.reporter || 'নিজস্ব প্রতিবেদক',
+    name: isBn ? (article.author || article.reporter || 'নিজস্ব প্রতিবেদক') : (article.authorEn || article.author || 'Staff Correspondent'),
+    nameEn: article.authorEn || article.author || 'Staff Correspondent',
     roleBn: article.authorDesignation || 'স্টাফ রিপোর্টার',
+    roleEn: article.authorDesignationEn || article.authorDesignation || 'Staff Reporter',
     avatar: article.authorAvatar
   };
 
@@ -505,7 +510,7 @@ export function NewsDetailsPage() {
 
             {/* Timestamps */}
             <div className="flex flex-col sm:items-end gap-1 text-[11px] sm:text-xs text-stone-500 font-sans">
-              <div className="flex items-center gap-1.5" title="প্রকাশের সময়">
+              <div className="flex items-center gap-1.5" title={isBn ? 'প্রকাশের সময়' : 'Published Time'}>
                 <Calendar className="w-3.5 h-3.5 text-stone-400" />
                 <span>
                   {isBn ? 'প্রকাশ: ' : 'Published: '}
@@ -515,7 +520,7 @@ export function NewsDetailsPage() {
                 </span>
               </div>
               {fullUpdateDate && (
-                <div className="flex items-center gap-1.5 text-rose-700" title="সর্বশেষ আপডেট">
+                <div className="flex items-center gap-1.5 text-rose-700" title={isBn ? 'সর্বশেষ আপডেট' : 'Last Updated'}>
                   <RefreshCw className="w-3.5 h-3.5" />
                   <span>
                     {isBn ? 'আপডেট: ' : 'Updated: '}
@@ -679,34 +684,14 @@ export function NewsDetailsPage() {
             />
           </div>
 
-          {/* Key Takeaways Box */}
-          <div className="mt-8 p-5 bg-stone-50 border border-stone-200 rounded-xl">
-            <div className="flex items-center gap-2 mb-3 text-rose-700 font-bold text-sm font-serif-bn">
-              <Sparkles className="w-4 h-4" />
-              <span>{isBn ? 'এক নজরে গুরুত্বপূর্ণ তথ্যসমূহ' : 'Key Highlights'}</span>
+          {/* In Brief Editorial Summary */}
+          <div className="mt-8 p-5 bg-stone-50 border-l-4 border-rose-700 rounded-r-xl">
+            <div className="flex items-center gap-2 mb-2 text-rose-700 font-bold text-sm font-serif-bn">
+              <span>{isBn ? 'সংক্ষেপে' : 'In Brief'}</span>
             </div>
-            <ul className="space-y-2 text-xs sm:text-sm text-stone-700 font-serif-bn">
-              <li className="flex items-start gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-rose-700 mt-2 shrink-0"></span>
-                <span>{stripHtmlTags(subheadline || article.excerpt || '')}</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-rose-700 mt-2 shrink-0"></span>
-                <span>
-                  {isBn
-                    ? `প্রতিবেদন প্রস্তুত করেছেন: ${article.author} (${article.authorRole || 'নিজস্ব প্রতিবেদক'})`
-                    : `Reported by: ${article.author}`}
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-rose-700 mt-2 shrink-0"></span>
-                <span>
-                  {isBn
-                    ? `বিষয়বস্তু বিভাগ: ${article.categoryName} ${article.subcategory ? '· ' + article.subcategory : ''}`
-                    : `Section: ${article.categoryName}`}
-                </span>
-              </li>
-            </ul>
+            <p className="text-xs sm:text-sm text-stone-700 font-serif-bn leading-relaxed">
+              {stripHtmlTags(subheadline || (isBn ? article.excerpt : (article.excerptEn || article.excerpt)) || '')}
+            </p>
           </div>
 
           {/* Public Official Correction Notes (Phase 15 Transparency) */}
@@ -851,7 +836,7 @@ export function NewsDetailsPage() {
             </p>
             <div className="flex items-center justify-between text-xs text-stone-500 pt-2 border-t border-stone-100">
               <span>{isBn ? 'নিকুঞ্জ-২ সেন্ট্রাল ব্যুরো, ঢাকা' : 'Nikunja-2 Central Bureau, Dhaka'}</span>
-              <span className="font-bold text-rose-700">২৪/৭ অনলাইন</span>
+              <span className="font-bold text-rose-700">{isBn ? '২৪/৭ অনলাইন' : '24/7 Online'}</span>
             </div>
           </div>
 

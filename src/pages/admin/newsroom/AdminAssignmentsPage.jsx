@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { AdminListRowsSkeleton } from '../../../components/admin/AdminSkeletons.jsx';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import {
@@ -65,7 +66,7 @@ export function AdminAssignmentsPage() {
   const adminState = useSelector((state) => state.admin || {});
   const canManageAssignments = hasEffectivePermission(authState, adminState, 'assignment.manage');
 
-  const [viewMode, setViewMode] = useState('board'); // 'board' | 'table'
+  const [viewMode, setViewMode] = useState('table'); // 'table' | 'board'
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [priorityFilter, setPriorityFilter] = useState('');
@@ -188,7 +189,7 @@ export function AdminAssignmentsPage() {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs p-5 sm:p-6 space-y-5">
       {/* Header & Controls */}
       <div className="bg-white p-5 rounded-xl border border-stone-200 shadow-2xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -203,26 +204,30 @@ export function AdminAssignmentsPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="inline-flex rounded-lg border border-stone-200 p-0.5 bg-stone-50">
-              <button
-                type="button"
-                onClick={() => setViewMode('board')}
-                className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-semibold cursor-pointer transition-colors ${
-                  viewMode === 'board' ? 'bg-white text-rose-700 shadow-2xs' : 'text-stone-600'
-                }`}
-              >
-                <LayoutGrid className="w-3.5 h-3.5" />
-                <span>বোর্ড</span>
-              </button>
+            <div className="inline-flex rounded-lg border border-stone-200 dark:border-stone-700 p-0.5 bg-stone-50 dark:bg-stone-900">
               <button
                 type="button"
                 onClick={() => setViewMode('table')}
                 className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-semibold cursor-pointer transition-colors ${
-                  viewMode === 'table' ? 'bg-white text-rose-700 shadow-2xs' : 'text-stone-600'
+                  viewMode === 'table'
+                    ? 'bg-white dark:bg-stone-800 text-rose-700 dark:text-rose-300 shadow-2xs'
+                    : 'text-stone-600 dark:text-stone-400'
                 }`}
               >
                 <List className="w-3.5 h-3.5" />
                 <span>তালিকা</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('board')}
+                className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-semibold cursor-pointer transition-colors ${
+                  viewMode === 'board'
+                    ? 'bg-white dark:bg-stone-800 text-rose-700 dark:text-rose-300 shadow-2xs'
+                    : 'text-stone-600 dark:text-stone-400'
+                }`}
+              >
+                <LayoutGrid className="w-3.5 h-3.5" />
+                <span>বোর্ড</span>
               </button>
             </div>
 
@@ -275,8 +280,8 @@ export function AdminAssignmentsPage() {
       </div>
 
       {isLoading ? (
-        <div className="py-16 flex justify-center text-stone-500">
-          <Loader2 className="w-6 h-6 animate-spin text-rose-700" />
+        <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 overflow-hidden">
+          <AdminListRowsSkeleton rows={6} />
         </div>
       ) : viewMode === 'board' ? (
         /* Kanban Assignment Board */

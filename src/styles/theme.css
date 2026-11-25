@@ -122,3 +122,401 @@
     color: #000000 !important;
   }
 }
+
+/* Light mode baseline input contrast & autofill protection */
+@layer base {
+  html:not(.dark) input:not([type="checkbox"]):not([type="radio"]),
+  html:not(.dark) textarea,
+  html:not(.dark) select {
+    background-color: #ffffff;
+    color: #111827;
+  }
+
+  html:not(.dark) input:-webkit-autofill,
+  html:not(.dark) input:-webkit-autofill:hover,
+  html:not(.dark) input:-webkit-autofill:focus,
+  html:not(.dark) textarea:-webkit-autofill,
+  html:not(.dark) select:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px #ffffff inset;
+    -webkit-text-fill-color: #111827;
+    caret-color: #111827;
+  }
+}
+
+/* Dark Theme Editorial Design System */
+html.dark {
+  --color-ink: #f5f5f4;
+  --color-paper: #0b0f19;
+  --color-paper-warm: #111827;
+}
+
+html.dark body {
+  background-color: #0b0f19;
+  color: #f5f5f4;
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+/* Native inputs, selects & autofill in dark mode (distinct slate-800 so inputs never look black) */
+html.dark input:not([type="checkbox"]):not([type="radio"]),
+html.dark textarea,
+html.dark select {
+  background-color: #1e293b;
+  color: #f8fafc;
+  border-color: #475569;
+}
+
+html.dark input:not([type="checkbox"]):not([type="radio"]):focus,
+html.dark textarea:focus,
+html.dark select:focus {
+  border-color: #e11d48;
+  background-color: #1e293b;
+}
+
+html.dark input:-webkit-autofill,
+html.dark input:-webkit-autofill:hover,
+html.dark input:-webkit-autofill:focus,
+html.dark textarea:-webkit-autofill,
+html.dark select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px #1e293b inset;
+  -webkit-text-fill-color: #f8fafc;
+  caret-color: #f8fafc;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #94a3b8;
+}
+
+html.dark ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+html.dark ::-webkit-scrollbar-track {
+  background: #0b0f19;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 9999px;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+@layer utilities {
+  /* Light surfaces -> Deep editorial dark slate */
+  :where(html.dark) .bg-white:not([class*="dark:bg-"]),
+  :where(html.dark) .bg-\[\#ffffff\]:not([class*="dark:bg-"]),
+  :where(html.dark) .bg-white\/95:not([class*="dark:bg-"]),
+  :where(html.dark) .bg-white\/90:not([class*="dark:bg-"]),
+  :where(html.dark) .bg-white\/80:not([class*="dark:bg-"]) {
+    background-color: #111827;
+  }
+
+  :where(html.dark) .bg-stone-50:not([class*="dark:bg-"]),
+  :where(html.dark) .bg-stone-50\/70:not([class*="dark:bg-"]),
+  :where(html.dark) .bg-stone-50\/50:not([class*="dark:bg-"]),
+  :where(html.dark) .bg-slate-50:not([class*="dark:bg-"]),
+  :where(html.dark) .bg-slate-50\/70:not([class*="dark:bg-"]),
+  :where(html.dark) .bg-\[\#fcfbf9\]:not([class*="dark:bg-"]),
+  :where(html.dark) .bg-\[\#faf8f5\]:not([class*="dark:bg-"]) {
+    background-color: #161e2e;
+  }
+
+  :where(html.dark) .bg-stone-100:not([class*="dark:bg-"]),
+  :where(html.dark) .bg-stone-100\/80:not([class*="dark:bg-"]),
+  :where(html.dark) .bg-slate-100:not([class*="dark:bg-"]) {
+    background-color: #1f2937;
+  }
+
+  :where(html.dark) .hover\:bg-white:hover:not([class*="dark:hover:bg-"]),
+  :where(html.dark) .hover\:bg-stone-50:hover:not([class*="dark:hover:bg-"]),
+  :where(html.dark) .hover\:bg-stone-50\/60:hover:not([class*="dark:hover:bg-"]),
+  :where(html.dark) .hover\:bg-stone-50\/70:hover:not([class*="dark:hover:bg-"]),
+  :where(html.dark) .hover\:bg-stone-100:hover:not([class*="dark:hover:bg-"]),
+  :where(html.dark) .hover\:bg-stone-100\/80:hover:not([class*="dark:hover:bg-"]),
+  :where(html.dark) .hover\:bg-stone-200:hover:not([class*="dark:hover:bg-"]),
+  :where(html.dark) .hover\:bg-stone-200\/45:hover:not([class*="dark:hover:bg-"]),
+  :where(html.dark) .hover\:bg-stone-200\/50:hover:not([class*="dark:hover:bg-"]),
+  :where(html.dark) .hover\:bg-stone-200\/60:hover:not([class*="dark:hover:bg-"]),
+  :where(html.dark) .hover\:bg-stone-300:hover:not([class*="dark:hover:bg-"]),
+  :where(html.dark) .hover\:bg-slate-50:hover:not([class*="dark:hover:bg-"]),
+  :where(html.dark) .hover\:bg-slate-100:hover:not([class*="dark:hover:bg-"]),
+  :where(html.dark) .hover\:bg-slate-200:hover:not([class*="dark:hover:bg-"]) {
+    background-color: #1e293b;
+  }
+
+  :where(html.dark) .hover\:bg-rose-50:hover:not([class*="dark:hover:bg-"]),
+  :where(html.dark) .hover\:bg-rose-50\/20:hover:not([class*="dark:hover:bg-"]),
+  :where(html.dark) .hover\:bg-rose-50\/30:hover:not([class*="dark:hover:bg-"]),
+  :where(html.dark) .hover\:bg-rose-100:hover:not([class*="dark:hover:bg-"]),
+  :where(html.dark) .hover\:bg-red-50:hover:not([class*="dark:hover:bg-"]) {
+    background-color: rgba(190, 18, 60, 0.22);
+  }
+
+  :where(html.dark) .hover\:bg-blue-50:hover:not([class*="dark:hover:bg-"]),
+  :where(html.dark) .hover\:bg-blue-50\/30:hover:not([class*="dark:hover:bg-"]),
+  :where(html.dark) .hover\:bg-blue-100:hover:not([class*="dark:hover:bg-"]),
+  :where(html.dark) .hover\:bg-indigo-50:hover:not([class*="dark:hover:bg-"]),
+  :where(html.dark) .hover\:bg-indigo-100:hover:not([class*="dark:hover:bg-"]),
+  :where(html.dark) .hover\:bg-sky-50:hover:not([class*="dark:hover:bg-"]) {
+    background-color: rgba(37, 99, 235, 0.2);
+  }
+
+  :where(html.dark) .hover\:bg-emerald-50:hover:not([class*="dark:hover:bg-"]),
+  :where(html.dark) .hover\:bg-emerald-100:hover:not([class*="dark:hover:bg-"]) {
+    background-color: rgba(5, 150, 105, 0.2);
+  }
+
+  :where(html.dark) .hover\:bg-amber-50:hover:not([class*="dark:hover:bg-"]),
+  :where(html.dark) .hover\:bg-amber-100:hover:not([class*="dark:hover:bg-"]),
+  :where(html.dark) .hover\:bg-orange-50:hover:not([class*="dark:hover:bg-"]),
+  :where(html.dark) .hover\:bg-orange-200:hover:not([class*="dark:hover:bg-"]) {
+    background-color: rgba(217, 119, 6, 0.2);
+  }
+
+  /* Dark ink text -> High-contrast crisp light text */
+  :where(html.dark) .text-stone-950:not([class*="dark:text-"]),
+  :where(html.dark) .text-stone-900:not([class*="dark:text-"]),
+  :where(html.dark) .text-slate-950:not([class*="dark:text-"]),
+  :where(html.dark) .text-slate-900:not([class*="dark:text-"]),
+  :where(html.dark) .text-black:not([class*="dark:text-"]),
+  :where(html.dark) .text-\[\#111827\]:not([class*="dark:text-"]) {
+    color: #f8fafc;
+  }
+
+  :where(html.dark) .text-stone-800:not([class*="dark:text-"]),
+  :where(html.dark) .text-slate-800:not([class*="dark:text-"]) {
+    color: #e2e8f0;
+  }
+
+  :where(html.dark) .text-stone-700:not([class*="dark:text-"]),
+  :where(html.dark) .text-slate-700:not([class*="dark:text-"]) {
+    color: #cbd5e1;
+  }
+
+  :where(html.dark) .text-stone-600:not([class*="dark:text-"]),
+  :where(html.dark) .text-slate-600:not([class*="dark:text-"]) {
+    color: #94a3b8;
+  }
+
+  :where(html.dark) .text-stone-500:not([class*="dark:text-"]),
+  :where(html.dark) .text-slate-500:not([class*="dark:text-"]) {
+    color: #94a3b8;
+  }
+
+  :where(html.dark) .hover\:text-stone-900:hover:not([class*="dark:hover:text-"]),
+  :where(html.dark) .hover\:text-stone-800:hover:not([class*="dark:hover:text-"]),
+  :where(html.dark) .hover\:text-stone-700:hover:not([class*="dark:hover:text-"]),
+  :where(html.dark) .hover\:text-stone-600:hover:not([class*="dark:hover:text-"]),
+  :where(html.dark) .hover\:text-slate-900:hover:not([class*="dark:hover:text-"]) {
+    color: #f8fafc;
+  }
+
+  :where(html.dark) .hover\:text-rose-800:hover:not([class*="dark:hover:text-"]),
+  :where(html.dark) .hover\:text-rose-700:hover:not([class*="dark:hover:text-"]),
+  :where(html.dark) .hover\:text-red-800:hover:not([class*="dark:hover:text-"]) {
+    color: #fda4af;
+  }
+
+  :where(html.dark) .hover\:text-blue-700:hover:not([class*="dark:hover:text-"]),
+  :where(html.dark) .hover\:text-indigo-700:hover:not([class*="dark:hover:text-"]),
+  :where(html.dark) .hover\:text-sky-700:hover:not([class*="dark:hover:text-"]) {
+    color: #93c5fd;
+  }
+
+  :where(html.dark) .hover\:text-amber-700:hover:not([class*="dark:hover:text-"]) {
+    color: #fde68a;
+  }
+
+  :where(html.dark) .group:hover .group-hover\:text-stone-900:not([class*="dark:group-hover:text-"]) {
+    color: #f8fafc;
+  }
+
+  :where(html.dark) .group:hover .group-hover\:text-rose-700:not([class*="dark:group-hover:text-"]) {
+    color: #fda4af;
+  }
+
+  :where(html.dark) .group:hover .group-hover\:text-blue-700:not([class*="dark:group-hover:text-"]),
+  :where(html.dark) .group:hover .group-hover\:text-purple-700:not([class*="dark:group-hover:text-"]) {
+    color: #93c5fd;
+  }
+
+  /* Subtle dark borders & dividers */
+  :where(html.dark) .border-stone-200:not([class*="dark:border-"]),
+  :where(html.dark) .border-stone-200\/80:not([class*="dark:border-"]),
+  :where(html.dark) .border-stone-100:not([class*="dark:border-"]),
+  :where(html.dark) .border-stone-300:not([class*="dark:border-"]),
+  :where(html.dark) .border-slate-200:not([class*="dark:border-"]),
+  :where(html.dark) .border-slate-100:not([class*="dark:border-"]),
+  :where(html.dark) .divide-stone-200 > :not(:last-child),
+  :where(html.dark) .divide-stone-100 > :not(:last-child),
+  :where(html.dark) .divide-slate-200 > :not(:last-child),
+  :where(html.dark) .divide-slate-100 > :not(:last-child) {
+    border-color: #273244;
+  }
+
+  :where(html.dark) .bg-stone-200:not([class*="dark:bg-"]),
+  :where(html.dark) .bg-slate-200:not([class*="dark:bg-"]) {
+    background-color: #273244;
+  }
+
+  /* Pastel badges & alert boxes in dark mode */
+  :where(html.dark) .bg-rose-50:not([class*="dark:bg-"]),
+  :where(html.dark) .bg-rose-50\/40:not([class*="dark:bg-"]),
+  :where(html.dark) .bg-rose-50\/70:not([class*="dark:bg-"]),
+  :where(html.dark) .bg-rose-100:not([class*="dark:bg-"]),
+  :where(html.dark) .bg-red-50:not([class*="dark:bg-"]) {
+    background-color: rgba(190, 18, 60, 0.18);
+  }
+
+  :where(html.dark) .bg-amber-50:not([class*="dark:bg-"]),
+  :where(html.dark) .bg-amber-50\/70:not([class*="dark:bg-"]),
+  :where(html.dark) .bg-amber-100:not([class*="dark:bg-"]),
+  :where(html.dark) .bg-orange-50\/70:not([class*="dark:bg-"]) {
+    background-color: rgba(217, 119, 6, 0.18);
+  }
+
+  :where(html.dark) .bg-emerald-50:not([class*="dark:bg-"]),
+  :where(html.dark) .bg-emerald-50\/50:not([class*="dark:bg-"]),
+  :where(html.dark) .bg-emerald-100:not([class*="dark:bg-"]) {
+    background-color: rgba(5, 150, 105, 0.18);
+  }
+
+  :where(html.dark) .bg-sky-50:not([class*="dark:bg-"]),
+  :where(html.dark) .bg-blue-50:not([class*="dark:bg-"]),
+  :where(html.dark) .bg-blue-100:not([class*="dark:bg-"]),
+  :where(html.dark) .bg-indigo-50:not([class*="dark:bg-"]),
+  :where(html.dark) .bg-purple-50:not([class*="dark:bg-"]),
+  :where(html.dark) .bg-purple-100:not([class*="dark:bg-"]),
+  :where(html.dark) .bg-violet-50:not([class*="dark:bg-"]) {
+    background-color: rgba(37, 99, 235, 0.18);
+  }
+
+  :where(html.dark) .bg-gray-50:not([class*="dark:bg-"]),
+  :where(html.dark) .bg-neutral-50:not([class*="dark:bg-"]),
+  :where(html.dark) .bg-zinc-50:not([class*="dark:bg-"]) {
+    background-color: #161e2e;
+  }
+
+  :where(html.dark) .bg-gray-100:not([class*="dark:bg-"]) {
+    background-color: #1f2937;
+  }
+
+  :where(html.dark) .text-gray-900:not([class*="dark:text-"]),
+  :where(html.dark) .text-gray-800:not([class*="dark:text-"]) {
+    color: #f1f5f9;
+  }
+
+  :where(html.dark) .text-gray-700:not([class*="dark:text-"]),
+  :where(html.dark) .text-gray-600:not([class*="dark:text-"]),
+  :where(html.dark) .text-gray-500:not([class*="dark:text-"]) {
+    color: #cbd5e1;
+  }
+
+  :where(html.dark) .text-sky-900:not([class*="dark:text-"]),
+  :where(html.dark) .text-sky-800:not([class*="dark:text-"]),
+  :where(html.dark) .text-blue-900:not([class*="dark:text-"]),
+  :where(html.dark) .text-blue-800:not([class*="dark:text-"]),
+  :where(html.dark) .text-blue-700:not([class*="dark:text-"]),
+  :where(html.dark) .text-indigo-900:not([class*="dark:text-"]),
+  :where(html.dark) .text-indigo-800:not([class*="dark:text-"]),
+  :where(html.dark) .text-indigo-700:not([class*="dark:text-"]),
+  :where(html.dark) .text-purple-700:not([class*="dark:text-"]),
+  :where(html.dark) .text-purple-600:not([class*="dark:text-"]) {
+    color: #93c5fd;
+  }
+
+  :where(html.dark) .border-gray-200:not([class*="dark:border-"]),
+  :where(html.dark) .border-gray-300:not([class*="dark:border-"]) {
+    border-color: #273244;
+  }
+
+  :where(html.dark) .text-rose-950:not([class*="dark:text-"]),
+  :where(html.dark) .text-rose-900:not([class*="dark:text-"]),
+  :where(html.dark) .text-rose-800:not([class*="dark:text-"]),
+  :where(html.dark) .text-rose-700:not([class*="dark:text-"]) {
+    color: #fda4af;
+  }
+
+  :where(html.dark) .text-amber-950:not([class*="dark:text-"]),
+  :where(html.dark) .text-amber-900:not([class*="dark:text-"]),
+  :where(html.dark) .text-amber-800:not([class*="dark:text-"]),
+  :where(html.dark) .text-amber-700:not([class*="dark:text-"]),
+  :where(html.dark) .text-orange-950:not([class*="dark:text-"]) {
+    color: #fde68a;
+  }
+
+  :where(html.dark) .text-emerald-900:not([class*="dark:text-"]),
+  :where(html.dark) .text-emerald-800:not([class*="dark:text-"]),
+  :where(html.dark) .text-emerald-700:not([class*="dark:text-"]) {
+    color: #6ee7b7;
+  }
+}
+
+html.dark .rich-article-block p,
+html.dark .rich-article-block ul,
+html.dark .rich-article-block ol {
+  color: #e2e8f0;
+}
+
+html.dark .rich-article-block h2,
+html.dark .rich-article-block h3,
+html.dark .rich-article-block h4 {
+  color: #f8fafc;
+}
+
+html.dark .rich-article-block blockquote {
+  background: linear-gradient(to right, rgba(185, 28, 28, 0.16), #161e2e);
+  color: #f8fafc;
+}
+
+html.dark .rich-article-block a {
+  color: #fb7185;
+}
+
+/* Aesthetic Editorial Shimmer & Progress Sweep */
+@keyframes editorial-shimmer-sweep {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes editorial-bar-sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(300%);
+  }
+}
+
+.editorial-shimmer {
+  background: linear-gradient(
+    90deg,
+    #f1efeb 0%,
+    #faf9f7 45%,
+    #f1efeb 90%
+  );
+  background-size: 200% 100%;
+  animation: editorial-shimmer-sweep 1.65s ease-in-out infinite;
+}
+
+html.dark .editorial-shimmer {
+  background: linear-gradient(
+    90deg,
+    #171e2b 0%,
+    #222c3d 45%,
+    #171e2b 90%
+  );
+  background-size: 200% 100%;
+}
+
+.editorial-progress-sweep {
+  animation: editorial-bar-sweep 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}

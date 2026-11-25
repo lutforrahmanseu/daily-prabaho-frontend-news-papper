@@ -6,7 +6,8 @@ import { setSelectedCategory } from '../../store/newsSlice.js';
 import {
   setSearchModalOpen,
   setMobileDrawerOpen,
-  toggleLanguage
+  toggleLanguage,
+  toggleTheme
 } from '../../store/uiSlice.js';
 import {
   selectIsReaderAuthenticated,
@@ -28,7 +29,9 @@ import {
   CheckCircle2,
   ChevronDown,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 /**
@@ -40,7 +43,8 @@ export function Navbar() {
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
-  const { language } = useSelector((state) => state.ui);
+  const { language, theme } = useSelector((state) => state.ui);
+  const isDark = theme === 'dark';
   const isReaderAuth = useSelector(selectIsReaderAuthenticated);
   const readerUser = useSelector(selectReaderUser);
   const [apiReaderLogout] = useReaderLogoutMutation();
@@ -155,7 +159,7 @@ export function Navbar() {
             
             {/* Left Scroll Navigation Button with Subtle Gradient Mask */}
             {canScrollLeft && (
-              <div className="absolute left-0 top-0 bottom-0 z-10 flex items-center pr-4 bg-gradient-to-r from-white via-white/95 to-transparent pointer-events-none">
+              <div className="absolute left-0 top-0 bottom-0 z-10 flex items-center pr-4 bg-gradient-to-r from-white via-white/95 dark:from-[#111827] dark:via-[#111827]/95 to-transparent pointer-events-none">
                 <button
                   type="button"
                   onClick={() => scrollCategories('left')}
@@ -252,7 +256,7 @@ export function Navbar() {
 
             {/* Right Scroll Navigation Button with Subtle Gradient Mask */}
             {canScrollRight && (
-              <div className="absolute right-0 top-0 bottom-0 z-10 flex items-center pl-4 bg-gradient-to-l from-white via-white/95 to-transparent pointer-events-none">
+              <div className="absolute right-0 top-0 bottom-0 z-10 flex items-center pl-4 bg-gradient-to-l from-white via-white/95 dark:from-[#111827] dark:via-[#111827]/95 to-transparent pointer-events-none">
                 <button
                   type="button"
                   onClick={() => scrollCategories('right')}
@@ -293,11 +297,26 @@ export function Navbar() {
             <button
               type="button"
               onClick={() => dispatch(toggleLanguage())}
-              className="flex items-center gap-1 px-2.5 py-1.5 text-stone-700 hover:text-rose-700 hover:bg-stone-100 rounded-md text-xs xl:text-sm font-semibold transition-colors cursor-pointer"
+              className="flex items-center gap-1 px-2.5 py-1.5 text-stone-700 hover:text-rose-700 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-md text-xs xl:text-sm font-semibold transition-colors cursor-pointer"
               title="Switch Language"
             >
               <Globe2 className="w-4 h-4 text-stone-600" />
               <span>{isBn ? 'Eng' : 'বাংলা'}</span>
+            </button>
+
+            {/* 3.5. Dark / Light Theme Toggle */}
+            <button
+              type="button"
+              onClick={() => dispatch(toggleTheme())}
+              className="p-1.5 text-stone-700 hover:text-rose-700 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-md transition-colors cursor-pointer"
+              title={isDark ? (isBn ? 'লাইট মোড' : 'Light Mode') : (isBn ? 'ডার্ক মোড' : 'Dark Mode')}
+              aria-label="Toggle Dark Mode"
+            >
+              {isDark ? (
+                <Sun className="w-4 h-4 text-amber-400" />
+              ) : (
+                <Moon className="w-4 h-4 text-stone-600" />
+              )}
             </button>
 
             {/* 4. Login / User Profile (Clean Reader Portal) */}
@@ -364,7 +383,7 @@ export function Navbar() {
                   title={isBn ? 'পাঠক অ্যাকাউন্টে লগইন করুন' : 'Sign In'}
                 >
                   <User className="w-4 h-4 text-stone-600" />
-                  <span>{isBn ? 'Login' : 'Login'}</span>
+                  <span>{isBn ? 'লগইন' : 'Login'}</span>
                 </Link>
               )}
             </div>

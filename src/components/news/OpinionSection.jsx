@@ -25,10 +25,12 @@ export function OpinionSection() {
       topic: art.title,
       topicEn: art.titleEn || art.title,
       quote: art.excerpt || art.subheadline || art.title,
-      readTime: `${art.readingTime || 3} মিনিট`,
-      name: art.author || matchedAuthor.name || 'নিজস্ব বিশ্লেষক',
+      readTime: isBn ? `${art.readingTime || 3} মিনিট` : `${art.readingTime || 3} min read`,
+      name: art.author || matchedAuthor.name || (isBn ? 'নিজস্ব বিশ্লেষক' : 'Staff Columnist'),
       nameEn: matchedAuthor.nameEn || art.author || 'Staff Columnist',
-      designation: art.authorDesignation || matchedAuthor.designation || 'সম্পাদকীয় ও মতামত বিভাগ',
+      designation: isBn
+        ? (art.authorDesignation || matchedAuthor.designation || 'সম্পাদকীয় ও মতামত বিভাগ')
+        : (matchedAuthor.designationEn || 'Editorial & Opinion Desk'),
       avatar: art.authorAvatar || matchedAuthor.avatar || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80'
     };
   });

@@ -1,4 +1,5 @@
 import React from 'react';
+import { AdminPageSkeleton } from '../../../components/admin/AdminSkeletons.jsx';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import {
@@ -65,16 +66,11 @@ export function AdminNewsroomDashboardPage() {
   };
 
   if (isLoading) {
-    return (
-      <div className="py-20 flex flex-col items-center justify-center text-stone-500 gap-2">
-        <Loader2 className="w-7 h-7 animate-spin text-rose-700" />
-        <p className="text-xs font-medium">নিউজরুম কমান্ড সেন্টার লোড হচ্ছে...</p>
-      </div>
-    );
+    return <AdminPageSkeleton />;
   }
 
   return (
-    <div className="space-y-6">
+    <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs p-5 sm:p-6 space-y-6">
       {/* Header */}
       <EditorialReveal immediate className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white p-5 rounded-xl border border-stone-200 shadow-2xs">
         <div>

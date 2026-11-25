@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { useGetRelatedNewsQuery } from '../../store/api/newsApi.js';
 import { usePublicArticles } from '../../hooks/usePortalData.js';
 import NewsCard from './NewsCard.jsx';
-import { Sparkles } from 'lucide-react';
+import { Newspaper } from 'lucide-react';
 
 export function RelatedNews({
   currentArticleId,
@@ -39,7 +39,7 @@ export function RelatedNews({
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <span className="p-1.5 rounded-lg bg-rose-50 text-rose-700">
-            <Sparkles className="w-4 h-4" />
+            <Newspaper className="w-4 h-4" />
           </span>
           <h3 className="text-xl sm:text-2xl font-bold text-stone-900 font-serif-bn">
             {isBn ? 'সম্পর্কিত অন্যান্য সংবাদ' : 'Related Stories'}

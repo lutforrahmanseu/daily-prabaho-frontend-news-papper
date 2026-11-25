@@ -26,6 +26,23 @@ function AuthSessionInitializer() {
   return null;
 }
 
+function ThemeSynchronizer() {
+  const theme = useSelector((state) => state.ui?.theme || 'light');
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+      root.style.colorScheme = 'dark';
+    } else {
+      root.classList.remove('dark');
+      root.style.colorScheme = 'light';
+    }
+  }, [theme]);
+
+  return null;
+}
+
 /**
  * Root Application Component
  * Coordinates global providers, Sanctum session hydration, Error Boundary, and React Router architecture
@@ -34,6 +51,7 @@ export default function App() {
   return (
     <MotionConfig reducedMotion="user">
       <ErrorBoundary>
+        <ThemeSynchronizer />
         <AuthSessionInitializer />
         <AppRoutes />
         <SweetAlertHost />

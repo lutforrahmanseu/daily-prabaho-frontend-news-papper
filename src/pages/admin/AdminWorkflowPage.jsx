@@ -14,6 +14,7 @@ import { toBengaliNumber, formatBengaliRelativeTime } from '../../utils/bengaliF
 import ArticleWorkflowDrawer from '../../components/admin/ArticleWorkflowDrawer.jsx';
 import WorkflowActionModal from '../../components/admin/WorkflowActionModal.jsx';
 import ArticleEditorModal from '../../components/admin/ArticleEditorModal.jsx';
+import { AdminListRowsSkeleton } from '../../components/admin/AdminSkeletons.jsx';
 import sweetAlert from '../../utils/sweetAlert.js';
 import {
   GitPullRequest,
@@ -181,29 +182,7 @@ export function AdminWorkflowPage() {
     searchQuery.trim()
   );
 
-  // 3. Pipeline Overall Status Counts (across all articles in pipeline)
-  const pipelineStats = useMemo(() => {
-    const stats = {
-      total: articles.length,
-      submitted: 0,
-      under_review: 0,
-      returned: 0,
-      approved: 0,
-      draft: 0,
-      scheduled: 0,
-      published: 0,
-      rejected: 0
-    };
-    articles.forEach((a) => {
-      const st = a.status || 'draft';
-      if (stats[st] !== undefined) {
-        stats[st] += 1;
-      }
-    });
-    return stats;
-  }, [articles]);
-
-  // 4. Filter Articles according to Scope, Designation, Specific Person, Status, Category, and Search
+  // 3. Filter Articles according to Scope, Designation, Specific Person, Status, Category, and Search
   const filteredArticles = useMemo(() => {
     return articles.filter((art) => {
       // Search
@@ -390,9 +369,11 @@ export function AdminWorkflowPage() {
 
   return (
     <div className="space-y-4">
+      {/* Unified Single Card Container */}
+      <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs overflow-hidden divide-y divide-stone-100 dark:divide-stone-800">
 
-      {/* 1. Header with Role Info & Action Button */}
-      <div className="bg-white p-4 sm:p-5 rounded-2xl border border-stone-200 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        {/* 1. Header with Role Info & Action Button */}
+        <div className="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="text-xl sm:text-2xl font-black font-serif-bn text-stone-900 tracking-tight">
@@ -410,10 +391,10 @@ export function AdminWorkflowPage() {
 
         {/* Active Role & Create Draft Button */}
         <div className="w-full sm:w-auto flex flex-col xs:flex-row sm:flex-row items-stretch sm:items-center gap-2.5">
-          <div className="flex items-center justify-between sm:justify-start gap-2 bg-white border border-stone-200 px-3 py-2 rounded-xl text-xs">
+          <div className="flex items-center justify-between sm:justify-start gap-2 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 px-3 py-2 rounded-xl text-xs">
             <Shield className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span className="text-stone-500 font-semibold whitespace-nowrap">সক্রিয় ভূমিকা:</span>
-            <span className="font-bold text-stone-900">{roleMeta.nameBn}</span>
+            <span className="text-stone-500 dark:text-stone-400 font-semibold whitespace-nowrap">ভূমিকা:</span>
+            <span className="font-bold text-stone-900 dark:text-stone-100">{roleMeta.nameBn}</span>
           </div>
 
           <button
@@ -425,378 +406,181 @@ export function AdminWorkflowPage() {
             className="w-full sm:w-auto px-4 py-2 rounded-xl bg-rose-700 hover:bg-rose-800 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-xs transition-colors cursor-pointer"
           >
             <Plus className="w-4 h-4 shrink-0" />
-            <span>নতুন ড্রাফট তৈরি করুন</span>
+            <span>নতুন ড্রাফট</span>
           </button>
         </div>
       </div>
 
-      {/* 2. Top Summary Stat Cards (Clean White Cards) */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
-        <button
-          type="button"
-          onClick={() => {
-            setStatusFilter('all');
-            setCurrentPage(1);
-          }}
-          className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
-            statusFilter === 'all'
-              ? 'bg-white border-stone-800 shadow-xs ring-1 ring-stone-800'
-              : 'bg-white border-stone-200 hover:border-stone-300'
-          }`}
-        >
-          <p className="text-[11px] font-semibold text-stone-500">মোট পাইপলাইন</p>
-          <p className="text-lg font-black font-mono text-stone-900 mt-0.5">
-            {toBengaliNumber(pipelineStats.total)}
-          </p>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => {
-            setStatusFilter('submitted');
-            setCurrentPage(1);
-          }}
-          className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
-            statusFilter === 'submitted'
-              ? 'bg-white border-blue-600 shadow-xs ring-1 ring-blue-600'
-              : 'bg-white border-stone-200 hover:border-blue-300'
-          }`}
-        >
-          <div className="flex items-center justify-between">
-            <p className="text-[11px] font-semibold text-blue-700">জমা পড়া</p>
-            <Send className="w-3.5 h-3.5 text-blue-500" />
+      {/* 2. Unified Filter Toolbar */}
+      <div className="p-4 bg-stone-50/40 dark:bg-stone-900/50 space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-2.5">
+          {/* Search Input */}
+          <div className="relative flex-1 min-w-[200px] max-w-md">
+            <Search className="w-4 h-4 absolute left-3 top-2.5 text-stone-400" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1);
+              }}
+              placeholder="শিরোনাম বা প্রতিবেদক খুঁজুন..."
+              className="w-full pl-9 pr-8 py-1.5 bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl text-xs text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-rose-500/40"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchQuery('');
+                  setCurrentPage(1);
+                }}
+                className="absolute right-2.5 top-2 text-stone-400 hover:text-stone-600 p-0.5 cursor-pointer"
+                title="অনুসন্ধান মুছুন"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
-          <p className="text-lg font-black font-mono text-blue-900 mt-0.5">
-            {toBengaliNumber(pipelineStats.submitted)}
-          </p>
-        </button>
 
-        <button
-          type="button"
-          onClick={() => {
-            setStatusFilter('under_review');
-            setCurrentPage(1);
-          }}
-          className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
-            statusFilter === 'under_review'
-              ? 'bg-white border-amber-600 shadow-xs ring-1 ring-amber-600'
-              : 'bg-white border-stone-200 hover:border-amber-300'
-          }`}
-        >
-          <div className="flex items-center justify-between">
-            <p className="text-[11px] font-semibold text-amber-700">পর্যালোচনায়</p>
-            <Eye className="w-3.5 h-3.5 text-amber-500" />
-          </div>
-          <p className="text-lg font-black font-mono text-amber-900 mt-0.5">
-            {toBengaliNumber(pipelineStats.under_review)}
-          </p>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => {
-            setStatusFilter('returned');
-            setCurrentPage(1);
-          }}
-          className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
-            statusFilter === 'returned'
-              ? 'bg-white border-orange-600 shadow-xs ring-1 ring-orange-600'
-              : 'bg-white border-stone-200 hover:border-orange-300'
-          }`}
-        >
-          <div className="flex items-center justify-between">
-            <p className="text-[11px] font-semibold text-orange-700">সংশোধনে ফেরত</p>
-            <RotateCcw className="w-3.5 h-3.5 text-orange-500" />
-          </div>
-          <p className="text-lg font-black font-mono text-orange-900 mt-0.5">
-            {toBengaliNumber(pipelineStats.returned)}
-          </p>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => {
-            setStatusFilter('approved');
-            setCurrentPage(1);
-          }}
-          className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
-            statusFilter === 'approved'
-              ? 'bg-white border-emerald-600 shadow-xs ring-1 ring-emerald-600'
-              : 'bg-white border-stone-200 hover:border-emerald-300'
-          }`}
-        >
-          <div className="flex items-center justify-between">
-            <p className="text-[11px] font-semibold text-emerald-700">অনুমোদিত</p>
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-          </div>
-          <p className="text-lg font-black font-mono text-emerald-900 mt-0.5">
-            {toBengaliNumber(pipelineStats.approved)}
-          </p>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => {
-            setStatusFilter('scheduled');
-            setCurrentPage(1);
-          }}
-          className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
-            statusFilter === 'scheduled'
-              ? 'bg-white border-indigo-600 shadow-xs ring-1 ring-indigo-600'
-              : 'bg-white border-stone-200 hover:border-indigo-300'
-          }`}
-        >
-          <div className="flex items-center justify-between">
-            <p className="text-[11px] font-semibold text-indigo-700">শিডিউল্ড</p>
-            <Clock className="w-3.5 h-3.5 text-indigo-500" />
-          </div>
-          <p className="text-lg font-black font-mono text-indigo-900 mt-0.5">
-            {toBengaliNumber(pipelineStats.scheduled)}
-          </p>
-        </button>
-      </div>
-
-      {/* 3. Scope Mode Selector: All | By Designation | Specific Person | My Desk */}
-      <div className="bg-white p-3 sm:p-3.5 rounded-2xl border border-stone-200 shadow-xs flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-1.5">
-          <span className="text-xs font-bold text-stone-700 mr-1 flex items-center gap-1">
-            <Layers className="w-3.5 h-3.5 text-stone-400" />
-            <span>ওয়ার্কফ্লো স্কোপ:</span>
-          </span>
-
-          <button
-            type="button"
-            onClick={() => {
-              setScopeMode('all');
-              setSelectedDesignation('all');
-              setSelectedPerson('all');
-              setCurrentPage(1);
-            }}
-            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer border ${
-              scopeMode === 'all' && selectedDesignation === 'all' && selectedPerson === 'all'
-                ? 'bg-white border-rose-600 text-rose-700 font-bold shadow-xs'
-                : 'bg-white border-stone-200 text-stone-600 hover:border-stone-300 hover:text-stone-900'
-            }`}
-          >
-            সকল সম্পাদকীয় কনটেন্ট (All)
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setScopeMode('by_designation');
-              setSelectedPerson('all');
-              setCurrentPage(1);
-            }}
-            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer border flex items-center gap-1.5 ${
-              scopeMode === 'by_designation' || selectedDesignation !== 'all'
-                ? 'bg-white border-rose-600 text-rose-700 font-bold shadow-xs'
-                : 'bg-white border-stone-200 text-stone-600 hover:border-stone-300 hover:text-stone-900'
-            }`}
-          >
-            <Briefcase className="w-3.5 h-3.5" />
-            <span>পদবি অনুযায়ী (By Designation)</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setScopeMode('by_specific');
-              setSelectedDesignation('all');
-              setCurrentPage(1);
-            }}
-            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer border flex items-center gap-1.5 ${
-              scopeMode === 'by_specific' || selectedPerson !== 'all'
-                ? 'bg-white border-rose-600 text-rose-700 font-bold shadow-xs'
-                : 'bg-white border-stone-200 text-stone-600 hover:border-stone-300 hover:text-stone-900'
-            }`}
-          >
-            <UserCheck className="w-3.5 h-3.5" />
-            <span>নির্দিষ্ট ব্যক্তি (Specific Staff)</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setScopeMode('my_desk');
-              setSelectedDesignation('all');
-              setSelectedPerson('all');
-              setCurrentPage(1);
-            }}
-            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer border flex items-center gap-1.5 ${
-              scopeMode === 'my_desk'
-                ? 'bg-white border-rose-600 text-rose-700 font-bold shadow-xs'
-                : 'bg-white border-stone-200 text-stone-600 hover:border-stone-300 hover:text-stone-900'
-            }`}
-          >
-            <User className="w-3.5 h-3.5" />
-            <span>আমার দায়িত্ব (My Desk)</span>
-          </button>
-        </div>
-
-        {/* Quick Reset if filtered */}
-        {isFiltered && (
-          <button
-            type="button"
-            onClick={resetAllFilters}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold text-rose-700 bg-white hover:bg-stone-50 border border-rose-300 transition-colors cursor-pointer"
-            title="সকল ফিল্টার মুছুন ও পূর্ণ তালিকা দেখুন"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-            <span>ফিল্টার রিসেট</span>
-          </button>
-        )}
-      </div>
-
-      {/* 4. Filter Toolbar: Designation, Specific Person, Category, and Search */}
-      <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-stone-200 flex flex-wrap items-center justify-between gap-3 shadow-xs">
-        
-        {/* Search Input */}
-        <div className="relative flex-1 min-w-[220px]">
-          <Search className="w-4 h-4 absolute left-3.5 top-3 text-stone-400" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              setCurrentPage(1);
-            }}
-            placeholder="শিরোনাম, প্রতিবেদক বা কিওয়ার্ড দিয়ে খুঁজুন..."
-            className="w-full pl-9 pr-9 py-2 bg-white border border-stone-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent"
-          />
-          {searchQuery && (
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Scope Quick Toggle: All vs My Desk */}
             <button
               type="button"
               onClick={() => {
-                setSearchQuery('');
+                const next = scopeMode === 'my_desk' ? 'all' : 'my_desk';
+                setScopeMode(next);
+                setSelectedDesignation('all');
+                setSelectedPerson('all');
                 setCurrentPage(1);
               }}
-              className="absolute right-3 top-2.5 text-stone-400 hover:text-stone-600 p-0.5 cursor-pointer"
-              title="অনুসন্ধান মুছুন"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          )}
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-
-          {/* 1. Designation Filter Dropdown */}
-          <div className={`flex items-center gap-1.5 bg-white border px-3 py-1.5 rounded-xl text-xs ${
-            selectedDesignation !== 'all' || scopeMode === 'by_designation' ? 'border-rose-400 ring-1 ring-rose-300' : 'border-stone-200'
-          }`}>
-            <Briefcase className="w-3.5 h-3.5 text-stone-500 shrink-0" />
-            <select
-              value={selectedDesignation}
-              onChange={(e) => {
-                setSelectedDesignation(e.target.value);
-                if (e.target.value !== 'all') {
-                  setScopeMode('by_designation');
-                  setSelectedPerson('all');
-                }
-                setCurrentPage(1);
-              }}
-              className="bg-transparent font-semibold text-stone-700 focus:outline-none cursor-pointer max-w-[160px] truncate"
-            >
-              <option value="all">পদবি: সকল পদবি</option>
-              {availableDesignations.map((des) => (
-                <option key={des} value={des}>
-                  {des}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* 2. Specific Person Filter Dropdown */}
-          <div className={`flex items-center gap-1.5 bg-white border px-3 py-1.5 rounded-xl text-xs ${
-            selectedPerson !== 'all' || scopeMode === 'by_specific' ? 'border-rose-400 ring-1 ring-rose-300' : 'border-stone-200'
-          }`}>
-            <UserCheck className="w-3.5 h-3.5 text-stone-500 shrink-0" />
-            <select
-              value={selectedPerson}
-              onChange={(e) => {
-                setSelectedPerson(e.target.value);
-                if (e.target.value !== 'all') {
-                  setScopeMode('by_specific');
-                  setSelectedDesignation('all');
-                }
-                setCurrentPage(1);
-              }}
-              className="bg-transparent font-semibold text-stone-700 focus:outline-none cursor-pointer max-w-[170px] truncate"
-            >
-              <option value="all">ব্যক্তি: নির্দিষ্ট কর্মী/লেখক</option>
-              {specificPeople.map((person) => (
-                <option key={person.name} value={person.name}>
-                  {person.name} ({person.designation})
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* 3. Category Filter Dropdown */}
-          <div className="flex items-center gap-1.5 bg-white border border-stone-200 px-3 py-1.5 rounded-xl text-xs">
-            <Filter className="w-3.5 h-3.5 text-stone-500 shrink-0" />
-            <select
-              value={selectedCategory}
-              onChange={(e) => {
-                setSelectedCategory(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="bg-transparent font-semibold text-stone-700 focus:outline-none cursor-pointer"
-            >
-              <option value="all">সকল বিভাগ (All Categories)</option>
-              {categoriesList.map((cat) => (
-                <option key={cat.id || cat.slug} value={cat.slug}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-        </div>
-
-      </div>
-
-      {/* 5. Status Stage Filter Tabs */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
-        {STATUS_STAGES.map((stage) => {
-          const count = statusCounts[stage.key] || 0;
-          const isActive = statusFilter === stage.key;
-          return (
-            <button
-              key={stage.key}
-              type="button"
-              onClick={() => {
-                setStatusFilter(stage.key);
-                setCurrentPage(1);
-              }}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer border flex items-center gap-1.5 ${
-                isActive
-                  ? 'bg-white border-rose-600 text-rose-700 font-bold shadow-xs'
-                  : 'bg-white border-stone-200 text-stone-600 hover:border-stone-300 hover:text-stone-900'
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer border flex items-center gap-1.5 ${
+                scopeMode === 'my_desk'
+                  ? 'bg-rose-50 dark:bg-rose-950/50 border-rose-300 dark:border-rose-800 text-rose-800 dark:text-rose-200 font-bold'
+                  : 'bg-stone-50 dark:bg-stone-800 border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 hover:border-stone-300'
               }`}
             >
-              <span>{stage.label.split(' ')[0]}</span>
-              <span
-                className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold ${
-                  isActive ? 'bg-rose-100 text-rose-800' : 'bg-stone-100 text-stone-600'
+              <User className="w-3.5 h-3.5" />
+              <span>আমার দায়িত্ব</span>
+            </button>
+
+            {/* Designation Filter */}
+            <div className="flex items-center gap-1.5 bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 px-2.5 py-1.5 rounded-xl text-xs">
+              <Briefcase className="w-3.5 h-3.5 text-stone-500 shrink-0" />
+              <select
+                value={selectedDesignation}
+                onChange={(e) => {
+                  setSelectedDesignation(e.target.value);
+                  setScopeMode(e.target.value !== 'all' ? 'by_designation' : 'all');
+                  setSelectedPerson('all');
+                  setCurrentPage(1);
+                }}
+                className="bg-transparent font-semibold text-stone-700 dark:text-stone-200 focus:outline-none cursor-pointer max-w-[140px] truncate"
+              >
+                <option value="all">সকল পদবি</option>
+                {availableDesignations.map((des) => (
+                  <option key={des} value={des}>
+                    {des}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Specific Person Filter */}
+            <div className="flex items-center gap-1.5 bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 px-2.5 py-1.5 rounded-xl text-xs">
+              <UserCheck className="w-3.5 h-3.5 text-stone-500 shrink-0" />
+              <select
+                value={selectedPerson}
+                onChange={(e) => {
+                  setSelectedPerson(e.target.value);
+                  setScopeMode(e.target.value !== 'all' ? 'by_specific' : 'all');
+                  setSelectedDesignation('all');
+                  setCurrentPage(1);
+                }}
+                className="bg-transparent font-semibold text-stone-700 dark:text-stone-200 focus:outline-none cursor-pointer max-w-[150px] truncate"
+              >
+                <option value="all">সকল কর্মী</option>
+                {specificPeople.map((person) => (
+                  <option key={person.name} value={person.name}>
+                    {person.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Category Filter */}
+            <div className="flex items-center gap-1.5 bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 px-2.5 py-1.5 rounded-xl text-xs">
+              <Filter className="w-3.5 h-3.5 text-stone-500 shrink-0" />
+              <select
+                value={selectedCategory}
+                onChange={(e) => {
+                  setSelectedCategory(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="bg-transparent font-semibold text-stone-700 dark:text-stone-200 focus:outline-none cursor-pointer"
+              >
+                <option value="all">সকল বিভাগ</option>
+                {categoriesList.map((cat) => (
+                  <option key={cat.id || cat.slug} value={cat.slug}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {isFiltered && (
+              <button
+                type="button"
+                onClick={resetAllFilters}
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 border border-rose-200 dark:border-rose-800 transition-colors cursor-pointer"
+                title="ফিল্টার রিসেট"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>রিসেট</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Status Stage Filter Tabs */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pt-1 no-scrollbar">
+          {STATUS_STAGES.map((stage) => {
+            const count = statusCounts[stage.key] || 0;
+            const isActive = statusFilter === stage.key;
+            return (
+              <button
+                key={stage.key}
+                type="button"
+                onClick={() => {
+                  setStatusFilter(stage.key);
+                  setCurrentPage(1);
+                }}
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer border flex items-center gap-1.5 ${
+                  isActive
+                    ? 'bg-rose-50 dark:bg-rose-950/50 border-rose-300 dark:border-rose-800 text-rose-800 dark:text-rose-200 font-bold'
+                    : 'bg-stone-50 dark:bg-stone-800/60 border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 hover:border-stone-300'
                 }`}
               >
-                {toBengaliNumber(count)}
-              </span>
-            </button>
-          );
-        })}
+                <span>{stage.label.split(' ')[0]}</span>
+                <span
+                  className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold ${
+                    isActive
+                      ? 'bg-rose-100 dark:bg-rose-900/70 text-rose-800 dark:text-rose-200'
+                      : 'bg-stone-200/70 dark:bg-stone-700 text-stone-600 dark:text-stone-300'
+                  }`}
+                >
+                  {toBengaliNumber(count)}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* 6. Dedicated Workflow Desk Articles Table */}
-      <div className="bg-white rounded-2xl border border-stone-200 shadow-xs overflow-hidden">
-        {/* Loading Notice */}
+      <div>
+        {/* Loading Skeleton */}
         {isNewsLoading ? (
-          <div className="p-12 flex items-center justify-center gap-2 text-xs text-stone-500">
-            <Loader2 className="w-4 h-4 animate-spin text-rose-700" />
-            <span>সম্পাদকীয় ওয়ার্কফ্লো ডেটা লোড হচ্ছে...</span>
-          </div>
+          <AdminListRowsSkeleton rows={6} />
         ) : paginatedArticles.length === 0 ? (
           <div className="py-16 text-center text-stone-500 text-xs">
             <p className="italic">কোনো সংবাদ পাওয়া যায়নি (No matching workflow articles found)</p>
@@ -1134,6 +918,7 @@ export function AdminWorkflowPage() {
             </div>
           </>
         )}
+      </div>
       </div>
 
       {/* Article Workflow Drawer */}

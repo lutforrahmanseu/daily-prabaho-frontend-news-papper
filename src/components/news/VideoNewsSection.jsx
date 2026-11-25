@@ -1,9 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { VIDEO_NEWS_ITEMS } from '../../data/sampleNews.js';
 import VideoPlayerModal from './VideoPlayerModal.jsx';
-import { Video, Play, Clock, Eye, Sparkles, ArrowRight } from 'lucide-react';
+import { Video, Play, Clock, Eye, Radio, ArrowRight } from 'lucide-react';
 import { EditorialReveal } from '../common/MotionPrimitives.jsx';
 import { useGetPublicMultimediaItemsQuery } from '../../store/api/multimediaApi.js';
 import { formatDurationLabel } from '../../utils/multimediaHelpers.js';
@@ -39,13 +38,12 @@ export function VideoNewsSection() {
       viewsEn: `${item.views_count || 0} views`
     }));
 
-    if (mappedCms.length >= 2) {
-      return mappedCms.slice(0, 4);
-    }
-    return [...mappedCms, ...VIDEO_NEWS_ITEMS].slice(0, 4);
+    return mappedCms.slice(0, 4);
   }, [cmsVideosData, isBn]);
 
-  const mainVideo = videos[0] || VIDEO_NEWS_ITEMS[0];
+  if (videos.length === 0) return null;
+
+  const mainVideo = videos[0];
   const secondaryVideos = videos.slice(1);
 
   return (
@@ -61,7 +59,7 @@ export function VideoNewsSection() {
         </div>
         <div className="flex items-center gap-3 text-xs font-semibold">
           <span className="hidden sm:inline-flex items-center gap-1.5 text-rose-700">
-            <Sparkles className="w-3.5 h-3.5" />
+            <Radio className="w-3.5 h-3.5" />
             <span>{isBn ? 'সরাসরি সম্প্রচার' : 'Digital Broadcast'}</span>
           </span>
           <Link

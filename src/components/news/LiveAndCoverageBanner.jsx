@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Layers, Radio, Sparkles } from 'lucide-react';
+import { useSelector } from 'react-redux';
+import { ArrowRight, Layers, Radio } from 'lucide-react';
 import {
   useGetPublicLiveBlogsQuery,
   useGetPublicSpecialCoveragesQuery
@@ -14,6 +15,8 @@ import { toBengaliNumber } from '../../utils/bengaliFormatter.js';
 import { LiveBadgePill } from '../live/LiveCoverageShared.jsx';
 
 export function LiveAndCoverageBanner() {
+  const language = useSelector((state) => state.ui?.language || 'bn');
+  const isBn = language === 'bn';
   const { data: liveRes } = useGetPublicLiveBlogsQuery({ per_page: 4 });
   const { data: coverageRes } = useGetPublicSpecialCoveragesQuery({ featured_only: 1, per_page: 4 });
 
@@ -36,10 +39,10 @@ export function LiveAndCoverageBanner() {
               </span>
               <div>
                 <h2 className="font-serif-bn text-base sm:text-lg font-extrabold text-stone-900">
-                  সরাসরি সংবাদ আপডেট
+                  {isBn ? 'সরাসরি সংবাদ আপডেট' : 'Live News Updates'}
                 </h2>
                 <p className="text-xs text-stone-500 font-normal">
-                  মুহূর্তের খবর তাৎক্ষণিক রিয়েল-টাইম ফিডে
+                  {isBn ? 'মুহূর্তের খবর তাৎক্ষণিক রিয়েল-টাইম ফিডে' : 'Breaking developments in a real-time live feed'}
                 </p>
               </div>
             </div>
@@ -48,7 +51,7 @@ export function LiveAndCoverageBanner() {
               to="/live"
               className="inline-flex items-center gap-1 text-xs font-bold text-rose-700 hover:text-rose-800 hover:underline"
             >
-              <span>সব লাইভ ডেস্ক</span>
+              <span>{isBn ? 'সব লাইভ ডেস্ক' : 'All Live Desks'}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -66,18 +69,18 @@ export function LiveAndCoverageBanner() {
                     <div className="flex items-center justify-between gap-2 mb-2">
                       <LiveBadgePill status={blog.status} size="sm" />
                       <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${eventMeta.badgeClass}`}>
-                        {eventMeta.label}
+                        {isBn ? eventMeta.label : (eventMeta.labelEn || eventMeta.label)}
                       </span>
                     </div>
                     <h3 className="font-serif-bn font-bold text-sm sm:text-base text-stone-900 group-hover:text-rose-700 line-clamp-2 leading-snug">
-                      {blog.title}
+                      {isBn ? blog.title : (blog.title_en || blog.title)}
                     </h3>
                   </div>
 
                   <div className="mt-3 pt-2.5 border-t border-stone-100 flex items-center justify-between text-xs text-stone-500 font-medium">
                     <span>{formatLiveTimestampBadge(blog.last_update_at || blog.started_at)}</span>
                     <span className="font-bold text-stone-800">
-                      {toBengaliNumber(blog.updates_count || 0)} আপডেট
+                      {isBn ? `${toBengaliNumber(blog.updates_count || 0)} আপডেট` : `${blog.updates_count || 0} updates`}
                     </span>
                   </div>
                 </Link>
@@ -97,10 +100,12 @@ export function LiveAndCoverageBanner() {
               </span>
               <div>
                 <h2 className="font-serif-bn text-base sm:text-lg font-extrabold text-stone-900">
-                  বিশেষ আয়োজন ও পূর্ণাঙ্গ কাভারেজ
+                  {isBn ? 'বিশেষ আয়োজন ও পূর্ণাঙ্গ কাভারেজ' : 'Special Coverage & Microsites'}
                 </h2>
                 <p className="text-xs text-stone-500 font-normal">
-                  নির্বাচন, বাজেট, ক্রীড়া আসর, জাতীয় দিবস ও জরুরি বিষয়ের ডেডিকেটেড পাতা
+                  {isBn
+                    ? 'নির্বাচন, বাজেট, ক্রীড়া আসর, জাতীয় দিবস ও জরুরি বিষয়ের ডেডিকেটেড পাতা'
+                    : 'Dedicated coverage hubs for elections, budgets, sports & major events'}
                 </p>
               </div>
             </div>
@@ -109,7 +114,7 @@ export function LiveAndCoverageBanner() {
               to="/coverage"
               className="inline-flex items-center gap-1 text-xs font-bold text-rose-700 hover:text-rose-800 hover:underline"
             >
-              <span>সব বিশেষ আয়োজন</span>
+              <span>{isBn ? 'সব বিশেষ আয়োজন' : 'All Special Coverage'}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -126,22 +131,21 @@ export function LiveAndCoverageBanner() {
                   <div>
                     <div className="flex items-center justify-between gap-2 mb-2">
                       <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
-                        <Sparkles className="w-3 h-3 text-rose-600" />
-                        <span>{cov.badge_text || typeMeta.shortLabel}</span>
+                        <span>{cov.badge_text || (isBn ? typeMeta.shortLabel : (typeMeta.shortLabelEn || typeMeta.shortLabel))}</span>
                       </span>
                     </div>
                     <h3 className="font-serif-bn font-bold text-sm sm:text-base text-stone-900 group-hover:text-rose-700 line-clamp-2 leading-snug">
-                      {cov.title}
+                      {isBn ? cov.title : (cov.title_en || cov.title)}
                     </h3>
                     {cov.subtitle && (
                       <p className="text-xs text-stone-500 line-clamp-2 mt-1.5 leading-relaxed">
-                        {cov.subtitle}
+                        {isBn ? cov.subtitle : (cov.subtitle_en || cov.subtitle)}
                       </p>
                     )}
                   </div>
 
                   <div className="mt-3 pt-2.5 border-t border-stone-100 flex items-center justify-between text-xs font-semibold text-rose-700 group-hover:translate-x-0.5 transition-transform">
-                    <span>পূর্ণাঙ্গ কাভারেজ পড়ুন</span>
+                    <span>{isBn ? 'পূর্ণাঙ্গ কাভারেজ পড়ুন' : 'Read Full Coverage'}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </div>
                 </Link>

@@ -360,7 +360,7 @@ export function AdminCitizenModerationPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs p-5 sm:p-6 space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-extrabold font-serif-bn text-stone-900">
@@ -381,7 +381,7 @@ export function AdminCitizenModerationPage() {
           { label: isBn ? 'যাচাই কিউ' : 'Verification Queue', val: overview?.verification_queue_count ?? 0, tone: 'text-indigo-700' },
           { label: isBn ? 'প্রকাশিত নাগরিক খবর' : 'Published Reports', val: overview?.published_submissions_count ?? 0, tone: 'text-emerald-700' },
           { label: isBn ? 'অপেক্ষমাণ আলোচনা' : 'Pending Threads', val: overview?.pending_discussions_count ?? 0, tone: 'text-sky-700' },
-          { label: isBn ? 'অপেক্ষমাণ মন্তব্য' : 'Pending Replies', val: overview?.pending_replies_count ?? 0, tone: 'text-purple-700' },
+          { label: isBn ? 'অপেক্ষমাণ মন্তব্য' : 'Pending Replies', val: overview?.pending_replies_count ?? 0, tone: 'text-amber-700' },
           { label: isBn ? 'খোলা অভিযোগ' : 'Open Abuse', val: overview?.open_abuse_reports_count ?? 0, tone: 'text-rose-700' }
         ].map((kpi) => (
           <div key={kpi.label} className="bg-white border border-stone-200 rounded-2xl p-4">
@@ -1040,7 +1040,7 @@ export function AdminCitizenModerationPage() {
                 {canReview && (
                   <form onSubmit={handleAssignReporter} className="border border-stone-200 rounded-xl p-4 space-y-2.5 text-xs">
                     <h3 className="font-bold text-stone-900 flex items-center gap-1.5">
-                      <UserPlus className="w-4 h-4 text-purple-700" />
+                      <UserPlus className="w-4 h-4 text-rose-700" />
                       <span>{isBn ? 'স্টাফ প্রতিবেদক ও নিউজরুম অ্যাসাইনমেন্ট' : 'Assign Staff Reporter'}</span>
                     </h3>
                     <select
@@ -1068,14 +1068,14 @@ export function AdminCitizenModerationPage() {
                         type="checkbox"
                         checked={assignForm.create_newsroom_assignment}
                         onChange={(e) => setAssignForm((p) => ({ ...p, create_newsroom_assignment: e.target.checked }))}
-                        className="rounded border-stone-300 text-purple-700"
+                        className="rounded border-stone-300 text-rose-700"
                       />
                       <span>{isBn ? 'নিউজরুম অ্যাসাইনমেন্ট বোর্ডে যুক্ত করুন' : 'Create Phase 15 Newsroom Assignment'}</span>
                     </label>
                     <button
                       type="submit"
                       disabled={assigning}
-                      className="w-full py-2 rounded-lg bg-purple-700 text-white font-bold cursor-pointer"
+                      className="w-full py-2 rounded-lg bg-rose-700 hover:bg-rose-800 text-white font-bold cursor-pointer"
                     >
                       {assigning ? 'Assigning...' : isBn ? 'প্রতিবেদক বরাদ্দ করুন' : 'Assign Reporter'}
                     </button>

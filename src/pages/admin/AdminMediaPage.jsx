@@ -266,7 +266,7 @@ export function AdminMediaPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs p-5 sm:p-6 space-y-6">
       {(authError || isError) && (
         <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center justify-between">
           <div className="flex items-center gap-2.5">

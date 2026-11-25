@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { AdminListRowsSkeleton } from '../../../components/admin/AdminSkeletons.jsx';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import {
@@ -152,15 +153,16 @@ export function AdminLiveDeskPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
+      <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs overflow-hidden divide-y divide-stone-100 dark:divide-stone-800">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-4 p-5">
         <div>
-          <h1 className="font-serif-bn text-2xl font-extrabold text-stone-900 dark:text-stone-100 flex items-center gap-2">
-            <Radio className="w-6 h-6 text-rose-700" />
+          <h1 className="font-serif-bn text-xl sm:text-2xl font-black text-stone-900 dark:text-stone-100 flex items-center gap-2">
+            <Radio className="w-6 h-6 text-rose-700 dark:text-rose-400" />
             <span>লাইভ নিউজ ডেস্ক (Live Desk)</span>
           </h1>
-          <p className="text-xs sm:text-sm text-stone-500 dark:text-stone-400 mt-1">
+          <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
             তাৎক্ষণিক লাইভ ব্লগ, সম্পাদকীয় অনুমোদন, পিন ও রিয়েল-টাইম ফিড নিয়ন্ত্রণ কেন্দ্র।
           </p>
         </div>
@@ -178,7 +180,7 @@ export function AdminLiveDeskPage() {
       </div>
 
       {/* KPI Row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x divide-stone-100 dark:divide-stone-800 bg-stone-50/40 dark:bg-stone-900/40">
         {[
           { label: 'সরাসরি চলছে', value: stats.live, color: 'text-rose-700' },
           { label: 'অনুমোদন অপেক্ষমান', value: stats.submitted, color: 'text-amber-700' },
@@ -187,7 +189,7 @@ export function AdminLiveDeskPage() {
         ].map((card) => (
           <div
             key={card.label}
-            className="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-4"
+            className="p-4"
           >
             <div className="text-xs text-stone-500 dark:text-stone-400">{card.label}</div>
             <div className={`text-2xl font-extrabold mt-1 ${card.color}`}>{toBengaliNumber(card.value)}</div>
@@ -196,7 +198,7 @@ export function AdminLiveDeskPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap items-center gap-3 rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-3.5">
+      <div className="flex flex-wrap items-center gap-3 bg-stone-50/40 dark:bg-stone-900/50 p-4">
         <div className="relative flex-1 min-w-[220px]">
           <Search className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
@@ -233,23 +235,19 @@ export function AdminLiveDeskPage() {
 
       {/* Live Blogs List */}
       {isLoading ? (
-        <div className="space-y-3">
-          {[1, 2, 3].map((n) => (
-            <div key={n} className="h-28 rounded-xl bg-stone-100 dark:bg-stone-800 animate-pulse" />
-          ))}
-        </div>
+        <AdminListRowsSkeleton rows={5} />
       ) : blogs.length === 0 ? (
-        <div className="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-10 text-center text-sm text-stone-500">
+        <div className="p-10 text-center text-sm text-stone-500">
           কোনো লাইভ ব্লগ পাওয়া যায়নি।
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="divide-y divide-stone-100 dark:divide-stone-800">
           {blogs.map((blog) => {
             const eventMeta = LIVE_EVENT_TYPE_META[blog.event_type] || LIVE_EVENT_TYPE_META.general;
             return (
               <div
                 key={blog.id}
-                className="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4"
+                className="p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 hover:bg-stone-50/70 transition-colors"
               >
                 <div className="space-y-2 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
@@ -386,6 +384,7 @@ export function AdminLiveDeskPage() {
           })}
         </div>
       )}
+      </div>
 
       {/* Create Live Blog Modal */}
       {showCreateModal && (

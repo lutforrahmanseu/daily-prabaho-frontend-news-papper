@@ -214,7 +214,7 @@ export function WorkflowActionModal({
                   ? 'bg-rose-700 hover:bg-rose-800'
                   : actionType === 'approve'
                   ? 'bg-emerald-600 hover:bg-emerald-700'
-                  : 'bg-indigo-600 hover:bg-indigo-700'
+                  : 'bg-rose-700 hover:bg-rose-800'
               }`}
             >
               <Send className="w-3.5 h-3.5" />

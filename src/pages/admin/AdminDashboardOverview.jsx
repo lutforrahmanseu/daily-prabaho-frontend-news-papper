@@ -437,12 +437,12 @@ export function AdminDashboardOverview() {
 
         {/* KPI 5: Audience Engagement & Shares */}
         <MotionStaggerItem className="col-span-2 sm:col-span-1">
-          <div className="bg-white p-4 sm:p-4.5 rounded-2xl border border-stone-200 shadow-xs hover:border-purple-300 transition-all h-full flex flex-col justify-between">
+          <div className="bg-white p-4 sm:p-4.5 rounded-2xl border border-stone-200 shadow-xs hover:border-rose-300 transition-all h-full flex flex-col justify-between">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider">
                 {isBn ? 'সোশ্যাল শেয়ার' : 'Social Shares'}
               </span>
-              <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-700 flex items-center justify-center">
                 <Share2 className="w-4 h-4" />
               </div>
             </div>

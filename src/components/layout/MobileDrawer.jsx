@@ -52,7 +52,9 @@ export function MobileDrawer() {
               {isBn ? (settings?.websiteNameBn || 'দৈনিক বার্তা প্রবাহ') : (settings?.websiteNameEn || 'Daily Prabaho')}
             </h3>
             <p className="text-[11px] text-rose-800 font-medium">
-              {settings?.tagline || (isBn ? 'ডিজিটাল নিউজ ও সম্পাদকীয় প্ল্যাটফর্ম' : 'Digital News & Editorial Platform')}
+              {isBn
+                ? (settings?.tagline || 'ডিজিটাল নিউজ ও সম্পাদকীয় প্ল্যাটফর্ম')
+                : (settings?.taglineEn || (!/[\u0980-\u09FF]/.test(settings?.tagline || '') && settings?.tagline ? settings.tagline : 'Digital News & Editorial Platform'))}
             </p>
           </div>
           <button

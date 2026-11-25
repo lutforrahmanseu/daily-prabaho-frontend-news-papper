@@ -8,6 +8,7 @@ import { extractApiError, transitionArticleWorkflow } from '../../utils/apiNorma
 import { getEffectiveRole } from '../../utils/permissions.js';
 import { toBengaliNumber, formatBengaliRelativeTime } from '../../utils/bengaliFormatter.js';
 import ArticleEditorModal from '../../components/admin/ArticleEditorModal.jsx';
+import { AdminTableRowsSkeleton } from '../../components/admin/AdminSkeletons.jsx';
 import sweetAlert from '../../utils/sweetAlert.js';
 import { EDITORIAL_EASE } from '../../components/common/MotionPrimitives.jsx';
 import {
@@ -283,119 +284,98 @@ export function AdminNewsPage() {
     }
   };
 
-  // Counts for pills
-  const totalCount = apiNewsData?.pagination?.total || articles.length;
-  const publishedCount = articles.filter((a) => (a.status || 'published') === 'published').length;
-  const inReviewCount = articles.filter((a) => ['submitted', 'under_review', 'approved'].includes(a.status)).length;
-  const draftCount = articles.filter((a) => a.status === 'draft').length;
-  const scheduledCount = articles.filter((a) => a.status === 'scheduled').length;
+  // Counts for pills (single-pass memoized)
+  const { totalCount, publishedCount, inReviewCount, draftCount, scheduledCount } = useMemo(() => {
+    let published = 0;
+    let inReview = 0;
+    let draft = 0;
+    let scheduled = 0;
+    for (const a of articles) {
+      const s = a.status || 'published';
+      if (s === 'published') published += 1;
+      else if (s === 'submitted' || s === 'under_review' || s === 'approved') inReview += 1;
+      else if (s === 'draft') draft += 1;
+      else if (s === 'scheduled') scheduled += 1;
+    }
+    return {
+      totalCount: apiNewsData?.pagination?.total || articles.length,
+      publishedCount: published,
+      inReviewCount: inReview,
+      draftCount: draft,
+      scheduledCount: scheduled
+    };
+  }, [articles, apiNewsData?.pagination?.total]);
+
+  const statusTabs = useMemo(() => [
+    { key: 'all', label: isBn ? 'সকল' : 'All', count: totalCount },
+    { key: 'published', label: isBn ? 'প্রকাশিত' : 'Published', count: publishedCount },
+    { key: 'review', label: isBn ? 'পর্যালোচনায়' : 'In Review', count: inReviewCount },
+    { key: 'draft', label: isBn ? 'খসড়া' : 'Drafts', count: draftCount },
+    { key: 'scheduled', label: isBn ? 'শিডিউল্ড' : 'Scheduled', count: scheduledCount }
+  ], [isBn, totalCount, publishedCount, inReviewCount, draftCount, scheduledCount]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
+      {/* Unified Single Card Container */}
+      <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs overflow-hidden divide-y divide-stone-100 dark:divide-stone-800">
 
-      {/* 1. Header Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-stone-200 shadow-xs">
-        <div>
-          <h1 className="text-2xl font-black font-serif-bn text-stone-900 tracking-tight">
-            {isBn ? 'সংবাদ ব্যবস্থাপনা ও কনটেন্ট সিএমএস' : 'News Management & Content CMS'}
-          </h1>
-          <p className="text-xs text-stone-500 mt-0.5">
-            {isBn
-              ? 'ফিল্টারিং, বাল্ক একশন, রিচ-টেক্সট এডিটিং এবং প্রকাশনা ট্র্যাকিং'
-              : 'Filtering, bulk actions, rich-text editing and publication tracking'}
-          </p>
+        {/* 1. Header Section */}
+        <div className="flex flex-wrap items-center justify-between gap-4 p-5">
+          <div>
+            <h1 className="text-xl sm:text-2xl font-black font-serif-bn text-stone-900 dark:text-stone-100 tracking-tight">
+              {isBn ? 'সংবাদ ব্যবস্থাপনা' : 'News Management'}
+            </h1>
+            <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
+              {isBn
+                ? 'সংবাদ তৈরি, সম্পাদনা, পর্যালোচনা ও প্রকাশনা পরিচালনা'
+                : 'Create, edit, review, and publish news articles'}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleCreate}
+            className="px-4 py-2 rounded-xl bg-rose-700 hover:bg-rose-800 text-white text-xs font-bold flex items-center gap-2 shadow-xs transition-colors cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>{isBn ? 'নতুন সংবাদ' : 'New Article'}</span>
+          </button>
         </div>
 
-        <button
-          type="button"
-          onClick={handleCreate}
-          className="px-4 py-2.5 rounded-xl bg-rose-700 hover:bg-rose-800 text-white text-xs font-bold flex items-center gap-2 shadow-sm transition-colors cursor-pointer"
-        >
-          <Plus className="w-4 h-4" />
-          <span>{isBn ? 'নতুন সংবাদ প্রকাশ করুন' : 'Create New Article'}</span>
-        </button>
-      </div>
+        {/* 2. Status Tabs + Filter Toolbar Section */}
+        <div className="p-4 bg-stone-50/40 dark:bg-stone-900/50 space-y-3">
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
+          {statusTabs.map((tab) => {
+            const active = statusFilter === tab.key;
+            return (
+              <button
+                key={tab.key}
+                type="button"
+                onClick={() => { setStatusFilter(tab.key); setCurrentPage(1); }}
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer border flex items-center gap-1.5 ${
+                  active
+                    ? 'bg-rose-50 dark:bg-rose-950/50 border-rose-300 dark:border-rose-800 text-rose-800 dark:text-rose-200 font-bold'
+                    : 'bg-stone-50 dark:bg-stone-800/60 border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 hover:border-stone-300 dark:hover:border-stone-600'
+                }`}
+              >
+                <span>{tab.label}</span>
+                <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
+                  active
+                    ? 'bg-rose-100 dark:bg-rose-900/70 text-rose-800 dark:text-rose-200'
+                    : 'bg-stone-200/70 dark:bg-stone-700 text-stone-600 dark:text-stone-300'
+                }`}>
+                  {isBn ? toBengaliNumber(tab.count) : tab.count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
 
-      {/* 2. Status Metric Filter Pills */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-        <button
-          type="button"
-          onClick={() => { setStatusFilter('all'); setCurrentPage(1); }}
-          className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${statusFilter === 'all'
-              ? 'bg-stone-900 text-white border-stone-900 shadow-xs'
-              : 'bg-white border-stone-200 text-stone-700 hover:border-stone-300'
-            }`}
-        >
-          <p className="text-[11px] font-semibold opacity-75">{isBn ? 'সর্বমোট সংবাদ' : 'All Articles'}</p>
-          <p className="text-xl font-extrabold font-serif-bn mt-0.5">
-            {isBn ? `${toBengaliNumber(totalCount)}টি` : `${totalCount}`}
-          </p>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => { setStatusFilter('published'); setCurrentPage(1); }}
-          className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${statusFilter === 'published'
-              ? 'bg-emerald-700 text-white border-emerald-700 shadow-xs'
-              : 'bg-white border-stone-200 text-stone-700 hover:border-emerald-300'
-            }`}
-        >
-          <p className="text-[11px] font-semibold opacity-75">{isBn ? 'প্রকাশিত (Live)' : 'Published (Live)'}</p>
-          <p className="text-xl font-extrabold font-serif-bn mt-0.5 text-emerald-600">
-            {isBn ? `${toBengaliNumber(publishedCount)}টি` : `${publishedCount}`}
-          </p>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => { setStatusFilter('review'); setCurrentPage(1); }}
-          className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${statusFilter === 'review'
-              ? 'bg-amber-600 text-white border-amber-600 shadow-xs'
-              : 'bg-white border-stone-200 text-stone-700 hover:border-amber-300'
-            }`}
-        >
-          <p className="text-[11px] font-semibold opacity-75">{isBn ? 'পর্যালোচনায় (Review)' : 'In Review'}</p>
-          <p className={`text-xl font-extrabold font-serif-bn mt-0.5 ${statusFilter === 'review' ? 'text-white' : 'text-amber-600'}`}>
-            {isBn ? `${toBengaliNumber(inReviewCount)}টি` : `${inReviewCount}`}
-          </p>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => { setStatusFilter('draft'); setCurrentPage(1); }}
-          className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${statusFilter === 'draft'
-              ? 'bg-stone-700 text-white border-stone-700 shadow-xs'
-              : 'bg-white border-stone-200 text-stone-700 hover:border-stone-300'
-            }`}
-        >
-          <p className="text-[11px] font-semibold opacity-75">{isBn ? 'খসড়া (Draft)' : 'Drafts'}</p>
-          <p className="text-xl font-extrabold font-serif-bn mt-0.5 text-stone-600">
-            {isBn ? `${toBengaliNumber(draftCount)}টি` : `${draftCount}`}
-          </p>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => { setStatusFilter('scheduled'); setCurrentPage(1); }}
-          className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${statusFilter === 'scheduled'
-              ? 'bg-blue-700 text-white border-blue-700 shadow-xs'
-              : 'bg-white border-stone-200 text-stone-700 hover:border-blue-300'
-            }`}
-        >
-          <p className="text-[11px] font-semibold opacity-75">{isBn ? 'শিডিউল্ড (Scheduled)' : 'Scheduled'}</p>
-          <p className="text-xl font-extrabold font-serif-bn mt-0.5 text-blue-600">
-            {isBn ? `${toBengaliNumber(scheduledCount)}টি` : `${scheduledCount}`}
-          </p>
-        </button>
-      </div>
-
-      {/* 3. Search and Multi-Filter Controls */}
-      <div className="bg-white p-4 rounded-2xl border border-stone-200 space-y-3">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-2.5">
 
           {/* Text Search */}
           <div className="relative flex-1 min-w-[220px] max-w-md">
-            <Search className="w-4 h-4 absolute left-3.5 top-3 text-stone-400" />
+            <Search className="w-4 h-4 absolute left-3 top-2.5 text-stone-400" />
             <input
               type="text"
               value={tableSearch}
@@ -403,8 +383,8 @@ export function AdminNewsPage() {
                 setTableSearch(e.target.value);
                 setCurrentPage(1);
               }}
-              placeholder={isBn ? 'শিরোনাম, প্রতিবেদক বা কিওয়ার্ড দিয়ে খুঁজুন...' : 'Search by headline, reporter or keyword...'}
-              className="w-full pl-9 pr-9 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-rose-500 focus:bg-white"
+              placeholder={isBn ? 'শিরোনাম বা প্রতিবেদক খুঁজুন...' : 'Search headline or reporter...'}
+              className="w-full pl-9 pr-8 py-1.5 bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl text-xs text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-rose-500/40"
             />
             {tableSearch && (
               <button
@@ -413,7 +393,7 @@ export function AdminNewsPage() {
                   setTableSearch('');
                   setCurrentPage(1);
                 }}
-                className="absolute right-3 top-2.5 text-stone-400 hover:text-stone-600 p-0.5 cursor-pointer"
+                className="absolute right-2.5 top-2 text-stone-400 hover:text-stone-600 p-0.5 cursor-pointer"
                 title={isBn ? 'অনুসন্ধান মুছুন' : 'Clear search'}
               >
                 <X className="w-3.5 h-3.5" />
@@ -423,78 +403,55 @@ export function AdminNewsPage() {
 
           {/* Filters: Category & Date */}
           <div className="flex flex-wrap items-center gap-2">
-
-            {/* Category Dropdown */}
-            <div className="flex items-center gap-1.5 bg-stone-50 border border-stone-200 px-3 py-1.5 rounded-xl text-xs">
-              <Filter className="w-3.5 h-3.5 text-stone-500" />
+            <div className="flex items-center gap-1.5 bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 px-2.5 py-1.5 rounded-xl text-xs">
+              <Filter className="w-3.5 h-3.5 text-stone-500 dark:text-stone-400" />
               <select
                 value={categoryFilter}
                 onChange={(e) => {
                   setCategoryFilter(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="bg-transparent font-semibold text-stone-700 focus:outline-none cursor-pointer"
+                className="bg-transparent font-semibold text-stone-700 dark:text-stone-200 focus:outline-none cursor-pointer"
               >
-                <option value="all">{isBn ? 'সকল বিভাগ (All Categories)' : 'All Categories'}</option>
+                <option value="all">{isBn ? 'সকল বিভাগ' : 'All Categories'}</option>
                 {categoriesList.map((cat) => (
                   <option key={cat.id || cat.slug} value={cat.slug}>
-                    {isBn ? `${cat.name} (${cat.nameEn})` : `${cat.nameEn || cat.name}`}
+                    {isBn ? cat.name : (cat.nameEn || cat.name)}
                   </option>
                 ))}
               </select>
             </div>
 
-            {/* Date Filter Dropdown */}
-            <div className="flex items-center gap-1.5 bg-stone-50 border border-stone-200 px-3 py-1.5 rounded-xl text-xs">
-              <Calendar className="w-3.5 h-3.5 text-stone-500" />
+            <div className="flex items-center gap-1.5 bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 px-2.5 py-1.5 rounded-xl text-xs">
+              <Calendar className="w-3.5 h-3.5 text-stone-500 dark:text-stone-400" />
               <select
                 value={dateFilter}
                 onChange={(e) => {
                   setDateFilter(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="bg-transparent font-semibold text-stone-700 focus:outline-none cursor-pointer"
+                className="bg-transparent font-semibold text-stone-700 dark:text-stone-200 focus:outline-none cursor-pointer"
               >
-                <option value="all">{isBn ? 'সকল সময়কাল (All Dates)' : 'All Dates'}</option>
-                <option value="today">{isBn ? 'আজকের সংবাদ (Today)' : 'Today'}</option>
-                <option value="this_week">{isBn ? 'গত ৭ দিন (This Week)' : 'Last 7 Days'}</option>
-                <option value="this_month">{isBn ? 'এই মাস (This Month)' : 'This Month'}</option>
-                <option value="custom">{isBn ? 'নির্দিষ্ট সময়সীমা (Custom Range)' : 'Custom Range'}</option>
+                <option value="all">{isBn ? 'সকল সময়কাল' : 'All Dates'}</option>
+                <option value="today">{isBn ? 'আজ' : 'Today'}</option>
+                <option value="this_week">{isBn ? 'গত ৭ দিন' : 'Last 7 Days'}</option>
+                <option value="this_month">{isBn ? 'এই মাস' : 'This Month'}</option>
+                <option value="custom">{isBn ? 'নির্দিষ্ট তারিখ' : 'Custom Range'}</option>
               </select>
             </div>
 
-            {/* Page Size Selector */}
-            <div className="flex items-center gap-1 text-xs text-stone-500 bg-stone-50 border border-stone-200 px-2.5 py-1.5 rounded-xl">
-              <span>{isBn ? 'প্রতি পেজে:' : 'Per page:'}</span>
-              <select
-                value={pageSize}
-                onChange={(e) => {
-                  setPageSize(Number(e.target.value));
-                  setCurrentPage(1);
-                }}
-                className="bg-transparent font-bold text-stone-800 focus:outline-none cursor-pointer"
-              >
-                <option value={10}>{isBn ? '১০টি' : '10'}</option>
-                <option value={20}>{isBn ? '২০টি' : '20'}</option>
-                <option value={50}>{isBn ? '৫০টি' : '50'}</option>
-              </select>
-            </div>
-
-            {/* Reset Filters Quick Button */}
             {isFiltered && (
               <button
                 type="button"
                 onClick={resetAllFilters}
-                className="flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition-colors cursor-pointer"
-                title={isBn ? 'সকল ফিল্টার মুছুন ও পূর্ণ তালিকা দেখুন' : 'Reset all filters'}
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 border border-rose-200 dark:border-rose-800 transition-colors cursor-pointer"
+                title={isBn ? 'ফিল্টার রিসেট' : 'Reset filters'}
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>{isBn ? 'রিসেট' : 'Reset'}</span>
               </button>
             )}
-
           </div>
-
         </div>
 
         {/* Custom Date Range Row if selected */}
@@ -596,8 +553,8 @@ export function AdminNewsPage() {
         )}
       </AnimatePresence>
 
-      {/* 5. News Table with Bulk Checkboxes */}
-      <div className="bg-white rounded-2xl border border-stone-200 shadow-xs overflow-hidden">
+      {/* 5. News Table with Bulk Checkboxes (inside the same unified card) */}
+      <div>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs sm:text-sm">
             <thead className="bg-stone-50 border-b border-stone-200 text-stone-600 font-semibold uppercase tracking-wider text-[11px]">
@@ -629,16 +586,9 @@ export function AdminNewsPage() {
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-stone-100">
+            <tbody className="divide-y divide-stone-100 dark:divide-stone-800">
               {isNewsLoading ? (
-                <tr>
-                  <td colSpan={8} className="py-16 text-center text-stone-400 text-xs">
-                    <span className="inline-flex items-center gap-2">
-                      <Loader2 className="w-4 h-4 animate-spin text-rose-700" />
-                      <span>সংবাদ তালিকা লোড হচ্ছে...</span>
-                    </span>
-                  </td>
-                </tr>
+                <AdminTableRowsSkeleton rows={6} colSpan={8} />
               ) : paginatedArticles.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="py-16 text-center text-stone-500 text-xs">
@@ -920,6 +870,7 @@ export function AdminNewsPage() {
             </button>
           </div>
         </div>
+      </div>
       </div>
 
       {/* Complete Article Editor Modal */}

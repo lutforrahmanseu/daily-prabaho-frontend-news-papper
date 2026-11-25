@@ -318,9 +318,10 @@ export function AdminEpaperPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
+      <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs overflow-hidden divide-y divide-stone-100 dark:divide-stone-800">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 p-5">
         <div>
           <h1 className="text-xl sm:text-2xl font-extrabold text-stone-900 font-serif-bn flex items-center gap-2">
             <Newspaper className="w-6 h-6 text-rose-700" />
@@ -378,8 +379,8 @@ export function AdminEpaperPage() {
       </div>
 
       {/* KPI Metrics Row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-4 rounded-2xl bg-white border border-stone-200 shadow-2xs">
+      <div className="grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x divide-stone-100 dark:divide-stone-800 bg-stone-50/40 dark:bg-stone-900/40">
+        <div className="p-4">
           <p className="text-xs text-stone-500">মোট সংস্করণ</p>
           <p className="text-2xl font-extrabold text-stone-900 mt-1">
             {toBengaliNumber(summary.total_editions || 0)}
@@ -388,7 +389,7 @@ export function AdminEpaperPage() {
             প্রকাশিত: {toBengaliNumber(summary.published_editions || 0)}
           </p>
         </div>
-        <div className="p-4 rounded-2xl bg-white border border-stone-200 shadow-2xs">
+        <div className="p-4">
           <p className="text-xs text-stone-500">মোট ই-পেপার পৃষ্ঠা</p>
           <p className="text-2xl font-extrabold text-stone-900 mt-1">
             {toBengaliNumber(summary.total_pages || 0)}
@@ -397,14 +398,14 @@ export function AdminEpaperPage() {
             সর্বশেষ সংখ্যা: {summary.latest_publication_date || '—'}
           </p>
         </div>
-        <div className="p-4 rounded-2xl bg-white border border-stone-200 shadow-2xs">
+        <div className="p-4">
           <p className="text-xs text-stone-500">মোট পঠন / ভিউ</p>
           <p className="text-2xl font-extrabold text-stone-900 mt-1">
             {toBengaliNumber(summary.total_views || 0)}
           </p>
           <p className="text-[11px] text-stone-500 mt-0.5">নিরাপদ PDF স্ট্রিম</p>
         </div>
-        <div className="p-4 rounded-2xl bg-white border border-stone-200 shadow-2xs">
+        <div className="p-4">
           <p className="text-xs text-stone-500">মোট PDF ডাউনলোড</p>
           <p className="text-2xl font-extrabold text-stone-900 mt-1">
             {toBengaliNumber(summary.total_downloads || 0)}
@@ -1039,6 +1040,7 @@ export function AdminEpaperPage() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

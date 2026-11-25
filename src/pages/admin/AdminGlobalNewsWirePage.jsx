@@ -788,7 +788,7 @@ export function AdminGlobalNewsWirePage() {
   };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-12 font-sans">
+    <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs p-5 sm:p-6 space-y-6 font-sans">
       
       {/* 1. Header Banner Synced with Standard CMS Card Styling */}
       <div className="bg-white rounded-2xl border border-stone-200 text-stone-900 p-6 sm:p-7 shadow-xs relative overflow-hidden">
@@ -1153,12 +1153,8 @@ export function AdminGlobalNewsWirePage() {
                 const isPublished = item.status === 'published';
                 const hasImage = Boolean(item.featured_image || item.imageUrl);
                 return (
-                  <motion.div
+                  <div
                     key={item.id}
-                    layout
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.15 }}
                     className="p-3 sm:p-4 hover:bg-blue-50/30 transition-colors flex items-center gap-3 sm:gap-4 group cursor-pointer"
                   >
                     {/* 1. Thumbnail or Agency Icon */}
@@ -1299,7 +1295,7 @@ export function AdminGlobalNewsWirePage() {
                         </button>
                       </div>
                     </div>
-                  </motion.div>
+                  </div>
                 );
               })}
             </div>
@@ -1309,12 +1305,8 @@ export function AdminGlobalNewsWirePage() {
               {filteredItems.map((item) => {
                 const isPublished = item.status === 'published';
                 return (
-                  <motion.div
+                  <div
                     key={item.id}
-                    layout
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.2, ease: EDITORIAL_EASE }}
                     className="bg-white rounded-3xl border border-stone-200 p-5 sm:p-6 shadow-xs hover:border-blue-400/80 transition-all space-y-4"
                   >
                     {/* Top Agency Badge & Timestamps */}
@@ -1491,7 +1483,7 @@ export function AdminGlobalNewsWirePage() {
 
                     </div>
 
-                  </motion.div>
+                  </div>
                 );
               })}
             </div>

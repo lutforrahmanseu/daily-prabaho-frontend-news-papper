@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { Camera, ArrowRight, Sparkles, Image as ImageIcon } from 'lucide-react';
+import { Camera, ArrowRight, Image as ImageIcon } from 'lucide-react';
 import { useGetPublicPhotoCollectionsQuery } from '../../store/api/multimediaApi.js';
 import { toBengaliNumber } from '../../utils/bengaliFormatter.js';
 import { EditorialReveal } from '../common/MotionPrimitives.jsx';
@@ -51,9 +51,8 @@ export function VisualShowcaseSection({ fallbackArticles = [] }) {
                 <h2 className="text-xl sm:text-2xl font-black font-serif-bn tracking-tight text-stone-950">
                   {isBn ? 'ছবিতে আজকের বাংলাদেশ ও বিশ্ব' : 'Visual Stories & Photojournalism'}
                 </h2>
-                <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 text-[10px] font-bold font-mono">
-                  <Sparkles className="w-2.5 h-2.5 text-rose-600" />
-                  <span>ফটোগ্যালারি</span>
+                <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 text-[10px] font-bold">
+                  <span>{isBn ? 'ফটোগ্যালারি' : 'Photo Gallery'}</span>
                 </span>
               </div>
               <p className="text-xs sm:text-sm text-stone-600 font-serif-bn mt-0.5">

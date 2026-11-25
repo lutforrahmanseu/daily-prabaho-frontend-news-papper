@@ -31,7 +31,7 @@ export function HomePage() {
   const politicsNews = articles.filter((a) => a.category === 'politics');
   const worldNews = articles.filter((a) => a.category === 'international');
   const businessNews = articles.filter((a) => a.category === 'economy');
-  const sportsNews = articles.filter((a) => a.category === 'sports');
+  const sportsNews = articles.filter((a) => a.category === 'sports' || a.category === 'cricket' || a.category === 'football');
   const entertainmentNews = articles.filter((a) => a.category === 'entertainment');
   const techNews = articles.filter((a) => a.category === 'technology');
   const lifestyleNews = articles.filter((a) => a.category === 'lifestyle');

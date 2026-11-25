@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { AdminPageSkeleton } from '../../components/admin/AdminSkeletons.jsx';
 import { useSelector } from 'react-redux';
 import {
   useGetRolesQuery,
@@ -175,12 +176,7 @@ export function AdminRolesPage() {
   };
 
   if (isRolesLoading || isPermsLoading) {
-    return (
-      <div className="bg-white rounded-2xl border border-stone-200 p-12 text-center text-stone-500">
-        <Loader2 className="w-6 h-6 animate-spin text-rose-700 mx-auto mb-2" />
-        <p className="text-xs font-semibold">ভূমিকা ও অনুমতি ম্যাট্রিক্স লোড হচ্ছে...</p>
-      </div>
-    );
+    return <AdminPageSkeleton />;
   }
 
   return (

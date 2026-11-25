@@ -13,7 +13,9 @@ export function SearchModal() {
   const { searchModalOpen, language } = useSelector((state) => state.ui);
   const isBn = language === 'bn';
 
-  const trendingTags = ['মেট্রোরেল', 'ক্রিকেট', 'পদ্মা সেতু', 'স্টার্টআপ', 'নির্বাচন', 'কক্সবাজার'];
+  const trendingTags = isBn
+    ? ['মেট্রোরেল', 'ক্রিকেট', 'পদ্মা সেতু', 'স্টার্টআপ', 'নির্বাচন', 'কক্সবাজার']
+    : ['Metro Rail', 'Cricket', 'Padma Bridge', 'Startups', 'Election', 'Cox’s Bazar'];
 
   const handleClose = () => {
     dispatch(setSearchModalOpen(false));

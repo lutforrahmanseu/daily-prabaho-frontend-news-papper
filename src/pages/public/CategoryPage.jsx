@@ -135,7 +135,7 @@ export function CategoryPage() {
 
   const pageTitle = subcategoryTitle
     ? `${subcategoryTitle} - ${categoryTitle}`
-    : `${categoryTitle} বিভাগ`;
+    : (isBn ? `${categoryTitle} বিভাগ` : `${categoryTitle} News`);
 
   return (
     <>

@@ -28,7 +28,10 @@ export function Footer() {
     String(value).replace(/[০-৯]/g, (digit) => '০১২৩৪৫৬৭৮৯'.indexOf(digit));
   const hasBengaliText = (value = '') => /[\u0980-\u09FF]/.test(String(value));
 
-  const tagline = settings?.tagline || (isBn ? 'ডিজিটাল নিউজ ও সম্পাদকীয় প্ল্যাটফর্ম' : 'Digital News & Editorial Platform');
+  const rawTagline = settings?.tagline || '';
+  const tagline = isBn
+    ? (rawTagline || 'ডিজিটাল নিউজ ও সম্পাদকীয় প্ল্যাটফর্ম')
+    : (settings?.taglineEn || (!hasBengaliText(rawTagline) && rawTagline ? rawTagline : 'Digital News & Editorial Platform'));
   const rawAddress = settings?.publisherAddress || settings?.contactAddress || 'নিকুঞ্জ-২, খিলক্ষেত, ঢাকা, বাংলাদেশ।';
   const address = isBn
     ? rawAddress

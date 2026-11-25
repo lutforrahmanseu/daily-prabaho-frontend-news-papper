@@ -7,6 +7,7 @@ import { usePublicArticles } from '../../hooks/usePortalData.js';
 import { formatBengaliRelativeTime, toBengaliNumber } from '../../utils/bengaliFormatter.js';
 import { Clock, Bookmark, ChevronRight, Newspaper } from 'lucide-react';
 import { EDITORIAL_EASE, SPRING_SNAPPY, EditorialReveal } from '../common/MotionPrimitives.jsx';
+import { NewsGridSkeleton } from '../common/NewsSkeletons.jsx';
 
 export function LatestNewsGrid() {
   const dispatch = useDispatch();
@@ -15,7 +16,7 @@ export function LatestNewsGrid() {
   const { savedArticleIds } = useSelector((state) => state.news);
 
   const [filterCategory, setFilterCategory] = useState('all');
-  const { articles } = usePublicArticles(
+  const { articles, isLoading, isFetching } = usePublicArticles(
     filterCategory === 'all' ? { per_page: 12 } : { category: filterCategory, per_page: 12 }
   );
   const isBn = language === 'bn';
@@ -45,7 +46,7 @@ export function LatestNewsGrid() {
           <span className="w-2.5 h-6 bg-rose-700 inline-block rounded-xs"></span>
           <h2 className="text-xl sm:text-2xl font-black text-stone-900 font-serif-bn tracking-tight flex items-center gap-2">
             <Clock className="w-5 h-5 text-rose-700" />
-            <span>{isBn ? 'সর্বশেষ সংবাদ গ্রিড' : 'Latest News Grid'}</span>
+            <span>{isBn ? 'সর্বশেষ সংবাদ' : 'Latest News'}</span>
           </h2>
         </div>
 
@@ -79,15 +80,18 @@ export function LatestNewsGrid() {
       </div>
 
       {/* Grid of Latest Stories */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={filterCategory}
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -4 }}
-          transition={{ duration: 0.2, ease: EDITORIAL_EASE }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"
-        >
+      {(isLoading || isFetching) && displayArticles.length === 0 ? (
+        <NewsGridSkeleton count={6} />
+      ) : (
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={filterCategory}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.2, ease: EDITORIAL_EASE }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"
+          >
           {displayArticles.map((story, idx) => {
             const isBookmarked = savedArticleIds.includes(story.id);
             const title = isBn ? story.title : (story.titleEn || story.title);
@@ -160,7 +164,8 @@ export function LatestNewsGrid() {
           );
         })}
         </motion.div>
-      </AnimatePresence>
+        </AnimatePresence>
+      )}
     </EditorialReveal>
   );
 }

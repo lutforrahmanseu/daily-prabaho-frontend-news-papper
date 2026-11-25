@@ -1,5 +1,6 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import TopUtilityBar from '../components/layout/TopUtilityBar.jsx';
 import Header from '../components/layout/Header.jsx';
 import Navbar from '../components/layout/Navbar.jsx';
@@ -14,13 +15,16 @@ import ArticleDetailModal from '../components/news/ArticleDetailModal.jsx';
  * Public Website Shell Layout
  */
 export function PublicLayout({ children }) {
+  const language = useSelector((state) => state.ui?.language || 'bn');
+  const isBn = language === 'bn';
+
   return (
-    <div className="min-h-screen bg-[#ffffff] text-[#111827] flex flex-col antialiased">
+    <div className="min-h-screen bg-[#ffffff] dark:bg-[#0b0f19] text-[#111827] dark:text-stone-100 flex flex-col antialiased transition-colors duration-200">
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:px-4 focus:py-2 focus:bg-[#B91C1C] focus:text-white focus:rounded-md focus:shadow-lg focus:font-semibold focus:text-sm"
       >
-        মূল সংবাদে যান
+        {isBn ? 'মূল সংবাদে যান' : 'Skip to main content'}
       </a>
 
       {/* 1. Top Utility Ribbon */}

@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { AdminListRowsSkeleton } from '../../components/admin/AdminSkeletons.jsx';
 import {
   useGetTagsQuery,
   useCreateTagMutation,
@@ -191,7 +192,7 @@ export function AdminTagsPage() {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs p-5 sm:p-6 space-y-6">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-stone-200 shadow-xs">
         <div>
@@ -229,9 +230,8 @@ export function AdminTagsPage() {
 
       {/* Table */}
       {isLoading ? (
-        <div className="bg-white rounded-2xl border border-stone-200 p-12 flex items-center justify-center gap-2 text-xs text-stone-500">
-          <Loader2 className="w-4 h-4 animate-spin text-rose-700" />
-          <span>ট্যাগ তালিকা লোড হচ্ছে...</span>
+        <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 overflow-hidden">
+          <AdminListRowsSkeleton rows={6} />
         </div>
       ) : (
         <Table

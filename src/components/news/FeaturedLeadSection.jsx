@@ -6,17 +6,18 @@ import { toggleBookmark } from '../../store/newsSlice.js';
 import { useFeaturedArticles, usePublicArticles } from '../../hooks/usePortalData.js';
 import { useGetActiveExperimentsQuery, useTrackExperimentEventMutation } from '../../store/api/analyticsApi.js';
 import { canSendClientAnalyticsTelemetry } from '../../utils/analyticsHelpers.js';
-import { formatBengaliRelativeTime, calculateReadingTime, toBengaliNumber } from '../../utils/bengaliFormatter.js';
-import { Clock, Bookmark, Share2, Sparkles } from 'lucide-react';
+import { formatBengaliRelativeTime, formatEnglishRelativeTime, calculateReadingTime, calculateEnglishReadingTime, toBengaliNumber } from '../../utils/bengaliFormatter.js';
+import { Clock, Bookmark, Share2, Newspaper } from 'lucide-react';
 import { EDITORIAL_EASE } from '../common/MotionPrimitives.jsx';
+import { FeaturedLeadSkeleton } from '../common/NewsSkeletons.jsx';
 
 export function FeaturedLeadSection() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { language } = useSelector((state) => state.ui);
   const { savedArticleIds } = useSelector((state) => state.news);
-  const { articles: featuredList } = useFeaturedArticles({ limit: 6 });
-  const { articles: recentList } = usePublicArticles({ per_page: 12 });
+  const { articles: featuredList, isLoading: featuredLoading } = useFeaturedArticles({ limit: 6 });
+  const { articles: recentList, isLoading: recentLoading } = usePublicArticles({ per_page: 12 });
   const { data: activeExpPayload } = useGetActiveExperimentsQuery();
   const [trackExperimentEvent] = useTrackExperimentEventMutation();
   const trackedLayoutRef = useRef(null);
@@ -61,6 +62,11 @@ export function FeaturedLeadSection() {
   };
 
   const articles = featuredList.length > 0 ? featuredList : recentList;
+  const isInitialLoading = (featuredLoading || recentLoading) && articles.length === 0;
+
+  if (isInitialLoading) {
+    return <FeaturedLeadSkeleton />;
+  }
 
   const isBn = language === 'bn';
 
@@ -103,12 +109,12 @@ export function FeaturedLeadSection() {
         <div className="flex items-center gap-2.5">
           <span className="w-2.5 h-6 bg-rose-700 inline-block rounded-xs"></span>
           <h2 className="text-xl sm:text-2xl font-black text-stone-900 font-serif-bn tracking-tight flex items-center gap-2">
-            <span>{isBn ? 'প্রধান ও নির্বাচিত সংবাদ' : 'Featured & Top Headlines'}</span>
+            <span>{isBn ? 'প্রধান সংবাদ' : 'Top Stories'}</span>
           </h2>
         </div>
-        <div className="flex items-center gap-1.5 text-xs text-rose-700 font-semibold">
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>{isBn ? 'শীর্ষ সম্পাদকীয় নির্বাচন' : 'Editorial Selection'}</span>
+        <div className="flex items-center gap-1.5 text-xs text-stone-600 font-semibold">
+          <Newspaper className="w-3.5 h-3.5 text-rose-700" />
+          <span>{isBn ? 'আজকের সংস্করণ' : "Today's Edition"}</span>
         </div>
       </div>
 
@@ -151,12 +157,12 @@ export function FeaturedLeadSection() {
                   <span>{isBn ? leadStory.categoryName : (leadStory.categoryNameEn || leadStory.categoryName)}</span>
                   <span className="text-stone-400 font-bold" aria-hidden="true">·</span>
                   <span className="text-stone-700 font-semibold text-xs">
-                    {isBn ? formatBengaliRelativeTime(leadStory.publishedAt) : 'Recently'}
+                    {isBn ? formatBengaliRelativeTime(leadStory.publishedAt) : formatEnglishRelativeTime(leadStory.publishedAt)}
                   </span>
                   <span className="text-stone-400 font-bold" aria-hidden="true">·</span>
                   <span className="text-stone-700 font-semibold text-xs flex items-center gap-1">
                     <Clock className="w-3.5 h-3.5 text-rose-600" />
-                    {isBn ? calculateReadingTime(leadStory.content) : '4 min read'}
+                    {isBn ? calculateReadingTime(leadStory.content) : calculateEnglishReadingTime(leadStory.content)}
                   </span>
                 </div>
 
@@ -181,7 +187,7 @@ export function FeaturedLeadSection() {
                   </div>
                   <div>
                     <h4 className="text-xs font-bold text-stone-900">
-                      {leadStory.author}
+                      {isBn ? leadStory.author : (leadStory.authorEn || leadStory.author)}
                     </h4>
                     <p className="text-xs text-stone-600 font-medium">
                       {leadStory.authorRole}
@@ -228,7 +234,7 @@ export function FeaturedLeadSection() {
             const title = variantTitle || (isBn ? story.title : (story.titleEn || story.title));
             const excerpt = isBn ? story.excerpt : (story.excerptEn || story.excerpt);
             const categoryName = isBn ? story.categoryName : (story.categoryNameEn || story.categoryName);
-            const timeAgo = isBn ? formatBengaliRelativeTime(story.publishedAt) : 'Recently';
+            const timeAgo = isBn ? formatBengaliRelativeTime(story.publishedAt) : formatEnglishRelativeTime(story.publishedAt);
 
             return (
               <motion.article
@@ -265,7 +271,7 @@ export function FeaturedLeadSection() {
                   </div>
 
                   <div className="pt-2 border-t border-stone-100 flex items-center justify-between text-xs text-stone-500 mt-2">
-                    <span className="text-[11px] font-medium text-stone-700">{story.author}</span>
+                    <span className="text-[11px] font-medium text-stone-700">{isBn ? story.author : (story.authorEn || story.author)}</span>
                     <motion.button
                       whileTap={{ scale: 0.85 }}
                       type="button"

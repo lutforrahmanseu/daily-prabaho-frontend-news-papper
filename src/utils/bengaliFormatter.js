@@ -55,6 +55,43 @@ export function formatBengaliRelativeTime(dateString, currentDate = new Date()) 
 }
 
 /**
+ * Formats relative time in English (e.g. "5 min ago", "2 hours ago")
+ * @param {string|Date} dateString
+ * @param {Date} [currentDate]
+ * @returns {string}
+ */
+export function formatEnglishRelativeTime(dateString, currentDate = new Date()) {
+  if (!dateString) return 'Just now';
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return 'Just now';
+  const diffInSeconds = Math.floor((currentDate.getTime() - date.getTime()) / 1000);
+
+  if (diffInSeconds < 60) return 'Just now';
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  if (diffInMinutes < 60) return `${diffInMinutes} min ago`;
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  if (diffInHours < 24) return `${diffInHours} hr ago`;
+  const diffInDays = Math.floor(diffInHours / 24);
+  if (diffInDays < 30) return `${diffInDays}d ago`;
+  const diffInMonths = Math.floor(diffInDays / 30);
+  if (diffInMonths < 12) return `${diffInMonths}mo ago`;
+  const diffInYears = Math.floor(diffInDays / 365);
+  return `${diffInYears}y ago`;
+}
+
+/**
+ * Estimates reading time in English
+ * @param {string} text
+ * @returns {string}
+ */
+export function calculateEnglishReadingTime(text) {
+  if (!text) return '1 min read';
+  const words = text.trim().split(/\s+/).length;
+  const minutes = Math.max(1, Math.ceil(words / 200));
+  return `${minutes} min read`;
+}
+
+/**
  * Estimates reading time in Bengali
  * @param {string} text 
  * @returns {string}

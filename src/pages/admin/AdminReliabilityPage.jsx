@@ -241,7 +241,7 @@ export function AdminReliabilityPage() {
             <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-semibold text-stone-500 flex items-center gap-1.5">
-                  <Layers className="w-4 h-4 text-purple-600" aria-hidden="true" />
+                  <Layers className="w-4 h-4 text-rose-600" aria-hidden="true" />
                   জব কিউ (Queue)
                 </span>
                 <StatusBadge

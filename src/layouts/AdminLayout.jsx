@@ -1,9 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useCallback, Suspense } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
+import { AdminPageSkeleton } from '../components/admin/AdminSkeletons.jsx';
 import { useDispatch, useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'motion/react';
 import { markAllNotificationsRead, addAuditLog } from '../store/adminSlice.js';
-import { toggleLanguage } from '../store/uiSlice.js';
+import { toggleLanguage, toggleTheme } from '../store/uiSlice.js';
 import { logout } from '../store/authSlice.js';
 import { useLogoutMutation } from '../store/api/authApi.js';
 import { useGetAdminNewsListQuery } from '../store/api/newsApi.js';
@@ -46,6 +47,7 @@ import {
   History,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   Menu,
   X,
   Bell,
@@ -63,7 +65,9 @@ import {
   Wallet,
   Wand2,
   FileAudio,
-  Globe
+  Globe,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 /**
@@ -79,8 +83,9 @@ export function AdminLayout({ children }) {
 
   const authState = useSelector((state) => state.auth);
   const adminState = useSelector((state) => state.admin);
-  const { language } = useSelector((state) => state.ui || {});
+  const { language, theme } = useSelector((state) => state.ui || {});
   const isBn = language === 'bn';
+  const isDark = theme === 'dark';
   const reduxNotifications = adminState?.notifications || [];
   const currentUser = authState?.user || adminState?.currentUser || {
     name: 'অ্যাডমিন',
@@ -120,6 +125,28 @@ export function AdminLayout({ children }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [notifDropdownOpen, setNotifDropdownOpen] = useState(false);
+  const [sidebarFilter, setSidebarFilter] = useState('');
+  const [openMenuId, setOpenMenuId] = useState(() => {
+    try {
+      const saved = localStorage.getItem('dp_admin_open_menu');
+      if (saved !== null) return saved || null;
+    } catch {
+      // Ignore storage errors
+    }
+    return 'publishing';
+  });
+
+  const toggleGroup = (groupId) => {
+    setOpenMenuId((prev) => {
+      const next = prev === groupId ? null : groupId;
+      try {
+        localStorage.setItem('dp_admin_open_menu', next || '');
+      } catch {
+        // Ignore storage errors
+      }
+      return next;
+    });
+  };
 
   const userDropdownRef = useRef(null);
   const notifDropdownRef = useRef(null);
@@ -143,356 +170,420 @@ export function AdminLayout({ children }) {
     setMobileOpen(false);
   }, [location.pathname]);
 
-  const allNavItems = [
+  const allNavMenus = [
     {
+      id: 'dashboard',
       name: 'ড্যাশবোর্ড',
       nameEn: 'Dashboard',
       path: '/admin/dashboard',
       icon: LayoutDashboard,
-      requiredPermission: 'news.read',
-      badge: null
+      requiredPermission: 'news.read'
     },
     {
-      name: 'সংবাদ ব্যবস্থাপনা',
-      nameEn: 'News CMS',
-      path: '/admin/news',
+      id: 'publishing',
+      name: 'সংবাদ ও প্রকাশনা',
+      nameEn: 'Publishing',
       icon: FileText,
-      requiredPermission: 'news.read',
-      badge: pendingCount > 0 ? toBengaliNumber(pendingCount) : null,
-      badgeColor: 'bg-amber-500 text-stone-900 font-bold'
+      badge: pendingCount > 0 ? (isBn ? toBengaliNumber(pendingCount) : String(pendingCount)) : null,
+      badgeColor: 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 font-semibold',
+      submenus: [
+        {
+          name: 'সংবাদ ব্যবস্থাপনা',
+          nameEn: 'News CMS',
+          path: '/admin/news',
+          icon: FileText,
+          requiredPermission: 'news.read',
+          badge: pendingCount > 0 ? (isBn ? toBengaliNumber(pendingCount) : String(pendingCount)) : null,
+          badgeColor: 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 font-semibold'
+        },
+        {
+          name: 'সম্পাদকীয় অনুমোদন',
+          nameEn: 'Editorial Workflow',
+          path: '/admin/workflow',
+          icon: GitPullRequest,
+          requiredPermission: ['news.review', 'news.create', 'news.read'],
+          badge: isBn ? 'অনুমোদন' : 'Review',
+          badgeColor: 'bg-stone-200/80 text-stone-700 dark:bg-stone-800 dark:text-stone-300 font-medium'
+        },
+        {
+          name: 'লাইভ নিউজ ডেস্ক',
+          nameEn: 'Live Desk',
+          path: '/admin/live-desk',
+          icon: LiveDeskIcon,
+          requiredPermission: ['live.view', 'live.contribute', 'live.publish']
+        },
+        {
+          name: 'বিশেষ আয়োজন',
+          nameEn: 'Special Coverage',
+          path: '/admin/special-coverage',
+          icon: SpecialCoverageIcon,
+          requiredPermission: ['coverage.view', 'coverage.manage', 'coverage.publish']
+        },
+        {
+          name: 'ই-পেপার সংস্করণ',
+          nameEn: 'E-Paper CMS',
+          path: '/admin/epaper',
+          icon: NewsroomHubIcon,
+          requiredPermission: ['epaper.view', 'epaper.manage', 'epaper.publish']
+        }
+      ]
     },
     {
-      name: 'সম্পাদকীয় কাজের ধারা',
-      nameEn: 'Editorial Workflow',
-      path: '/admin/workflow',
-      icon: GitPullRequest,
-      requiredPermission: ['news.review', 'news.create', 'news.read'],
-      badge: 'অনুমোদন',
-      badgeColor: 'bg-indigo-600 text-white font-bold'
-    },
-    {
-      name: 'নিউজরুম কমান্ড সেন্টার',
-      nameEn: 'Newsroom Hub',
-      path: '/admin/newsroom',
+      id: 'newsroom',
+      name: 'নিউজরুম ডেস্ক',
+      nameEn: 'Newsroom Desk',
       icon: NewsroomHubIcon,
-      requiredPermission: ['assignment.view', 'assignment.manage', 'planning.manage', 'source.view', 'correction.request', 'embargo.manage']
+      submenus: [
+        {
+          name: 'নিউজরুম কমান্ড',
+          nameEn: 'Newsroom Hub',
+          path: '/admin/newsroom',
+          icon: NewsroomHubIcon,
+          requiredPermission: ['assignment.view', 'assignment.manage', 'planning.manage', 'source.view', 'correction.request', 'embargo.manage']
+        },
+        {
+          name: 'অ্যাসাইনমেন্ট বোর্ড',
+          nameEn: 'Assignments',
+          path: '/admin/newsroom/assignments',
+          icon: NewsroomBriefcaseIcon,
+          requiredPermission: ['assignment.view', 'assignment.manage']
+        },
+        {
+          name: 'বার্তাকক্ষ পরিকল্পনা',
+          nameEn: 'Editorial Planning',
+          path: '/admin/newsroom/planning',
+          icon: NewsroomCalendarIcon,
+          requiredPermission: ['planning.manage', 'assignment.view', 'assignment.manage']
+        },
+        {
+          name: 'সংবাদ উৎস',
+          nameEn: 'Source Directory',
+          path: '/admin/newsroom/sources',
+          icon: NewsroomSourceIcon,
+          requiredPermission: ['source.view', 'source.manage', 'source.confidential']
+        },
+        {
+          name: 'সংবাদ সংশোধনী',
+          nameEn: 'Corrections',
+          path: '/admin/newsroom/corrections',
+          icon: NewsroomCorrectionIcon,
+          requiredPermission: ['correction.request', 'correction.approve', 'news.review']
+        },
+        {
+          name: 'এমবার্গো নিয়ন্ত্রণ',
+          nameEn: 'Embargoes',
+          path: '/admin/newsroom/embargoes',
+          icon: NewsroomEmbargoIcon,
+          requiredPermission: 'embargo.manage'
+        }
+      ]
     },
     {
-      name: 'অ্যাসাইনমেন্ট বোর্ড',
-      nameEn: 'Assignments',
-      path: '/admin/newsroom/assignments',
-      icon: NewsroomBriefcaseIcon,
-      requiredPermission: ['assignment.view', 'assignment.manage']
-    },
-    {
-      name: 'বার্তাকক্ষ পরিকল্পনা',
-      nameEn: 'Editorial Planning',
-      path: '/admin/newsroom/planning',
-      icon: NewsroomCalendarIcon,
-      requiredPermission: ['planning.manage', 'assignment.view', 'assignment.manage']
-    },
-    {
-      name: 'সংবাদ উৎস ডিরেক্টরি',
-      nameEn: 'Source Directory',
-      path: '/admin/newsroom/sources',
-      icon: NewsroomSourceIcon,
-      requiredPermission: ['source.view', 'source.manage', 'source.confidential']
-    },
-    {
-      name: 'সংবাদ সংশোধনী ও রিভিশন',
-      nameEn: 'Corrections',
-      path: '/admin/newsroom/corrections',
-      icon: NewsroomCorrectionIcon,
-      requiredPermission: ['correction.request', 'correction.approve', 'news.review']
-    },
-    {
-      name: 'নিউজ এমবার্গো নিয়ন্ত্রণ',
-      nameEn: 'Embargoes',
-      path: '/admin/newsroom/embargoes',
-      icon: NewsroomEmbargoIcon,
-      requiredPermission: 'embargo.manage'
-    },
-    {
-      name: 'লাইভ নিউজ ডেস্ক',
-      nameEn: 'Live Desk',
-      path: '/admin/live-desk',
-      icon: LiveDeskIcon,
-      requiredPermission: ['live.view', 'live.contribute', 'live.publish']
-    },
-    {
-      name: 'বিশেষ আয়োজন CMS',
-      nameEn: 'Special Coverage',
-      path: '/admin/special-coverage',
-      icon: SpecialCoverageIcon,
-      requiredPermission: ['coverage.view', 'coverage.manage', 'coverage.publish']
-    },
-    {
-      name: 'মাল্টিমিডিয়া স্টুডিও',
-      nameEn: 'Multimedia CMS',
-      path: '/admin/multimedia',
-      icon: MultimediaHubIcon,
-      requiredPermission: ['multimedia.view', 'multimedia.create', 'multimedia.publish']
-    },
-    {
-      name: 'ফটো গ্যালারি ও স্টোরি',
-      nameEn: 'Photo Galleries',
-      path: '/admin/multimedia/galleries',
-      icon: PhotoGalleryIcon,
-      requiredPermission: ['multimedia.view', 'multimedia.create', 'multimedia.publish']
-    },
-    {
-      name: 'পডকাস্ট ও অডিও',
-      nameEn: 'Podcasts & Audio',
-      path: '/admin/multimedia/podcasts',
-      icon: PodcastCmsIcon,
-      requiredPermission: ['multimedia.view', 'multimedia.create', 'multimedia.publish']
-    },
-    {
-      name: 'স্টোরিটেলিং বিল্ডার',
-      nameEn: 'Longform Storytelling',
-      path: '/admin/multimedia/stories',
-      icon: LongformStoryIcon,
-      requiredPermission: ['multimedia.view', 'multimedia.create', 'multimedia.publish']
-    },
-    {
-      name: 'বিভাগ ও বিষয়',
-      nameEn: 'Categories',
-      path: '/admin/categories',
-      icon: FolderTree,
-      requiredPermission: 'category.manage',
-      badge: null
-    },
-    {
-      name: 'ট্যাগ সমূহ',
-      nameEn: 'Tags',
-      path: '/admin/tags',
-      icon: Tag,
-      requiredPermission: 'seo.manage',
-      badge: null
-    },
-    {
-      name: 'প্রতিবেদক ও সাংবাদিক',
-      nameEn: 'Reporters',
-      path: '/admin/reporters',
-      icon: Users,
-      requiredPermission: 'user.manage',
-      badge: null
-    },
-    {
-      name: 'কলামিস্ট ও লেখক',
-      nameEn: 'Authors',
-      path: '/admin/authors',
-      icon: Feather,
-      requiredPermission: 'news.update',
-      badge: null
-    },
-    {
-      name: 'ব্যবহারকারী',
-      nameEn: 'Users',
-      path: '/admin/users',
-      icon: UserCheck,
-      requiredPermission: 'user.manage',
-      badge: null
-    },
-    {
-      name: 'ভূমিকা ও অনুমতি',
-      nameEn: 'Roles & RBAC',
-      path: '/admin/roles',
-      icon: Shield,
-      requiredPermission: 'role.manage',
-      badge: null
-    },
-    {
-      name: 'মিডিয়া লাইব্রেরি',
-      nameEn: 'Media Library',
-      path: '/admin/media',
+      id: 'media',
+      name: 'মিডিয়া ও বিভাগ',
+      nameEn: 'Media & Taxonomy',
       icon: ImageIcon,
-      requiredPermission: 'media.upload',
-      badge: null
+      submenus: [
+        {
+          name: 'মিডিয়া লাইব্রেরি',
+          nameEn: 'Media Library',
+          path: '/admin/media',
+          icon: ImageIcon,
+          requiredPermission: 'media.upload'
+        },
+        {
+          name: 'মাল্টিমিডিয়া স্টুডিও',
+          nameEn: 'Multimedia CMS',
+          path: '/admin/multimedia',
+          icon: MultimediaHubIcon,
+          requiredPermission: ['multimedia.view', 'multimedia.create', 'multimedia.publish']
+        },
+        {
+          name: 'ফটো গ্যালারি',
+          nameEn: 'Photo Galleries',
+          path: '/admin/multimedia/galleries',
+          icon: PhotoGalleryIcon,
+          requiredPermission: ['multimedia.view', 'multimedia.create', 'multimedia.publish']
+        },
+        {
+          name: 'পডকাস্ট ও অডিও',
+          nameEn: 'Podcasts & Audio',
+          path: '/admin/multimedia/podcasts',
+          icon: PodcastCmsIcon,
+          requiredPermission: ['multimedia.view', 'multimedia.create', 'multimedia.publish']
+        },
+        {
+          name: 'লংফর্ম স্টোরি',
+          nameEn: 'Longform Stories',
+          path: '/admin/multimedia/stories',
+          icon: LongformStoryIcon,
+          requiredPermission: ['multimedia.view', 'multimedia.create', 'multimedia.publish']
+        },
+        {
+          name: 'বিভাগ ও বিষয়',
+          nameEn: 'Categories',
+          path: '/admin/categories',
+          icon: FolderTree,
+          requiredPermission: 'category.manage'
+        },
+        {
+          name: 'ট্যাগ সমূহ',
+          nameEn: 'Tags',
+          path: '/admin/tags',
+          icon: Tag,
+          requiredPermission: 'seo.manage'
+        }
+      ]
     },
     {
-      name: 'বিজ্ঞাপন ক্যাম্পেইন',
-      nameEn: 'Advertisements',
-      path: '/admin/advertisements',
-      icon: Megaphone,
-      requiredPermission: 'ads.manage',
-      badge: null
+      id: 'studio',
+      name: 'লেখা ও প্রোডাকশন',
+      nameEn: 'Editorial Studio',
+      icon: Feather,
+      submenus: [
+        {
+          name: 'বিশ্ব সংবাদ অটোমেশন',
+          nameEn: 'Global News Wire',
+          path: '/admin/global-wire',
+          icon: Globe,
+          requiredPermission: ['ai.use', 'news.create']
+        },
+        {
+          name: 'বার্তাকক্ষ সহায়তা',
+          nameEn: 'Editorial Assistant',
+          path: '/admin/ai-assistant',
+          icon: Feather,
+          requiredPermission: ['ai.use', 'ai.logs.view', 'ai.settings.manage']
+        },
+        {
+          name: 'কনটেন্ট স্টুডিও',
+          nameEn: 'Content Studio',
+          path: '/admin/ai-content',
+          icon: Wand2,
+          requiredPermission: ['ai.use', 'news.create']
+        },
+        {
+          name: 'ScribeForge ট্রানস্ক্রাইব',
+          nameEn: 'ScribeForge Studio',
+          path: '/admin/scribeforge',
+          icon: FileAudio,
+          requiredPermission: ['ai.use', 'news.create']
+        },
+        {
+          name: 'ক্রিয়েটর স্টুডিও',
+          nameEn: 'Creator Studio',
+          path: '/admin/creator-studio',
+          icon: Clapperboard,
+          requiredPermission: ['creator_studio.view', 'creator_studio.create', 'creator_studio.publish', 'creator_studio.settings.manage']
+        }
+      ]
     },
     {
-      name: 'মন্তব্য মডারেশন',
-      nameEn: 'Comments Moderation',
-      path: '/admin/comments',
+      id: 'community',
+      name: 'পাঠক ও কমিউনিটি',
+      nameEn: 'Audience & Community',
       icon: CommentModerateIcon,
-      requiredPermission: 'comments.moderate',
-      badge: null
+      submenus: [
+        {
+          name: 'মন্তব্য মডারেশন',
+          nameEn: 'Comments Moderation',
+          path: '/admin/comments',
+          icon: CommentModerateIcon,
+          requiredPermission: 'comments.moderate'
+        },
+        {
+          name: 'পাঠক মতামত জরিপ',
+          nameEn: 'Reader Polls',
+          path: '/admin/polls',
+          icon: ReaderPollIcon,
+          requiredPermission: 'polls.manage'
+        },
+        {
+          name: 'নাগরিক সাংবাদিকতা',
+          nameEn: 'Citizen & Community',
+          path: '/admin/citizen-journalism',
+          icon: CheckCheck,
+          requiredPermission: ['citizen.review', 'citizen.publish', 'community.moderate', 'community.manage']
+        },
+        {
+          name: 'ইভেন্ট ও প্রকল্প',
+          nameEn: 'Events & Projects',
+          path: '/admin/events',
+          icon: EventsHubIcon,
+          requiredPermission: ['events.manage', 'events.participants.manage', 'events.competitions.judge', 'events.results.publish']
+        },
+        {
+          name: 'হাইপারলোকাল (৬৪ জেলা)',
+          nameEn: 'Hyperlocal Network',
+          path: '/admin/hyperlocal',
+          icon: HyperlocalIcon,
+          requiredPermission: [
+            'hyperlocal.view',
+            'hyperlocal.locations.manage',
+            'hyperlocal.correspondents.manage',
+            'hyperlocal.assignments.manage',
+            'hyperlocal.regional.approve',
+            'hyperlocal.analytics.view'
+          ]
+        }
+      ]
     },
     {
-      name: 'পাঠক মতামত জরিপ',
-      nameEn: 'Reader Polls',
-      path: '/admin/polls',
-      icon: ReaderPollIcon,
-      requiredPermission: 'polls.manage',
-      badge: null
-    },
-    {
-      name: 'ই-পেপার ব্যবস্থাপনা',
-      nameEn: 'E-Paper CMS',
-      path: '/admin/epaper',
-      icon: NewsroomHubIcon,
-      requiredPermission: ['epaper.view', 'epaper.manage', 'epaper.publish'],
-      badge: 'PDF',
-      badgeColor: 'bg-rose-600 text-white'
-    },
-    {
-      name: 'AI বার্তাকক্ষ সহায়তা',
-      nameEn: 'AI Assistant',
-      path: '/admin/ai-assistant',
-      icon: Sparkles,
-      requiredPermission: ['ai.use', 'ai.logs.view', 'ai.settings.manage'],
-      badge: 'AI',
-      badgeColor: 'bg-indigo-600 text-white'
-    },
-    {
-      name: 'AI কনটেন্ট স্টুডিও',
-      nameEn: 'AI Content',
-      path: '/admin/ai-content',
-      icon: Wand2,
-      requiredPermission: ['ai.use', 'news.create'],
-      badge: 'PRO',
-      badgeColor: 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
-    },
-    {
-      name: 'ScribeForge ট্রানস্ক্রাইব',
-      nameEn: 'ScribeForge Studio',
-      path: '/admin/scribeforge',
-      icon: FileAudio,
-      requiredPermission: ['ai.use', 'news.create'],
-      badge: 'v1.0',
-      badgeColor: 'bg-orange-600 text-white'
-    },
-    {
-      name: 'বিশ্ব সংবাদ অটোমেশন (Wire)',
-      nameEn: 'Global AI News Wire',
-      path: '/admin/global-wire',
-      icon: Globe,
-      requiredPermission: ['ai.use', 'news.create'],
-      badge: 'AUTO',
-      badgeColor: 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white'
-    },
-    {
-      name: 'নিউজ ক্রিয়েটর স্টুডিও',
-      nameEn: 'Creator Studio',
-      path: '/admin/creator-studio',
-      icon: Clapperboard,
-      requiredPermission: ['creator_studio.view', 'creator_studio.create', 'creator_studio.publish', 'creator_studio.settings.manage'],
-      badge: 'Studio',
-      badgeColor: 'bg-rose-600 text-white'
-    },
-    {
-      name: 'মনিটাইজেশন ও আয়',
-      nameEn: 'Monetization',
-      path: '/admin/monetization',
-      icon: Wallet,
-      requiredPermission: [
-        'subscriptions.manage',
-        'payments.view',
-        'payments.refund',
-        'advertisers.manage',
-        'campaigns.manage',
-        'sponsored.manage',
-        'sponsored.approve'
-      ],
-      badge: 'BDT',
-      badgeColor: 'bg-emerald-700 text-white'
-    },
-    {
-      name: 'নাগরিক সাংবাদিকতা',
-      nameEn: 'Citizen & Community',
-      path: '/admin/citizen-journalism',
-      icon: CheckCheck,
-      requiredPermission: ['citizen.review', 'citizen.publish', 'community.moderate', 'community.manage'],
-      badge: 'UGC',
-      badgeColor: 'bg-teal-700 text-white'
-    },
-    {
-      name: 'ইভেন্ট ও বিশেষ উদ্যোগ',
-      nameEn: 'Events & Projects',
-      path: '/admin/events',
-      icon: EventsHubIcon,
-      requiredPermission: ['events.manage', 'events.participants.manage', 'events.competitions.judge', 'events.results.publish'],
-      badge: 'Events',
-      badgeColor: 'bg-rose-700 text-white'
-    },
-    {
-      name: 'হাইপারলোকাল নেটওয়ার্ক',
-      nameEn: 'Hyperlocal Network',
-      path: '/admin/hyperlocal',
-      icon: HyperlocalIcon,
-      requiredPermission: [
-        'hyperlocal.view',
-        'hyperlocal.locations.manage',
-        'hyperlocal.correspondents.manage',
-        'hyperlocal.assignments.manage',
-        'hyperlocal.regional.approve',
-        'hyperlocal.analytics.view'
-      ],
-      badge: '৬৪ জেলা',
-      badgeColor: 'bg-rose-700 text-white'
-    },
-    {
-      name: 'নিউজ API ও সিন্ডিকেশন',
-      nameEn: 'News API & Syndication',
-      path: '/admin/syndication',
-      icon: KeyRound,
-      requiredPermission: [
-        'syndication.view',
-        'syndication.partners.approve',
-        'syndication.licenses.manage',
-        'syndication.plans.manage',
-        'syndication.abuse.manage'
-      ],
-      badge: 'API v1',
-      badgeColor: 'bg-indigo-600 text-white'
-    },
-    {
-      name: 'অ্যানালিটিক্স',
-      nameEn: 'Analytics',
-      path: '/admin/analytics',
+      id: 'revenue',
+      name: 'আয় ও অ্যানালিটিক্স',
+      nameEn: 'Revenue & Analytics',
       icon: BarChart3,
-      requiredPermission: 'analytics.view',
-      badge: 'লাইভ',
-      badgeColor: 'bg-emerald-500 text-white animate-pulse'
+      submenus: [
+        {
+          name: 'অ্যানালিটিক্স',
+          nameEn: 'Analytics',
+          path: '/admin/analytics',
+          icon: BarChart3,
+          requiredPermission: 'analytics.view',
+          badge: isBn ? 'লাইভ' : 'Live',
+          badgeColor: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
+        },
+        {
+          name: 'বিজ্ঞাপন ক্যাম্পেইন',
+          nameEn: 'Advertisements',
+          path: '/admin/advertisements',
+          icon: Megaphone,
+          requiredPermission: 'ads.manage'
+        },
+        {
+          name: 'মনিটাইজেশন ও আয়',
+          nameEn: 'Monetization',
+          path: '/admin/monetization',
+          icon: Wallet,
+          requiredPermission: [
+            'subscriptions.manage',
+            'payments.view',
+            'payments.refund',
+            'advertisers.manage',
+            'campaigns.manage',
+            'sponsored.manage',
+            'sponsored.approve'
+          ]
+        },
+        {
+          name: 'নিউজ API ও সিন্ডিকেশন',
+          nameEn: 'News API & Syndication',
+          path: '/admin/syndication',
+          icon: KeyRound,
+          requiredPermission: [
+            'syndication.view',
+            'syndication.partners.approve',
+            'syndication.licenses.manage',
+            'syndication.plans.manage',
+            'syndication.abuse.manage'
+          ]
+        }
+      ]
     },
     {
-      name: 'অডিট লগ',
-      nameEn: 'Audit Logs',
-      path: '/admin/audit-logs',
-      icon: History,
-      requiredPermission: ['user.manage', 'settings.manage'],
-      badge: null
+      id: 'team',
+      name: 'টিম ও ব্যবহারকারী',
+      nameEn: 'Team & Users',
+      icon: Users,
+      submenus: [
+        {
+          name: 'প্রতিবেদক ও সাংবাদিক',
+          nameEn: 'Reporters',
+          path: '/admin/reporters',
+          icon: Users,
+          requiredPermission: 'user.manage'
+        },
+        {
+          name: 'কলামিস্ট ও লেখক',
+          nameEn: 'Authors',
+          path: '/admin/authors',
+          icon: Feather,
+          requiredPermission: 'news.update'
+        },
+        {
+          name: 'ব্যবহারকারী',
+          nameEn: 'Users',
+          path: '/admin/users',
+          icon: UserCheck,
+          requiredPermission: 'user.manage'
+        },
+        {
+          name: 'ভূমিকা ও অনুমতি',
+          nameEn: 'Roles & RBAC',
+          path: '/admin/roles',
+          icon: Shield,
+          requiredPermission: 'role.manage'
+        }
+      ]
     },
     {
-      name: 'সিস্টেম নির্ভরযোগ্যতা',
-      nameEn: 'System Reliability',
-      path: '/admin/reliability',
-      icon: ShieldCheck,
-      requiredPermission: 'settings.manage',
-      badge: null
-    },
-    {
-      name: 'সিস্টেম সেটিংস',
-      nameEn: 'Settings',
-      path: '/admin/settings',
+      id: 'system',
+      name: 'সিস্টেম ও সেটিংস',
+      nameEn: 'System & Settings',
       icon: Settings,
-      requiredPermission: 'settings.manage',
-      badge: null
+      submenus: [
+        {
+          name: 'অডিট লগ',
+          nameEn: 'Audit Logs',
+          path: '/admin/audit-logs',
+          icon: History,
+          requiredPermission: ['user.manage', 'settings.manage']
+        },
+        {
+          name: 'সিস্টেম নির্ভরযোগ্যতা',
+          nameEn: 'System Reliability',
+          path: '/admin/reliability',
+          icon: ShieldCheck,
+          requiredPermission: 'settings.manage'
+        },
+        {
+          name: 'সিস্টেম সেটিংস',
+          nameEn: 'Settings',
+          path: '/admin/settings',
+          icon: Settings,
+          requiredPermission: 'settings.manage'
+        }
+      ]
     }
   ];
 
-  // RBAC Permission-based dynamic menu filtering using real Sanctum permissions
-  const navItems = allNavItems.filter((item) =>
-    hasEffectivePermission(authState, adminState, item.requiredPermission)
-  );
+  // RBAC Permission-based dynamic menu & submenu filtering (memoized to avoid re-building on every render)
+  const navMenus = useMemo(() => {
+    return allNavMenus
+      .map((menu) => {
+        if (menu.submenus) {
+          const allowedSubs = menu.submenus.filter((sub) =>
+            hasEffectivePermission(authState, adminState, sub.requiredPermission)
+          );
+          return allowedSubs.length > 0 ? { ...menu, submenus: allowedSubs } : null;
+        }
+        return hasEffectivePermission(authState, adminState, menu.requiredPermission) ? menu : null;
+      })
+      .filter(Boolean);
+  }, [authState, adminState, isBn, pendingCount]);
+
+  const isRouteActive = useCallback((path) => {
+    if (location.pathname === path) return true;
+    if (path === '/admin/dashboard' || path === '/admin/newsroom' || path === '/admin/multimedia') {
+      return false;
+    }
+    return location.pathname.startsWith(`${path}/`);
+  }, [location.pathname]);
+
+  // Auto-expand only the parent menu containing the currently active route
+  useEffect(() => {
+    const activeParent = navMenus.find((menu) =>
+      menu.submenus?.some((sub) => isRouteActive(sub.path))
+    );
+    if (activeParent?.id) {
+      setOpenMenuId((prev) => (prev === activeParent.id ? prev : activeParent.id));
+      try {
+        localStorage.setItem('dp_admin_open_menu', activeParent.id);
+      } catch {
+        // Ignore storage errors
+      }
+    }
+  }, [location.pathname, navMenus, isRouteActive]);
 
   // Route map for human-readable breadcrumb
   const BREADCRUMB_MAP = {
@@ -558,7 +649,7 @@ export function AdminLayout({ children }) {
   const currentRoleObj = getRoleDisplayMeta(currentRole, currentUser?.roleName);
 
   return (
-    <div className="min-h-screen bg-stone-100 flex font-sans text-stone-900 selection:bg-rose-900 selection:text-white">
+    <div className="min-h-screen bg-stone-100 dark:bg-[#0b0f19] flex font-sans text-stone-900 dark:text-stone-100 selection:bg-rose-900 selection:text-white">
       
       {/* 1. Mobile Sidebar Backdrop Overlay */}
       <AnimatePresence>
@@ -576,29 +667,28 @@ export function AdminLayout({ children }) {
 
       {/* 2. Responsive Sidebar (Desktop Collapsible & Mobile Slide-out) */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 bg-stone-950 text-stone-300 flex flex-col border-r border-stone-800 transition-all duration-300 ease-in-out lg:static ${
+        className={`fixed inset-y-0 left-0 z-50 bg-[#f8f7f4] dark:bg-[#11161f] text-stone-700 dark:text-stone-300 flex flex-col border-r border-stone-200/80 dark:border-stone-800/70 transition-all duration-300 ease-in-out lg:sticky lg:top-0 lg:h-screen shrink-0 ${
           mobileOpen ? 'translate-x-0 w-64' : '-translate-x-full lg:translate-x-0'
         } ${collapsed ? 'lg:w-16' : 'lg:w-64'}`}
       >
         {/* Brand Header */}
-        <div className="h-16 flex items-center justify-between px-4 border-b border-stone-800/80 bg-stone-950">
+        <div className="h-16 flex items-center justify-between px-4 border-b border-stone-200/80 dark:border-stone-800/70 bg-[#f8f7f4] dark:bg-[#11161f]">
           {(!collapsed || mobileOpen) ? (
             <Link to="/admin/dashboard" className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-rose-700 flex items-center justify-center text-white font-bold font-serif-bn shadow-xs">
+              <div className="w-8 h-8 rounded-lg bg-rose-700/90 flex items-center justify-center text-white font-bold font-serif-bn shadow-xs">
                 প্র
               </div>
               <div className="flex flex-col leading-tight">
-                <span className="text-base font-bold font-serif-bn text-white tracking-wide">
+                <span className="text-base font-bold font-serif-bn text-stone-900 dark:text-stone-100 tracking-wide">
                   {isBn ? 'দৈনিক বার্তা প্রবাহ' : 'Daily Prabaho'}
                 </span>
-                <span className="text-[10px] text-stone-400 font-mono uppercase tracking-wider flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                  Editorial CMS
+                <span className="text-[10px] text-stone-500 dark:text-stone-400 font-medium tracking-wider">
+                  {isBn ? 'বার্তাকক্ষ ডেস্ক' : 'Editorial Desk'}
                 </span>
               </div>
             </Link>
           ) : (
-            <div className="w-8 h-8 rounded-lg bg-rose-700 flex items-center justify-center text-white font-bold font-serif-bn shadow-xs mx-auto">
+            <div className="w-8 h-8 rounded-lg bg-rose-700/90 flex items-center justify-center text-white font-bold font-serif-bn shadow-xs mx-auto">
               প্র
             </div>
           )}
@@ -608,7 +698,7 @@ export function AdminLayout({ children }) {
             type="button"
             onClick={() => setCollapsed(!collapsed)}
             aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-            className="hidden lg:flex p-1.5 rounded-lg text-stone-400 hover:text-white hover:bg-stone-800 transition-colors"
+            className="hidden lg:flex p-1.5 rounded-lg text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-200/60 dark:hover:bg-stone-800/70 transition-colors"
           >
             {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
           </button>
@@ -618,71 +708,208 @@ export function AdminLayout({ children }) {
             type="button"
             onClick={() => setMobileOpen(false)}
             aria-label="Close mobile navigation"
-            className="lg:hidden p-1.5 rounded-lg text-stone-400 hover:text-white hover:bg-stone-800 transition-colors"
+            className="lg:hidden p-1.5 rounded-lg text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-200/60 dark:hover:bg-stone-800/70 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Navigation Links */}
-        <nav className="flex-1 py-3 px-2 space-y-0.5 overflow-y-auto no-scrollbar">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isExact = location.pathname === item.path;
-            const isSub = item.path !== '/admin/dashboard' && item.path !== '/admin/newsroom' && location.pathname.startsWith(item.path);
-            const isActive = isExact || isSub;
-            const itemName = isBn ? item.name : (item.nameEn || item.name);
+        {/* Quick Sidebar Filter */}
+        {(!collapsed || mobileOpen) && (
+          <div className="px-3 pt-3 pb-1 shrink-0">
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 text-stone-400 dark:text-stone-500 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                value={sidebarFilter}
+                onChange={(e) => setSidebarFilter(e.target.value)}
+                placeholder={isBn ? 'মেনু খুঁজুন...' : 'Filter menu...'}
+                aria-label={isBn ? 'মেনু খুঁজুন' : 'Filter menu'}
+                className="w-full bg-white dark:bg-stone-900/80 text-stone-800 dark:text-stone-200 placeholder:text-stone-400 dark:placeholder:text-stone-500 text-xs pl-8 pr-7 py-1.5 rounded-lg border border-stone-200/90 dark:border-stone-800 focus:outline-none focus:border-rose-500/70 transition-colors"
+              />
+              {sidebarFilter && (
+                <button
+                  type="button"
+                  onClick={() => setSidebarFilter('')}
+                  aria-label={isBn ? 'খোঁজা মুছুন' : 'Clear filter'}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-stone-400 dark:text-stone-500 hover:text-stone-700 dark:hover:text-stone-200"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+          </div>
+        )}
 
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                title={itemName}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-colors group relative ${
-                  isActive
-                    ? 'text-white font-bold'
-                    : 'text-stone-400 hover:text-stone-100 hover:bg-stone-900'
-                }`}
-              >
-                {isActive && (
-                  <motion.span
-                    layoutId="admin-sidebar-active"
-                    transition={SPRING_SNAPPY}
-                    className="absolute inset-0 rounded-lg bg-rose-700 shadow-sm"
-                  />
-                )}
-                <Icon className={`relative z-10 w-4 h-4 shrink-0 transition-transform ${isActive ? 'text-white' : 'text-stone-400 group-hover:text-white group-hover:scale-105'}`} />
-                {(!collapsed || mobileOpen) && (
-                  <span className="relative z-10 flex-1 truncate">{itemName}</span>
-                )}
-                {(!collapsed || mobileOpen) && item.badge && (
-                  <span className={`relative z-10 text-[10px] px-1.5 py-0.2 rounded-full font-mono ${item.badgeColor || 'bg-stone-800 text-stone-300'}`}>
-                    {item.badge}
-                  </span>
-                )}
-                {/* Collapsed Tooltip */}
-                {collapsed && !mobileOpen && (
-                  <span className="absolute left-full ml-2 px-2 py-1 bg-stone-800 text-white text-[11px] rounded shadow-md whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none z-50 transition-opacity">
-                    {itemName}
-                  </span>
-                )}
-              </Link>
-            );
-          })}
+        {/* Navigation Links (Single-Open Accordion Parent Menus & Indented Submenus) */}
+        <nav className="flex-1 py-2 px-2 space-y-1 overflow-y-auto no-scrollbar">
+          {(() => {
+            const q = sidebarFilter.trim().toLowerCase();
+            let totalMatches = 0;
+
+            const renderedMenus = navMenus.map((menu) => {
+              const MenuIcon = menu.icon;
+              const menuLabel = isBn ? menu.name : (menu.nameEn || menu.name);
+
+              // Direct single-link menu (e.g. Dashboard)
+              if (!menu.submenus) {
+                if (q) {
+                  const bn = (menu.name || '').toLowerCase();
+                  const en = (menu.nameEn || '').toLowerCase();
+                  if (!bn.includes(q) && !en.includes(q)) return null;
+                }
+                totalMatches += 1;
+                const isActive = isRouteActive(menu.path);
+
+                return (
+                  <Link
+                    key={menu.id}
+                    to={menu.path}
+                    title={menuLabel}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-colors group relative ${
+                      isActive
+                        ? 'bg-rose-100/80 dark:bg-rose-950/55 ring-1 ring-rose-200/80 dark:ring-rose-800/40 text-rose-900 dark:text-rose-200 font-bold'
+                        : 'text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-200/50 dark:hover:bg-stone-800/50'
+                    }`}
+                  >
+                    <MenuIcon className={`w-4 h-4 shrink-0 ${isActive ? 'text-rose-700 dark:text-rose-300' : 'text-stone-500 dark:text-stone-400 group-hover:text-stone-800 dark:group-hover:text-stone-200'}`} />
+                    {(!collapsed || mobileOpen) && (
+                      <span className="flex-1 truncate">{menuLabel}</span>
+                    )}
+                    {collapsed && !mobileOpen && (
+                      <span className="absolute left-full ml-2 px-2 py-1 bg-stone-800 text-white text-[11px] rounded shadow-md whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none z-50 transition-opacity">
+                        {menuLabel}
+                      </span>
+                    )}
+                  </Link>
+                );
+              }
+
+              // Parent menu with submenus
+              const parentMatches = q
+                ? (menu.name || '').toLowerCase().includes(q) || (menu.nameEn || '').toLowerCase().includes(q)
+                : false;
+
+              const visibleSubmenus = q && !parentMatches
+                ? menu.submenus.filter((sub) => {
+                    const bn = (sub.name || '').toLowerCase();
+                    const en = (sub.nameEn || '').toLowerCase();
+                    return bn.includes(q) || en.includes(q);
+                  })
+                : menu.submenus;
+
+              if (visibleSubmenus.length === 0) return null;
+              totalMatches += visibleSubmenus.length;
+
+              const hasActiveChild = menu.submenus.some((sub) => isRouteActive(sub.path));
+              const isExpanded = Boolean(q) || openMenuId === menu.id;
+
+              // Collapsed icon-only mode: clicking parent jumps to first submenu
+              if (collapsed && !mobileOpen) {
+                const targetPath = (menu.submenus.find((s) => isRouteActive(s.path)) || menu.submenus[0]).path;
+                return (
+                  <Link
+                    key={menu.id}
+                    to={targetPath}
+                    title={menuLabel}
+                    className={`flex items-center justify-center px-3 py-2.5 rounded-lg text-xs font-semibold transition-colors group relative ${
+                      hasActiveChild
+                        ? 'bg-rose-100/80 dark:bg-rose-950/55 text-rose-800 dark:text-rose-200 ring-1 ring-rose-200/80 dark:ring-rose-800/40'
+                        : 'text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-200/50 dark:hover:bg-stone-800/50'
+                    }`}
+                  >
+                    <MenuIcon className="w-4 h-4 shrink-0" />
+                    <span className="absolute left-full ml-2 px-2 py-1 bg-stone-800 text-white text-[11px] rounded shadow-md whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none z-50 transition-opacity">
+                      {menuLabel}
+                    </span>
+                  </Link>
+                );
+              }
+
+              return (
+                <div key={menu.id} className="space-y-0.5">
+                  <button
+                    type="button"
+                    onClick={() => toggleGroup(menu.id)}
+                    aria-expanded={isExpanded}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-colors select-none ${
+                      hasActiveChild
+                        ? 'bg-stone-200/60 dark:bg-stone-800/60 text-stone-900 dark:text-stone-100 font-bold'
+                        : 'text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-200/45 dark:hover:bg-stone-800/45'
+                    }`}
+                  >
+                    <MenuIcon className={`w-4 h-4 shrink-0 ${hasActiveChild ? 'text-rose-700 dark:text-rose-400' : 'text-stone-500 dark:text-stone-400'}`} />
+                    <span className="flex-1 text-left truncate">{menuLabel}</span>
+                    {menu.badge && !isExpanded && (
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-mono ${menu.badgeColor || 'bg-stone-200/80 dark:bg-stone-800 text-stone-700 dark:text-stone-300'}`}>
+                        {menu.badge}
+                      </span>
+                    )}
+                    {isExpanded ? (
+                      <ChevronDown className="w-3.5 h-3.5 text-stone-400 dark:text-stone-500 shrink-0" />
+                    ) : (
+                      <ChevronRight className="w-3.5 h-3.5 text-stone-400 dark:text-stone-500 shrink-0" />
+                    )}
+                  </button>
+
+                  {isExpanded && (
+                    <div className="ml-4 pl-2.5 border-l border-stone-200/90 dark:border-stone-800 space-y-0.5 py-0.5">
+                      {visibleSubmenus.map((sub) => {
+                        const SubIcon = sub.icon;
+                        const isActive = isRouteActive(sub.path);
+                        const subLabel = isBn ? sub.name : (sub.nameEn || sub.name);
+
+                        return (
+                          <Link
+                            key={sub.path}
+                            to={sub.path}
+                            title={subLabel}
+                            className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-[11.5px] font-medium transition-colors group ${
+                              isActive
+                                ? 'bg-rose-100/80 dark:bg-rose-950/55 ring-1 ring-rose-200/80 dark:ring-rose-800/40 text-rose-900 dark:text-rose-200 font-semibold'
+                                : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200 hover:bg-stone-200/45 dark:hover:bg-stone-800/50'
+                            }`}
+                          >
+                            <SubIcon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-rose-700 dark:text-rose-300' : 'text-stone-400 dark:text-stone-500 group-hover:text-stone-700 dark:group-hover:text-stone-300'}`} />
+                            <span className="flex-1 truncate">{subLabel}</span>
+                            {sub.badge && (
+                              <span className={`text-[9.5px] px-1.5 py-0.2 rounded-full font-mono ${sub.badgeColor || 'bg-stone-200/80 dark:bg-stone-800 text-stone-700 dark:text-stone-300'}`}>
+                                {sub.badge}
+                              </span>
+                            )}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            });
+
+            if (totalMatches === 0 && q) {
+              return (
+                <div className="px-3 py-6 text-center text-xs text-stone-500">
+                  {isBn ? 'কোনো মেনু পাওয়া যায়নি' : 'No matching menu'}
+                </div>
+              );
+            }
+
+            return renderedMenus;
+          })()}
         </nav>
 
         {/* Sidebar Footer User Info */}
-        <div className="p-3 border-t border-stone-800/80 bg-stone-950/80">
+        <div className="p-3 border-t border-stone-200/80 dark:border-stone-800/70 bg-stone-100/70 dark:bg-[#0e131b]">
           <div className="flex items-center gap-3">
             <img
               src={currentUser.avatar}
               alt={currentUser.name}
-              className="w-8 h-8 rounded-full object-cover ring-2 ring-stone-700 shrink-0"
+              className="w-8 h-8 rounded-full object-cover ring-2 ring-stone-200 dark:ring-stone-700 shrink-0"
             />
             {(!collapsed || mobileOpen) && (
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold text-white truncate">{currentUser.name}</p>
-                <p className="text-[10px] text-stone-400 truncate">
+                <p className="text-xs font-bold text-stone-900 dark:text-stone-100 truncate">{currentUser.name}</p>
+                <p className="text-[10px] text-stone-500 dark:text-stone-400 truncate">
                   {isBn ? currentRoleObj.nameBn : (currentRoleObj.nameEn || currentRoleObj.nameBn)}
                 </p>
               </div>
@@ -695,7 +922,7 @@ export function AdminLayout({ children }) {
       <div className="flex-1 flex flex-col min-w-0 overflow-x-hidden">
         
         {/* Top Header Bar */}
-        <header className="h-16 bg-white border-b border-stone-200 px-4 sm:px-6 flex items-center justify-between gap-4 sticky top-0 z-30 shadow-xs">
+        <header className="h-16 bg-white/95 dark:bg-[#11161f]/95 backdrop-blur-xs border-b border-stone-200/80 dark:border-stone-800/70 px-4 sm:px-6 flex items-center justify-between gap-4 sticky top-0 z-30 shadow-xs">
           
           {/* Left: Mobile Toggle & Breadcrumb */}
           <div className="flex items-center gap-3 min-w-0">
@@ -703,16 +930,16 @@ export function AdminLayout({ children }) {
               type="button"
               onClick={() => setMobileOpen(true)}
               aria-label="Open navigation menu"
-              className="lg:hidden p-2 rounded-lg text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition-colors"
+              className="lg:hidden p-2 rounded-lg text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
             >
               <Menu className="w-5 h-5" />
             </button>
 
             {/* Breadcrumb Hierarchy */}
-            <nav className="flex items-center gap-1.5 text-xs text-stone-500 overflow-hidden" aria-label="Breadcrumb">
+            <nav className="flex items-center gap-1.5 text-xs text-stone-500 dark:text-stone-400 overflow-hidden" aria-label="Breadcrumb">
               <Link
                 to="/admin/dashboard"
-                className="hover:text-rose-700 flex items-center gap-1 font-medium transition-colors shrink-0"
+                className="hover:text-rose-700 dark:hover:text-rose-400 flex items-center gap-1 font-medium transition-colors shrink-0"
               >
                 <Home className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">{isBn ? 'সিএমএস' : 'CMS'}</span>
@@ -724,8 +951,8 @@ export function AdminLayout({ children }) {
 
                 return (
                   <React.Fragment key={idx}>
-                    <span className="text-stone-400">/</span>
-                    <span className={`truncate capitalize ${isLast ? 'font-bold text-stone-900' : 'text-stone-600 hover:text-rose-700'}`}>
+                    <span className="text-stone-400 dark:text-stone-600">/</span>
+                    <span className={`truncate capitalize ${isLast ? 'font-bold text-stone-900 dark:text-stone-100' : 'text-stone-600 dark:text-stone-400 hover:text-rose-700 dark:hover:text-rose-400'}`}>
                       {label}
                     </span>
                   </React.Fragment>
@@ -750,12 +977,23 @@ export function AdminLayout({ children }) {
             <button
               type="button"
               onClick={() => dispatch(toggleLanguage())}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-stone-300 hover:bg-stone-50 text-stone-700 text-xs font-semibold transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800 text-stone-700 text-xs font-semibold transition-colors cursor-pointer"
               title={isBn ? 'Switch to English' : 'বাংলায় পরিবর্তন করুন'}
               aria-label="Toggle Language"
             >
               <Globe className="w-3.5 h-3.5 text-rose-700" />
               <span>{isBn ? 'English' : 'বাংলা'}</span>
+            </button>
+
+            {/* Dark / Light Theme Toggle */}
+            <button
+              type="button"
+              onClick={() => dispatch(toggleTheme())}
+              className="p-1.5 rounded-lg border border-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800 text-stone-700 transition-colors cursor-pointer"
+              title={isDark ? (isBn ? 'লাইট মোড' : 'Light Mode') : (isBn ? 'ডার্ক মোড' : 'Dark Mode')}
+              aria-label="Toggle Dark Mode"
+            >
+              {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-stone-600" />}
             </button>
 
             {/* Public Website Preview Link */}
@@ -781,7 +1019,7 @@ export function AdminLayout({ children }) {
               >
                 <Bell className="w-4 h-4" />
                 {unreadCount > 0 && (
-                  <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-600 ring-2 ring-white"></span>
+                  <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-600 ring-2 ring-white dark:ring-stone-900"></span>
                 )}
               </button>
 
@@ -932,16 +1170,11 @@ export function AdminLayout({ children }) {
           </div>
         </header>
 
-        {/* Page Content Viewport */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto overflow-y-auto">
-          <motion.div
-            key={location.pathname}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.22, ease: EDITORIAL_EASE }}
-          >
+        {/* Page Content Viewport (Synced Suspense fallback across all menus & submenus) */}
+        <main className="flex-1 p-4 sm:p-5 lg:p-6 w-full overflow-y-auto bg-stone-50 dark:bg-[#0b0f19] transition-colors duration-200">
+          <Suspense fallback={<AdminPageSkeleton />}>
             {children || <Outlet />}
-          </motion.div>
+          </Suspense>
         </main>
 
       </div>

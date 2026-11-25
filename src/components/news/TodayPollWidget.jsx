@@ -30,66 +30,7 @@ export function TodayPollWidget() {
   };
 
   if (!hasServerPolls) {
-    // Offline/initial fallback using redux initial poll
-    const totalVotes = fallbackPoll.yes + fallbackPoll.no + fallbackPoll.noOpinion;
-    const yesPercent = totalVotes > 0 ? Math.round((fallbackPoll.yes / totalVotes) * 100) : 0;
-    const noPercent = totalVotes > 0 ? Math.round((fallbackPoll.no / totalVotes) * 100) : 0;
-    const noOpinionPercent = totalVotes > 0 ? 100 - yesPercent - noPercent : 0;
-
-    return (
-      <div className="bg-white border border-stone-200 rounded-xl p-5 shadow-xs">
-        <div className="flex items-center gap-2 pb-3 mb-3 border-b border-stone-100">
-          <HelpCircle className="w-4 h-4 text-rose-700" />
-          <h3 className="text-sm font-bold text-stone-900 font-serif-bn">
-            {isBn ? 'মতামত জরিপ' : "Today's Reader Poll"}
-          </h3>
-        </div>
-        <p className="text-xs sm:text-sm font-semibold text-stone-800 leading-relaxed font-serif-bn mb-4">
-          {isBn ? fallbackPoll.question : fallbackPoll.questionEn}
-        </p>
-        {!fallbackPoll.userVoted ? (
-          <div className="space-y-2">
-            {[
-              { id: 'yes', bn: 'হ্যাঁ', en: 'Yes' },
-              { id: 'no', bn: 'না', en: 'No' },
-              { id: 'noOpinion', bn: 'মন্তব্য নেই', en: 'No Opinion' }
-            ].map((opt) => (
-              <button
-                key={opt.id}
-                type="button"
-                onClick={() => dispatch(voteFallbackPoll(opt.id))}
-                className="w-full py-2 px-3 text-xs font-semibold rounded-lg border border-stone-300 hover:border-rose-600 hover:bg-rose-50 text-stone-800 transition-all text-left flex items-center justify-between cursor-pointer"
-              >
-                <span>{isBn ? opt.bn : opt.en}</span>
-                <span className="text-stone-400 text-[11px]">{isBn ? 'ভোট দিন' : 'Vote'}</span>
-              </button>
-            ))}
-          </div>
-        ) : (
-          <div className="space-y-2.5">
-            <p className="text-xs text-emerald-700 font-medium flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4" />
-              <span>{isBn ? 'আপনার মতামত গ্রহণ করা হয়েছে' : 'Vote recorded'}</span>
-            </p>
-            {[
-              { label: isBn ? 'হ্যাঁ' : 'Yes', pct: yesPercent, color: 'bg-emerald-600' },
-              { label: isBn ? 'না' : 'No', pct: noPercent, color: 'bg-rose-600' },
-              { label: isBn ? 'মন্তব্য নেই' : 'No Opinion', pct: noOpinionPercent, color: 'bg-stone-500' }
-            ].map((bar) => (
-              <div key={bar.label}>
-                <div className="flex justify-between text-xs text-stone-700 mb-1">
-                  <span>{bar.label}</span>
-                  <span className="font-bold">{isBn ? toBengaliNumber(bar.pct) : bar.pct}%</span>
-                </div>
-                <div className="w-full h-2 bg-stone-100 rounded-full overflow-hidden">
-                  <div className={`h-full ${bar.color}`} style={{ width: `${bar.pct}%` }} />
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    );
+    return null;
   }
 
   const showResults = activeServerPoll.userVoted || !activeServerPoll.isOpen;

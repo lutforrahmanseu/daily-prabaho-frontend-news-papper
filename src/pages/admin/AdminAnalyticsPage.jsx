@@ -357,7 +357,7 @@ export function AdminAnalyticsPage() {
             <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-xs">
               <div className="flex items-center justify-between text-xs text-stone-500 font-semibold">
                 <span>ভিডিও ভিউ</span>
-                <Video className="w-4 h-4 text-purple-600" />
+                <Video className="w-4 h-4 text-rose-600" />
               </div>
               <div className="mt-2">
                 <h3 className="text-2xl font-extrabold text-stone-900 font-serif-bn">

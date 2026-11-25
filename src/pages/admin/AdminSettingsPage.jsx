@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { AdminPageSkeleton } from '../../components/admin/AdminSkeletons.jsx';
 import { useDispatch, useSelector } from 'react-redux';
 import { baseApi } from '../../store/api/baseApi.js';
 import {
@@ -221,12 +222,7 @@ export function AdminSettingsPage() {
   };
 
   if (isSettingsLoading) {
-    return (
-      <div className="bg-white rounded-2xl border border-stone-200 p-12 text-center text-stone-500">
-        <Loader2 className="w-6 h-6 animate-spin text-rose-700 mx-auto mb-2" />
-        <p className="text-xs font-semibold">ওয়েবসাইট কনফিগারেশন লোড হচ্ছে...</p>
-      </div>
-    );
+    return <AdminPageSkeleton />;
   }
 
   return (

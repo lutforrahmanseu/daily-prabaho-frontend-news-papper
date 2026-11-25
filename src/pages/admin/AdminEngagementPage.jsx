@@ -96,7 +96,7 @@ export function AdminEngagementPage({ initialTab = 'comments' }) {
   const polls = pollsRes?.items || [];
 
   return (
-    <div className="space-y-6">
+    <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs p-5 sm:p-6 space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl sm:text-2xl font-extrabold text-stone-900 font-serif-bn">

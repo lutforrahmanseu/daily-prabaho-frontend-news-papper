@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { AdminListRowsSkeleton } from '../../components/admin/AdminSkeletons.jsx';
 import {
   useGetReportersQuery,
   useCreateReporterMutation,
@@ -164,9 +165,8 @@ export function AdminReportersPage() {
 
       {/* Reporters Grid */}
       {isLoading ? (
-        <div className="bg-white rounded-2xl border border-stone-200 p-12 flex items-center justify-center gap-2 text-xs text-stone-500">
-          <Loader2 className="w-4 h-4 animate-spin text-rose-700" />
-          <span>সাংবাদিক তালিকা লোড হচ্ছে...</span>
+        <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 overflow-hidden">
+          <AdminListRowsSkeleton rows={6} />
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">

@@ -3,12 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   setSearchModalOpen,
-  setMobileDrawerOpen
+  setMobileDrawerOpen,
+  toggleTheme
 } from '../../store/uiSlice.js';
 import { setSelectedCategory } from '../../store/newsSlice.js';
-import { useFeaturedArticles, useBreakingArticles, usePortalSettings } from '../../hooks/usePortalData.js';
-import { INITIAL_NEWS } from '../../data/sampleNews.js';
-import { Menu, Search, Bookmark } from 'lucide-react';
+import { useFeaturedArticles, useBreakingArticles, usePublicArticles, usePortalSettings } from '../../hooks/usePortalData.js';
+import { Menu, Search, Bookmark, Sun, Moon } from 'lucide-react';
 
 /**
  * Broadsheet Masthead Header (Styled like Prothom Alo & international broadsheets)
@@ -18,10 +18,12 @@ import { Menu, Search, Bookmark } from 'lucide-react';
 export function Header() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { language } = useSelector((state) => state.ui);
+  const { language, theme } = useSelector((state) => state.ui);
+  const isDark = theme === 'dark';
   const { settings } = usePortalSettings();
   const { articles: featuredArticles } = useFeaturedArticles({ per_page: 3 });
   const { items: breakingItems } = useBreakingArticles();
+  const { articles: recentArticles } = usePublicArticles({ per_page: 3 });
 
   const isBn = language === 'bn';
 
@@ -29,11 +31,15 @@ export function Header() {
     ? (settings?.websiteNameBn || settings?.portalNameBn || 'দৈনিক বার্তা প্রবাহ')
     : (settings?.websiteNameEn || settings?.portalNameEn || 'Daily Prabaho');
 
-  const tagline = settings?.tagline || (isBn ? 'সত্যের সন্ধানে অবিচল প্রতিদিনের কণ্ঠস্বর' : 'Unwavering Voice in Search of Truth');
+  const rawTagline = settings?.tagline || '';
+  const hasBengaliTagline = /[\u0980-\u09FF]/.test(rawTagline);
+  const tagline = isBn
+    ? (rawTagline || 'সত্যের সন্ধানে অবিচল প্রতিদিনের কণ্ঠস্বর')
+    : (settings?.taglineEn || (!hasBengaliTagline && rawTagline ? rawTagline : 'Unwavering Voice in Search of Truth'));
 
-  // Curate 3 prominent highlight stories for the masthead
+  // Curate up to 3 prominent real stories for the masthead
   const mastheadHighlights = useMemo(() => {
-    const list = [...(featuredArticles || []), ...(breakingItems || []), ...INITIAL_NEWS];
+    const list = [...(featuredArticles || []), ...(breakingItems || []), ...(recentArticles || [])];
     const seen = new Set();
     const result = [];
     for (const item of list) {
@@ -46,7 +52,7 @@ export function Header() {
       if (result.length >= 3) break;
     }
     return result;
-  }, [featuredArticles, breakingItems]);
+  }, [featuredArticles, breakingItems, recentArticles]);
 
   return (
     <header className="bg-white border-b border-stone-200">
@@ -103,7 +109,7 @@ export function Header() {
                     <div className="relative w-11 h-11 lg:w-12 lg:h-12 rounded-xs overflow-hidden bg-stone-100 shrink-0 ring-1 ring-stone-200">
                       <img
                         src={image}
-                        alt={item.title}
+                        alt={isBn ? item.title : (item.titleEn || item.title)}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     </div>
@@ -112,14 +118,14 @@ export function Header() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1 mb-0.5">
                       <span className="w-1.5 h-1.5 rounded-xs bg-rose-600 shrink-0 inline-block"></span>
-                      {item.categoryName && (
+                      {(item.categoryName || item.categoryNameEn) && (
                         <span className="text-[10px] font-bold text-rose-700 uppercase tracking-tight truncate">
-                          {item.categoryName}
+                          {isBn ? item.categoryName : (item.categoryNameEn || item.categoryName)}
                         </span>
                       )}
                     </div>
                     <h4 className="text-[11px] lg:text-[12px] font-semibold text-stone-900 group-hover:text-rose-700 leading-snug font-serif-bn line-clamp-2 transition-colors">
-                      {item.title}
+                      {isBn ? item.title : (item.titleEn || item.title)}
                     </h4>
                   </div>
                 </Link>
@@ -127,13 +133,22 @@ export function Header() {
             })}
           </div>
 
-          {/* Mobile Right: Quick Search & Saved Bookmarks */}
-          <div className="flex md:hidden items-center gap-1">
+          {/* Mobile / Tablet Quick Actions (Theme Toggle, Search, Bookmarks) */}
+          <div className="flex lg:hidden items-center gap-1">
+            <button
+              type="button"
+              onClick={() => dispatch(toggleTheme())}
+              aria-label="Toggle Dark Mode"
+              title={isDark ? (isBn ? 'লাইট মোড' : 'Light Mode') : (isBn ? 'ডার্ক মোড' : 'Dark Mode')}
+              className="p-2 text-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg cursor-pointer"
+            >
+              {isDark ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5" />}
+            </button>
             <button
               type="button"
               onClick={() => dispatch(setSearchModalOpen(true))}
               aria-label="Search"
-              className="p-2 text-stone-700 hover:bg-stone-100 rounded-lg cursor-pointer"
+              className="p-2 text-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg cursor-pointer md:hidden"
             >
               <Search className="w-5 h-5" />
             </button>
@@ -141,7 +156,7 @@ export function Header() {
               type="button"
               onClick={() => navigate('/reader/profile?tab=bookmarks')}
               aria-label="Saved Articles"
-              className="p-2 text-stone-700 hover:bg-stone-100 rounded-lg cursor-pointer"
+              className="p-2 text-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg cursor-pointer md:hidden"
             >
               <Bookmark className="w-5 h-5" />
             </button>

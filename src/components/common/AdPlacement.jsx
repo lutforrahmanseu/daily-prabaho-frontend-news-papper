@@ -152,15 +152,6 @@ export function AdPlacement({
       }
     }
 
-    // Ensure at least 4 slides for smooth, lively carousel rotation
-    for (const def of DEFAULT_SHOWCASE_ADS) {
-      if (result.length >= 4) break;
-      if (!seen.has(def.title)) {
-        seen.add(def.title);
-        result.push(def);
-      }
-    }
-
     return result;
   }, [adsListData, singleAd]);
 
@@ -284,7 +275,7 @@ export function AdPlacement({
     return isBn ? 'ওয়েবসাইট ভিজিট করুন' : 'Visit Website';
   }, [currentAd, isBn]);
 
-  if (isAdFreeReader) {
+  if (isAdFreeReader || effectiveAds.length === 0) {
     return null;
   }
 
@@ -426,7 +417,7 @@ export function AdPlacement({
                 {/* Corner Watermark */}
                 <div className="absolute top-2.5 right-2.5 z-10 px-2 py-0.5 rounded bg-black/60 backdrop-blur-sm text-[9px] font-mono tracking-widest uppercase font-bold text-amber-300 border border-amber-400/30 flex items-center gap-1">
                   <Sparkles className="w-2.5 h-2.5 text-amber-400" />
-                  <span>AD • বিজ্ঞাপন</span>
+                  <span>{isBn ? 'AD • বিজ্ঞাপন' : 'AD • SPONSORED'}</span>
                 </div>
 
                 {/* Ad Content Overlay */}

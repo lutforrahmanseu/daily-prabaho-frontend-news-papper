@@ -43,8 +43,12 @@ export function TopUtilityBar() {
 
           <div className="hidden sm:flex items-center gap-1.5 text-stone-700 border-l border-stone-200 pl-2 sm:pl-3 whitespace-nowrap shrink-0">
             <CloudSun className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-            <span>{userLocation}: {isBn ? toBengaliNumber(weatherTemp) : weatherTemp}°C</span>
-            <span className="hidden lg:inline text-stone-500">({weatherCondition})</span>
+            <span>
+              {isBn ? userLocation : (userLocation === 'ঢাকা' ? 'Dhaka' : userLocation)}: {isBn ? toBengaliNumber(weatherTemp) : weatherTemp}°C
+            </span>
+            <span className="hidden lg:inline text-stone-500">
+              ({isBn ? weatherCondition : (weatherCondition === 'কুয়াশাচ্ছন্ন রোদ' ? 'Partly Cloudy' : weatherCondition)})
+            </span>
           </div>
         </div>
 

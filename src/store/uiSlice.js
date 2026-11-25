@@ -12,8 +12,21 @@ const getInitialLanguage = () => {
   return 'bn';
 };
 
+const getInitialTheme = () => {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const saved = window.localStorage.getItem('newsflow_theme');
+      if (saved === 'dark' || saved === 'light') return saved;
+    }
+  } catch {
+    // Ignore localStorage errors
+  }
+  return 'light';
+};
+
 const initialState = {
   language: getInitialLanguage(), // 'bn' | 'en'
+  theme: getInitialTheme(), // 'light' | 'dark'
   fontSize: 'normal', // 'normal' | 'large'
   activeView: 'public', // 'public' | 'admin'
   searchModalOpen: false,
@@ -70,6 +83,28 @@ export const uiSlice = createSlice({
     },
     setEdition: (state, action) => {
       state.edition = action.payload;
+    },
+    setTheme: (state, action) => {
+      const next = action.payload === 'dark' ? 'dark' : 'light';
+      state.theme = next;
+      try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          window.localStorage.setItem('newsflow_theme', next);
+        }
+      } catch {
+        // Ignore localStorage errors
+      }
+    },
+    toggleTheme: (state) => {
+      const next = state.theme === 'dark' ? 'light' : 'dark';
+      state.theme = next;
+      try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          window.localStorage.setItem('newsflow_theme', next);
+        }
+      } catch {
+        // Ignore localStorage errors
+      }
     }
   }
 });
@@ -83,7 +118,9 @@ export const {
   setSearchModalOpen,
   setEpaperModalOpen,
   setMobileDrawerOpen,
-  setEdition
+  setEdition,
+  setTheme,
+  toggleTheme
 } = uiSlice.actions;
 
 export default uiSlice.reducer;

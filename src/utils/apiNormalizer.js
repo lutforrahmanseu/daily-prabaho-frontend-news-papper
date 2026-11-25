@@ -12,6 +12,36 @@ const FALLBACK_ARTICLE_IMAGE =
 const FALLBACK_AVATAR =
   'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80';
 
+const CATEGORY_NAME_EN_BY_SLUG = {
+  bangladesh: 'Bangladesh',
+  politics: 'Politics',
+  economy: 'Economy',
+  business: 'Business',
+  international: 'International',
+  world: 'World',
+  sports: 'Sports',
+  cricket: 'Cricket',
+  football: 'Football',
+  entertainment: 'Entertainment',
+  technology: 'Technology',
+  opinion: 'Opinion',
+  lifestyle: 'Lifestyle'
+};
+
+const AUTHOR_NAME_EN_MAP = {
+  'নিজস্ব প্রতিবেদক': 'Staff Correspondent',
+  'অর্থনীতি ডেস্ক': 'Economy Desk',
+  'রাজনৈতিক প্রতিবেদক': 'Political Correspondent',
+  'আন্তর্জাতিক ডেস্ক': 'International Desk',
+  'ক্রীড়া প্রতিবেদক': 'Sports Correspondent',
+  'ক্রীড়া ডেস্ক': 'Sports Desk',
+  'প্রযুক্তি ডেস্ক': 'Tech Desk',
+  'বিনোদন ডেস্ক': 'Entertainment Desk',
+  'ফিচার ডেস্ক': 'Feature Desk',
+  'সম্পাদকীয় ও মতামত বিভাগ': 'Editorial & Opinion Desk',
+  'দৈনিক বার্তা প্রবাহ': 'Daily Prabaho'
+};
+
 /**
  * Unwrap Laravel `{ success, message, data }` payload safely.
  */
@@ -168,6 +198,7 @@ export const normalizeArticle = (raw) => {
     titleEn: raw.title_en || raw.titleEn || raw.title || '',
     slug: raw.slug || String(raw.id || ''),
     subheadline: raw.subheadline || '',
+    subheadlineEn: raw.subheadline_en || raw.subheadlineEn || raw.subheadline || '',
     excerpt: stripHtmlTags(raw.summary ?? raw.excerpt ?? ''),
     excerptEn: stripHtmlTags(raw.summary_en || raw.excerptEn || raw.summary || ''),
     summary: stripHtmlTags(raw.summary ?? raw.excerpt ?? ''),
@@ -181,16 +212,21 @@ export const normalizeArticle = (raw) => {
     category: categorySlug,
     categoryId: catObj?.id ?? raw.category_id ?? raw.categoryId ?? null,
     categoryName,
-    categoryNameEn: catObj?.name_en || raw.categoryNameEn || categoryName,
+    categoryNameEn: catObj?.name_en || catObj?.nameEn || raw.categoryNameEn || CATEGORY_NAME_EN_BY_SLUG[categorySlug] || categoryName,
     categoryObj: catObj,
     subcategory: subcatObj?.slug || (typeof raw.subcategory === 'string' ? raw.subcategory : '') || '',
     subcategoryId: subcatObj?.id ?? raw.subcategory_id ?? raw.subcategoryId ?? null,
     subcategoryName: subcatObj?.name || raw.subcategoryName || '',
     subcategoryObj: subcatObj,
     author: authorObj?.name || (typeof raw.author === 'string' ? raw.author : 'নিজস্ব প্রতিবেদক'),
+    authorEn: (() => {
+      const bnName = authorObj?.name || (typeof raw.author === 'string' ? raw.author : 'নিজস্ব প্রতিবেদক');
+      return authorObj?.name_en || authorObj?.nameEn || AUTHOR_NAME_EN_MAP[bnName] || bnName;
+    })(),
     authorId: authorObj?.id ?? raw.author_id ?? raw.authorId ?? null,
     authorAvatar: normalizeMediaUrl(authorObj?.avatar_url, FALLBACK_AVATAR),
     authorDesignation: authorObj?.designation || '',
+    authorDesignationEn: AUTHOR_NAME_EN_MAP[authorObj?.designation || ''] || authorObj?.designation || '',
     authorSlug: authorObj?.slug || (authorObj?.id ? String(authorObj.id) : ''),
     authorObj,
     reporter: reporterObj?.name || (typeof raw.reporter === 'string' ? raw.reporter : ''),
@@ -276,7 +312,7 @@ export const normalizeCategory = (cat) => {
     ...cat,
     id: cat.id,
     name: cat.name,
-    nameEn: cat.name_en || cat.nameEn || cat.name,
+    nameEn: cat.name_en || cat.nameEn || CATEGORY_NAME_EN_BY_SLUG[cat.slug] || cat.name,
     slug: cat.slug,
     description: cat.description || '',
     parentId: cat.parent_id ?? cat.parentId ?? null,
